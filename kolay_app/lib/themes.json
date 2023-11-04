@@ -1,0 +1,16 @@
+{
+    "light_theme": {
+        "celeste":"b2f7ef",
+        "verdigris":"77bbb4",
+        "tropical_indigo":"8b85c1",
+        "mimi_pink":"f7d6e0",
+        "lavender_pink":"f2b5d4"
+    },
+    "dark_theme": {
+        "charcoal":"264653",
+        "persian_green":"2a9d8f",
+        "saffron":"e9c46a",
+        "sandy_brown":"f4a261",
+        "burnt_sienna":"e76f51"
+    }
+}
