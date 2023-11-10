@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import '../screens/meal_plans.dart';
 import '../screens/home.dart';
+import '../screens/goals.dart';
+import '../screens/settings.dart';
+import '../screens/shopping_lists.dart';
+import '../screens/to_dos.dart';
 
 class SideBarMenu extends StatelessWidget {
   @override
@@ -11,7 +15,7 @@ class SideBarMenu extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           UserAccountsDrawerHeader(
-            accountName: const Text('ZartZurt08'),
+            accountName: const Text('Jane Doe'),
             accountEmail: const Text('example@gmail.com'),
             currentAccountPicture: CircleAvatar(
               child: ClipOval(
@@ -46,30 +50,31 @@ class SideBarMenu extends StatelessWidget {
             leading: const Icon(Icons.shopping_bag),
             title: const Text('Shopping List'),
             onTap: () => Navigator.of(context).pushReplacement(MaterialPageRoute(
- builder: (context) => MealPlansPage())),
+ builder: (context) => ShoppingListsPage())),
           ),
           ListTile(
             leading: const Icon(Icons.man_rounded),
             title: const Text('Personal Goals'),
             onTap: () => Navigator.of(context).pushReplacement(MaterialPageRoute(
- builder: (context) => MealPlansPage())),
+ builder: (context) => GoalsPage())),
           ),
-          const ListTile(
-            leading: Icon(Icons.check_box),
-            title: Text('To dos'),
+          ListTile(
+            leading: const Icon(Icons.check_box),
+            title: const Text('To dos'),
+            onTap: () => Navigator.of(context).pushReplacement(MaterialPageRoute(
+ builder: (context) => ToDosPage())),
           ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.settings),
             title: const Text('Settings'),
             onTap: () => Navigator.of(context).pushReplacement(MaterialPageRoute(
- builder: (context) => MealPlansPage())),
+ builder: (context) => SettingsPage())),
           ),
           ListTile(
             title: const Text('Log Out'),
             leading: const Icon(Icons.exit_to_app),
-            onTap: () => Navigator.of(context).pushReplacement(MaterialPageRoute(
- builder: (context) => MealPlansPage())),
+            onTap: () => {},
           ),
         ],
       ),
