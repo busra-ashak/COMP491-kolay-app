@@ -9,7 +9,7 @@ class ShoppingListExpandable extends StatelessWidget {
       children:<Widget>[
         IconButton(
           alignment: Alignment.topLeft,
-          onPressed: () {}, 
+          onPressed: () =>  context.read<ShoppingList>().getAllShoppingLists(), 
           icon: const Icon(Icons.delete)
         ),
         Expanded(
@@ -18,7 +18,7 @@ class ShoppingListExpandable extends StatelessWidget {
             subtitle: const Text('Creation date placeholder'),
             children: <Widget>[
               Column(
-                children: _buildExpandableContent(context, context.watch<ShoppingList>().shoppingList),
+                children: _buildExpandableContent(context, context.watch<ShoppingList>().shoppingList, "New shopping list"),
               ),
             ],
           )
@@ -27,14 +27,14 @@ class ShoppingListExpandable extends StatelessWidget {
     );
   }
 
-  _buildExpandableContent(BuildContext context, List<String> shopList) {
+  _buildExpandableContent(BuildContext context, List<String> shopList, String shopListName) {
     List<Widget> columnContent = [];
 
     for (String content in shopList) {
       columnContent.add(
         ListTile(
           trailing: IconButton(
-            onPressed: () => context.read<ShoppingList>().deleteItemFromShoppingList(content),
+            onPressed: () => context.read<ShoppingList>().deleteItemFromShoppingList(shopListName, content, false),
             icon: const Icon(Icons.delete)),
           title: Text(content),
         )
@@ -44,7 +44,7 @@ class ShoppingListExpandable extends StatelessWidget {
     columnContent.add(
       ListTile(
         title: IconButton(
-          onPressed: () => context.read<ShoppingList>().addItemToShoppingList("newItem"),
+          onPressed: () => context.read<ShoppingList>().addItemToShoppingList(shopListName, "newItem3"),
           icon: const Icon(Icons.add)
         )
       )

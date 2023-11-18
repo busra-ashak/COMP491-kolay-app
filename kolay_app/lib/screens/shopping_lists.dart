@@ -25,7 +25,7 @@ class _ShoppingListsPageState extends State<ShoppingListsPage> {
           ShoppingListExpandable(), 
           ShoppingListExpandable(),
           IconButton(
-            onPressed: () => context.read<ShoppingList>().createShoppingList(),
+            onPressed: () => context.read<ShoppingList>().createShoppingList("New shopping list"),
             icon: const Icon(Icons.add)),
         ],
       ),
