@@ -1,76 +1,56 @@
+import 'package:flutter/material.dart';
+import 'package:kolay_app/providers/todo_provider.dart';
+import 'package:provider/provider.dart';
+import '../widgets/sideabar_menu.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import '../firebase_options.dart';
 
-
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: TodoPage(),
-    );
-  }
+class ToDosPage extends StatefulWidget {
+ @override
+ State<ToDosPage> createState() => _ToDosPageState();
 }
-
-class TodoPage extends StatefulWidget {
-  @override
-  _TodoPageState createState() => _TodoPageState();
-}
-
-class _TodoPageState extends State<TodoPage> {
-  TextEditingController _todoController = TextEditingController();
-  List<String> _todoList = [];
-
-  void _addTodo() {
-    setState(() {
-      String todo = _todoController.text;
-      if (todo.isNotEmpty) {
-        _todoList.add(todo);
-        _todoController.clear();
-      }
-      DateTime currentTime = DateTime.now();
-      FirebaseFirestore.instance.collection("TODOs").add({
-        "TODO": todo,
-        "time":"${currentTime.day}/${currentTime.month}/${currentTime.year}",
-        "username":"KolayAppFirstUser"});
-    });
-  }
+class _ToDosPageState extends State<ToDosPage> {
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: SideBarMenu(),
       appBar: AppBar(
-        title: Text('To-Do App'),
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        title: const Text('Your To Dos', style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),   
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _todoController,
-              decoration: InputDecoration(
-                hintText: 'Enter your to-do',
-              ),
+      body: Center(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top:10), //apply padding to all four sides
+              child: Text('${context.watch<TodoList>().count}')
             ),
-          ),
-          ElevatedButton(
-            onPressed: _addTodo,
-            child: Text('Add To-Do'),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _todoList.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(_todoList[index]),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+            const Divider(),
+            Expanded(
+                child: ListView.separated(
+                  itemCount: context.watch<TodoList>().count,
+                  itemBuilder: (BuildContext context, int index) {
+                    return ListTile(
+                      title: Center(child: Text(context.watch<TodoList>().todosList[index].description)),
+                    );
+                  },
+                  separatorBuilder: (BuildContext context, int index) => const Divider(),
+                )
+            )
+        ]
+        )
+      ),
+      floatingActionButton: FloatingActionButton(
+        key: const Key('addItem_floatingActionButton'),
+        onPressed: () => context.read<TodoList>().addItem(),
+        tooltip: 'Add Item',
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
 }
