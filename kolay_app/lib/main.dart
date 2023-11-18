@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kolay_app/providers/shopping_list_provider.dart';
 import 'package:kolay_app/providers/todo_provider.dart';
 import 'package:provider/provider.dart';
 import 'screens/home.dart';
@@ -13,6 +14,7 @@ void main() async{
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => ShoppingList()),
         ChangeNotifierProvider(create: (_) => TodoList()),
         ChangeNotifierProvider(create: (_) => Todo()),
       ],

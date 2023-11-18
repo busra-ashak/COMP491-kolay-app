@@ -81,6 +81,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.6"
+  expandable_widgets:
+    dependency: "direct main"
+    description:
+      name: expandable_widgets
+      sha256: "4c533af4056a529b341977566700a7fab34f76f33510c95e4416ab38451cfa12"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3+1"
   fake_async:
     dependency: transitive
     description:
