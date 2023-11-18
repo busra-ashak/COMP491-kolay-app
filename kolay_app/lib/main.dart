@@ -3,8 +3,13 @@ import 'package:kolay_app/providers/shopping_list_provider.dart';
 import 'package:kolay_app/providers/todo_provider.dart';
 import 'package:provider/provider.dart';
 import 'screens/home.dart';
-
-void main() {
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+ 
+void main() async{
+  await Firebase.initializeApp(
+  options: DefaultFirebaseOptions.currentPlatform,
+);
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MultiProvider(

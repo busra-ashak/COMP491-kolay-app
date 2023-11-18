@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "379384017444",
+    "project_id": "kolayfb",
+    "storage_bucket": "kolayfb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:379384017444:android:bd410bc42cb24ea91f9eb1",
+        "android_client_info": {
+          "package_name": "com.example.kolay_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAPrbs8FdEW12XQRO05hLOeD4Se1QwQ-xQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:kolay_app/providers/todo_provider.dart';
 import 'package:provider/provider.dart';
 import '../widgets/sideabar_menu.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import '../firebase_options.dart';
 
 class ToDosPage extends StatefulWidget {
  @override
