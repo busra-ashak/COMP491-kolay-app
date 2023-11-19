@@ -44,7 +44,7 @@ class ShoppingListExpandable extends StatelessWidget {
     columnContent.add(
       ListTile(
         title: IconButton(
-          onPressed: () => context.read<ShoppingList>().addItemToShoppingList(shopListName, "newItem3"),
+          onPressed: () => context.read<ShoppingList>().addItemToShoppingList(shopListName, "newItem4"),
           icon: const Icon(Icons.add)
         )
       )
