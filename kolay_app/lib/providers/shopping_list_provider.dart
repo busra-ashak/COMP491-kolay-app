@@ -19,7 +19,7 @@ class ShoppingList with ChangeNotifier {
     } catch (e) {
       print('Error fetching document IDs: $e');
     }
-    notifyListeners();
+
     return Future.value(documentIDs);
 }
 

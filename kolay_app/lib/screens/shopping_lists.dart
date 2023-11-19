@@ -23,7 +23,7 @@ class _ShoppingListsPageState extends State<ShoppingListsPage> {
         children: [
           // Use FutureBuilder to asynchronously build the UI based on the result of getAllShoppingLists
           FutureBuilder<List<String>>(
-            future: context.read<ShoppingList>().getAllShoppingLists(),
+            future: context.watch<ShoppingList>().getAllShoppingLists(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return CircularProgressIndicator(); // Display a loading indicator while the future is being resolved
@@ -34,7 +34,7 @@ class _ShoppingListsPageState extends State<ShoppingListsPage> {
               } else {
                 // Dynamically create ShoppingListExpandable widgets based on available shopping lists
                 return Column(
-                  children: (snapshot.data ?? []).map((listName) => ShoppingListExpandable()).toList(),
+                  children: (snapshot.data ?? []).map((listName) => ShoppingListExpandable(initialShoppingListName: listName)).toList(),
                 );
               }
             },
