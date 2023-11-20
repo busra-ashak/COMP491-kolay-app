@@ -6,21 +6,22 @@ class ShoppingList with ChangeNotifier {
   int get count => _shoppingList.length;
   List<String> get shoppingList => _shoppingList;
 
-  void getAllShoppingLists() async {
-    // Parse the data in a meaningful way
+  Future<List<String>> getAllShoppingLists() async {
+    List<String> documentIDs = [];
+
     try {
       var collectionReference = FirebaseFirestore.instance.collection('shoppingLists');
-      // Get all documents in the collection
       QuerySnapshot querySnapshot = await collectionReference.get();
 
       for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
-        Map<String, dynamic> data = documentSnapshot.data() as Map<String, dynamic>;
-        print('Document ID: ${documentSnapshot.id}, Data: $data');
+        documentIDs.add(documentSnapshot.id);
       }
     } catch (e) {
-      print('Error fetching documents: $e');
+      print('Error fetching document IDs: $e');
     }
-  }
+
+    return Future.value(documentIDs);
+}
 
   void addItemToShoppingList(String listName, String newItem) {
     _shoppingList.add(newItem);
@@ -32,7 +33,7 @@ class ShoppingList with ChangeNotifier {
     }).catchError((error) {
       print('Error adding item: $error');
     });
-  
+    
     notifyListeners();
   }
 
