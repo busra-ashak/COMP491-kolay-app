@@ -19,27 +19,31 @@ class _ShoppingListsPageState extends State<ShoppingListsPage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Your Shopping Lists', style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
       ),
-      body: Column(
+      body: ListView(
         children: [
           // Use FutureBuilder to asynchronously build the UI based on the result of getAllShoppingLists
-          FutureBuilder<List<String>>(
+          FutureBuilder<Map<String, Map>>(
             future: context.watch<ShoppingList>().getAllShoppingLists(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator(); // Display a loading indicator while the future is being resolved
+                return const Padding(padding: EdgeInsets.all(16), child: Center(child: CircularProgressIndicator(),)); // Display a loading indicator while the future is being resolved
               } else if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
               } else if (!snapshot.hasData || (snapshot.data != null && snapshot.data!.isEmpty)) {
-                return Text('No shopping lists available.');
+                return const Padding(padding: EdgeInsets.all(16), child: Center(child: Text('No shopping lists available.')));
               } else {
                 // Dynamically create ShoppingListExpandable widgets based on available shopping lists
                 return Column(
-                  children: (snapshot.data ?? []).map((listName) => ShoppingListExpandable(initialShoppingListName: listName)).toList(),
+                  children: (snapshot.data ?? {}).values.map(
+                    (doc) => ShoppingListExpandable(
+                      listName: doc['listName'],
+                      creationDatetime: doc['creationDatetime'],
+                      listItems: doc['listItems'],
+                      )).toList(),
                 );
               }
             },
           ),
-          // "Add" button to create a new shopping list
           IconButton(
             onPressed: () {
               _showCreateListDialog(context);
@@ -51,35 +55,34 @@ class _ShoppingListsPageState extends State<ShoppingListsPage> {
     );
   }
 
-  // Function to show a dialog for creating a new shopping list
   void _showCreateListDialog(BuildContext context) {
-    TextEditingController _controller = TextEditingController();
+    TextEditingController controller = TextEditingController();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Create a new shopping list'),
+          title: const Text('Create a new shopping list'),
           content: TextField(
-            controller: _controller,
-            decoration: InputDecoration(labelText: 'Shopping list name'),
+            controller: controller,
+            decoration: const InputDecoration(labelText: 'The name of your shopping list'),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
-                String newListName = _controller.text;
+                String newListName = controller.text;
                 if (newListName.isNotEmpty) {
                   context.read<ShoppingList>().createShoppingList(newListName);
                   Navigator.of(context).pop();
                 }
               },
-              child: Text('Create'),
+              child: const Text('Create'),
             ),
           ],
         );

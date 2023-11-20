@@ -1,35 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 class ShoppingList with ChangeNotifier {
-  final List<String> _shoppingList = ['potato', 'tomato'];
 
-  int get count => _shoppingList.length;
-  List<String> get shoppingList => _shoppingList;
-
-  Future<List<String>> getAllShoppingLists() async {
-    List<String> documentIDs = [];
+  Future<Map<String, Map>> getAllShoppingLists() async {
+    Map<String, Map> documents = {};
 
     try {
       var collectionReference = FirebaseFirestore.instance.collection('shoppingLists');
       QuerySnapshot querySnapshot = await collectionReference.get();
 
       for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
-        documentIDs.add(documentSnapshot.id);
+        var datetime = documentSnapshot.get('creationDatetime');
+        Map<String, Map> doc = 
+        {documentSnapshot.id : 
+          {
+          'listName': documentSnapshot.get('listName'),
+          'creationDatetime': DateTime.fromMillisecondsSinceEpoch(datetime).toString(),
+          'listItems': documentSnapshot.get('listItems')
+          }
+        };
+        documents.addAll(doc);
       }
     } catch (e) {
       print('Error fetching document IDs: $e');
     }
 
-    return Future.value(documentIDs);
+    return Future.value(documents);
 }
 
   void addItemToShoppingList(String listName, String newItem) {
-    _shoppingList.add(newItem);
-    Map newItemMap = {'itemName': newItem, 'itemTicked': false};
     var documentReference = FirebaseFirestore.instance.collection('shoppingLists').doc(listName);
 
     documentReference.update({
-      'listItems': FieldValue.arrayUnion([newItemMap])
+      'listItems.$newItem': {'itemName': newItem, 'itemTicked': false}
+    }).catchError((error) {
+      print('Error adding item: $error');
+    });
+    
+    notifyListeners();
+  }
+
+  void toggleItemCheckbox(String listName, String itemName, bool itemTicked) async {
+    var documentReference = FirebaseFirestore.instance.collection('shoppingLists').doc(listName);
+
+    documentReference.update({
+      'listItems.$itemName': {'itemName': itemName, 'itemTicked': !itemTicked}
     }).catchError((error) {
       print('Error adding item: $error');
     });
@@ -38,7 +53,6 @@ class ShoppingList with ChangeNotifier {
   }
 
   void deleteItemFromShoppingList(String listName, String oldItem, bool oldItemTicked) {
-    _shoppingList.remove(oldItem);
     var documentReference = FirebaseFirestore.instance.collection('shoppingLists').doc(listName);
 
     documentReference.update({
@@ -54,8 +68,8 @@ class ShoppingList with ChangeNotifier {
     FirebaseFirestore.instance.collection("shoppingLists").doc(listName).set(
       {
       "listName": listName,
-      "creationDatetime": DateTime.now(),
-      "listItems": []
+      "creationDatetime": DateTime.now().millisecondsSinceEpoch,
+      "listItems": {}
       }
     ).catchError((error) {
       print('Error creating list: $error');
