@@ -1,32 +1,87 @@
 import 'package:flutter/material.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 class TodoList with ChangeNotifier {
-  final List<Todo> _todos = [Todo(), Todo(), Todo()];
-    //'Call mom', 'Rob a bank', 'Compliment a random person'];
 
-  int get count => _todos.length;
-  List<Todo> get todosList => _todos;
+  Future<Map<String, Map>> getAllTodoLists() async {
+    Map<String, Map> documents = {};
 
-  void addItem() {
-    _todos.add(Todo());
+    try {
+      var collectionReference = FirebaseFirestore.instance.collection('todoLists');
+      QuerySnapshot querySnapshot = await collectionReference.get();
+
+      for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
+        var datetime = documentSnapshot.get('creationDatetime');
+        Map<String, Map> doc =
+        {documentSnapshot.id :
+        {
+          'listName': documentSnapshot.get('listName'),
+          'creationDatetime': DateTime.fromMillisecondsSinceEpoch(datetime).toString(),
+          'listItems': documentSnapshot.get('listItems')
+        }
+        };
+        documents.addAll(doc);
+      }
+    } catch (e) {
+      print('Error fetching document IDs: $e');
+    }
+
+    return Future.value(documents);
+  }
+
+  void addTodoItemToList(String listName, String newItem) {
+    var documentReference = FirebaseFirestore.instance.collection('todoLists').doc(listName);
+
+    documentReference.update({
+      'listItems.$newItem': {'itemName': newItem, 'itemTicked': false}
+    }).catchError((error) {
+      print('Error adding item: $error');
+    });
+
     notifyListeners();
   }
-}
 
-class Todo with ChangeNotifier {
-  bool isChecked = false;
-  String description = 'New TODO ehe';
-  DateTime creationDateTime = DateTime.now();
+  void toggleItemCheckbox(String listName, String itemName, bool itemTicked) async {
+    var documentReference = FirebaseFirestore.instance.collection('todoLists').doc(listName);
 
-  void createTodo(String description) {
-    this.description = description;
-    creationDateTime = DateTime.now();
+    documentReference.update({
+      'listItems.$itemName': {'itemName': itemName, 'itemTicked': !itemTicked}
+    }).catchError((error) {
+      print('Error adding item: $error');
+    });
+
     notifyListeners();
   }
 
-  void toggleCheckbox() {
-    isChecked = !isChecked;
+  void deleteTodoItemFromList(String listName, String oldItem, bool oldItemTicked) {
+    var documentReference = FirebaseFirestore.instance.collection('todoLists').doc(listName);
+
+    documentReference.update({
+      'listItems': FieldValue.arrayRemove([{'itemName': oldItem, 'itemTicked': oldItemTicked}])
+    }).catchError((error) {
+      print('Error deleting item: $error');
+    });
+
     notifyListeners();
   }
 
+  void createTodoList(String listName) {
+    FirebaseFirestore.instance.collection("todoLists").doc(listName).set(
+        {
+          "listName": listName,
+          "creationDatetime": DateTime.now().millisecondsSinceEpoch,
+          "listItems": {}
+        }
+    ).catchError((error) {
+      print('Error creating list: $error');
+    });
+    notifyListeners();
+  }
+
+  void deleteTodoList(String listName) {
+    // open modal and ask are you sure
+    FirebaseFirestore.instance.collection("todoLists").doc(listName).delete().catchError((error) {
+      print('Error creating list: $error');
+    });
+    notifyListeners();
+  }
 }

@@ -16,7 +16,6 @@ void main() async{
       providers: [
         ChangeNotifierProvider(create: (_) => ShoppingList()),
         ChangeNotifierProvider(create: (_) => TodoList()),
-        ChangeNotifierProvider(create: (_) => Todo()),
       ],
       child: const MyApp(),
     ),
