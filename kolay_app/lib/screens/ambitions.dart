@@ -1,42 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../widgets/sideabar_menu.dart';
-import '../widgets/shopping_list_expandable.dart';
-import '../providers/shopping_list_provider.dart';
+import '../widgets/milestone_expandable.dart';
+import '../providers/milestone_provider.dart';
 
-class ShoppingListsPage extends StatefulWidget {
-  @override
-  State<ShoppingListsPage> createState() => _ShoppingListsPageState();
+class AmbitionsPage extends StatefulWidget {
+ @override
+ State<AmbitionsPage> createState() => _AmbitionsPageState();
 }
+class _AmbitionsPageState extends State<AmbitionsPage> {
 
-class _ShoppingListsPageState extends State<ShoppingListsPage> {
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       drawer: SideBarMenu(),
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Your Shopping Lists', style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        title: const Text('Your Ambitions', style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),   
       ),
       body: ListView(
         children: [
           FutureBuilder<Map<String, Map>>(
-            future: context.watch<ShoppingList>().getAllShoppingLists(),
+            future: context.watch<Milestone>().getAllMilestones(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Padding(padding: EdgeInsets.all(16), child: Center(child: CircularProgressIndicator(),)); // Display a loading indicator while the future is being resolved
               } else if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
               } else if (!snapshot.hasData || (snapshot.data != null && snapshot.data!.isEmpty)) {
-                return const Padding(padding: EdgeInsets.all(16), child: Center(child: Text('No shopping lists available.')));
+                return const Padding(padding: EdgeInsets.all(16), child: Center(child: Text('No milestones available.')));
               } else {
                 return Column(
                   children: (snapshot.data ?? {}).values.map(
-                    (doc) => ShoppingListExpandable(
-                      listName: doc['listName'],
-                      creationDatetime: doc['creationDatetime'],
-                      listItems: doc['listItems'],
+                    (doc) => MilestoneExpandable(
+                      milestoneName: doc['milestoneName'],
+                      subgoals: doc['subgoals'],
                       )).toList(),
                 );
               }
@@ -60,10 +60,10 @@ class _ShoppingListsPageState extends State<ShoppingListsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Create a new shopping list'),
+          title: const Text('Create a new milestone'),
           content: TextField(
             controller: controller,
-            decoration: const InputDecoration(labelText: 'The name of your shopping list'),
+            decoration: const InputDecoration(labelText: 'The name of your milestone'),
           ),
           actions: [
             TextButton(
@@ -74,9 +74,9 @@ class _ShoppingListsPageState extends State<ShoppingListsPage> {
             ),
             TextButton(
               onPressed: () {
-                String newListName = controller.text;
-                if (newListName.isNotEmpty) {
-                  context.read<ShoppingList>().createShoppingList(newListName);
+                String newMilestoneName = controller.text;
+                if (newMilestoneName.isNotEmpty) {
+                  context.read<Milestone>().createMilestone(newMilestoneName);
                   Navigator.of(context).pop();
                 }
               },

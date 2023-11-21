@@ -61,7 +61,7 @@ class ShoppingListExpandable extends StatelessWidget {
             trailing: IconButton(
                 onPressed: () => context
                     .read<ShoppingList>()
-                    .deleteItemFromShoppingList(listName, content['itemName'], content['itemTicked']),
+                    .deleteItemFromShoppingList(listName, content['itemName']),
                 icon: const Icon(Icons.delete)),
             title: Text(content['itemName']),
           ),
