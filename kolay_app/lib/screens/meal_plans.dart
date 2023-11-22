@@ -51,11 +51,11 @@ class _MealPlansPageState extends State<MealPlansPage> {
                           listName: doc['listName'],
                           datetime: doc['datetime'],
                           listItems: doc['listItems'],
-                          onSave: () => _saveMealPlanToDatabase(context, doc['listName']),
+                          onSave: () => _saveMealPlanToDatabase(context, doc['listName'], DateTime.fromMillisecondsSinceEpoch(doc['datetime'])),
                         ),
                         ElevatedButton(
                           onPressed: () {
-                            _showConfirmDialog(context, doc['listName']);
+                            _showConfirmDialog(context, doc['listName'], DateTime.fromMillisecondsSinceEpoch(doc['datetime']));
                           },
                           child: const Text('Confirm'),
                         ),
@@ -77,7 +77,7 @@ class _MealPlansPageState extends State<MealPlansPage> {
     );
   }
 
-  void _showConfirmDialog(BuildContext context, String listName) {
+  void _showConfirmDialog(BuildContext context, String listName,  DateTime datetime) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -93,7 +93,7 @@ class _MealPlansPageState extends State<MealPlansPage> {
             ),
             TextButton(
               onPressed: () {
-                _saveMealPlanToDatabase(context, listName);
+                _saveMealPlanToDatabase(context, listName, datetime);
               },
               child: const Text('Confirm'),
             ),
@@ -104,7 +104,7 @@ class _MealPlansPageState extends State<MealPlansPage> {
   }
 
 
-  Future<void> _saveMealPlanToDatabase(BuildContext context, String listName) async {
+  Future<void> _saveMealPlanToDatabase(BuildContext context, String listName, DateTime datetime) async {
     var mealPlanList = context.read<MealPlanList>();
     var mealPlan = mealPlanList.localMealPlans.firstWhere(
       (element) => element['listName'] == listName,
@@ -112,7 +112,7 @@ class _MealPlansPageState extends State<MealPlansPage> {
     );
 
     if (mealPlan.isNotEmpty) {
-      await mealPlanList.createMealPlan(mealPlan['listName'], DateTime.now()); // Update with the selected or current date
+      await mealPlanList.createMealPlan(listName, datetime);
 
       for (var itemName in mealPlan['listItems'].keys) {
         await mealPlanList.addMealPlanItem(mealPlan['listName'], itemName);
