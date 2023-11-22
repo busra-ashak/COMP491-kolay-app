@@ -1,55 +1,88 @@
 import 'package:flutter/material.dart';
+import 'package:kolay_app/providers/todo_provider.dart';
+import 'package:provider/provider.dart';
 import '../widgets/sideabar_menu.dart';
 
 class HomePage extends StatefulWidget {
- @override
- State<HomePage> createState() => _HomePageState();
+  @override
+  State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       drawer: SideBarMenu(),
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: const Text('Here is your plan for today', style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),   
+        title: Text(
+          'Your Daily Plan',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: TodaysPlan(),
-      ),// This trailing comma makes auto-formatting nicer for build methods.
+      body: TodaysPlan(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Add functionality to open a dialog or navigate to a new screen for adding tasks.
+        },
+        child: Icon(Icons.gps_fixed_rounded),
+        backgroundColor: Colors.teal,
+      ),
     );
   }
 }
 
 class TodaysPlan extends StatelessWidget {
-  final _todaysPlanItems = ["Call your mom <3", "Do 10 push-ups!", "Read 20 pages :)", "Go on a walk ^^"];
-  final List<int> _colorCodes = <int>[600, 500, 400, 300];
-  
-
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-    padding: const EdgeInsets.all(8),
-    itemCount: _todaysPlanItems.length,
-    itemBuilder: (BuildContext context, int index) {
-      return Container(
-        height: 50,
-        color: Colors.teal[_colorCodes[index]],
-        child: Center(child: Text(_todaysPlanItems[index])),
-      );
-    }
-  );
+    return FutureBuilder<List<String>>(
+      future: context.read<TodoList>().getIncompleteTasksForHomeScreen(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+          return Center(
+            child: Text(
+              'No incomplete tasks for today!',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          );
+        } else {
+          List<String> incompleteTasks = snapshot.data!;
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(8),
+            itemCount: incompleteTasks.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Card(
+                color: Colors.teal[200],
+                elevation: 3,
+                margin: EdgeInsets.symmetric(vertical: 8),
+                child: ListTile(
+                  title: Text(
+                    incompleteTasks[index],
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  // You can add additional elements like icons here.
+                  // Example: trailing: Icon(Icons.check),
+                ),
+              );
+            },
+          );
+        }
+      },
+    );
   }
 }

@@ -28,6 +28,30 @@ class TodoList with ChangeNotifier {
     return Future.value(documents);
   }
 
+  //A function that fetches incompleted tasks to represent in homescreen
+  Future<List<String>> getIncompleteTasksForHomeScreen() async {
+    List<String> incompleteTasks = [];
+
+    try {
+      var collectionReference = FirebaseFirestore.instance.collection('todoLists');
+      QuerySnapshot querySnapshot = await collectionReference.get();
+
+      for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
+        Map<String, dynamic> listItems = documentSnapshot.get('listItems');
+
+        listItems.forEach((itemName, itemDetails) {
+          if (itemDetails['itemTicked'] == false) {
+            incompleteTasks.add(itemName);
+          }
+        });
+      }
+    } catch (e) {
+      print('Error fetching incomplete tasks: $e');
+    }
+
+    return incompleteTasks;
+  }
+
   void addTodoItemToList(String listName, String newItem) {
     var documentReference = FirebaseFirestore.instance.collection('todoLists').doc(listName);
 
