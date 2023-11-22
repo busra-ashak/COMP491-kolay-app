@@ -7,7 +7,6 @@ class ShoppingListExpandable extends StatelessWidget {
   final String creationDatetime;
   final Map listItems;
 
-  // Constructor to accept the initial shopping list name
   const ShoppingListExpandable({
     Key? key, 
     required this.listName,
@@ -20,12 +19,12 @@ class ShoppingListExpandable extends StatelessWidget {
       children: <Widget>[
         IconButton(
           alignment: Alignment.topLeft,
-          onPressed: () => context.read<ShoppingList>().deleteShoppingList(listName),
+          onPressed: () => _showDeleteListDialog(context, listName),
           icon: const Icon(Icons.delete),
         ),
         Expanded(
           child: ExpansionTile(
-            title: Text(listName), // Use the initial shopping list name here
+            title: Text(listName),
             subtitle: Text(creationDatetime),
             children: <Widget>[
               Column(
@@ -59,9 +58,7 @@ class ShoppingListExpandable extends StatelessWidget {
                     .toggleItemCheckbox(listName, content['itemName'], content['itemTicked']);
               }),
             trailing: IconButton(
-                onPressed: () => context
-                    .read<ShoppingList>()
-                    .deleteItemFromShoppingList(listName, content['itemName'], content['itemTicked']),
+                onPressed: () => _showDeleteItemFromListDialog(context, listName, content['itemName']),
                 icon: const Icon(Icons.delete)),
             title: Text(content['itemName']),
           ),
@@ -108,6 +105,58 @@ class ShoppingListExpandable extends StatelessWidget {
                 }
               },
               child: const Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  
+  void _showDeleteListDialog(BuildContext context, String listName) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Are you sure you want to delete $listName?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                context.read<ShoppingList>().deleteShoppingList(listName);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showDeleteItemFromListDialog(BuildContext context, String listName, String oldItem) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Are you sure you want to delete $oldItem?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                context.read<ShoppingList>().deleteItemFromShoppingList(listName, oldItem);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Yes'),
             ),
           ],
         );

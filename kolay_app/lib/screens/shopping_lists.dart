@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../widgets/shopping_list_expandable.dart';
 import '../widgets/sideabar_menu.dart';
+import '../widgets/shopping_list_expandable.dart';
 import '../providers/shopping_list_provider.dart';
 
 class ShoppingListsPage extends StatefulWidget {
@@ -21,7 +21,6 @@ class _ShoppingListsPageState extends State<ShoppingListsPage> {
       ),
       body: ListView(
         children: [
-          // Use FutureBuilder to asynchronously build the UI based on the result of getAllShoppingLists
           FutureBuilder<Map<String, Map>>(
             future: context.watch<ShoppingList>().getAllShoppingLists(),
             builder: (context, snapshot) {
@@ -32,7 +31,6 @@ class _ShoppingListsPageState extends State<ShoppingListsPage> {
               } else if (!snapshot.hasData || (snapshot.data != null && snapshot.data!.isEmpty)) {
                 return const Padding(padding: EdgeInsets.all(16), child: Center(child: Text('No shopping lists available.')));
               } else {
-                // Dynamically create ShoppingListExpandable widgets based on available shopping lists
                 return Column(
                   children: (snapshot.data ?? {}).values.map(
                     (doc) => ShoppingListExpandable(

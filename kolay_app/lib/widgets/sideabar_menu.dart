@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../screens/meal_plans.dart';
 import '../screens/home.dart';
-import '../screens/goals.dart';
+import '../screens/ambitions.dart';
 import '../screens/settings.dart';
 import '../screens/shopping_lists.dart';
 import '../screens/to_dos.dart';
@@ -48,15 +48,15 @@ class SideBarMenu extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.shopping_bag),
-            title: const Text('Shopping List'),
+            title: const Text('Shopping Lists'),
             onTap: () => Navigator.of(context).pushReplacement(MaterialPageRoute(
  builder: (context) => ShoppingListsPage())),
           ),
           ListTile(
             leading: const Icon(Icons.man_rounded),
-            title: const Text('Personal Goals'),
+            title: const Text('Ambitions'),
             onTap: () => Navigator.of(context).pushReplacement(MaterialPageRoute(
- builder: (context) => GoalsPage())),
+ builder: (context) => AmbitionsPage())),
           ),
           ListTile(
             leading: const Icon(Icons.check_box),

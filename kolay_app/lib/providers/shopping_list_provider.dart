@@ -26,7 +26,7 @@ class ShoppingList with ChangeNotifier {
     }
 
     return Future.value(documents);
-}
+  }
 
   void addItemToShoppingList(String listName, String newItem) {
     var documentReference = FirebaseFirestore.instance.collection('shoppingLists').doc(listName);
@@ -40,23 +40,23 @@ class ShoppingList with ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleItemCheckbox(String listName, String itemName, bool itemTicked) async {
+  void toggleItemCheckbox(String listName, String itemName, bool itemTicked) {
     var documentReference = FirebaseFirestore.instance.collection('shoppingLists').doc(listName);
 
     documentReference.update({
-      'listItems.$itemName': {'itemName': itemName, 'itemTicked': !itemTicked}
+      'listItems.$itemName.itemTicked': !itemTicked
     }).catchError((error) {
-      print('Error adding item: $error');
+      print('Error updating checkbox: $error');
     });
     
     notifyListeners();
   }
 
-  void deleteItemFromShoppingList(String listName, String oldItem, bool oldItemTicked) {
+  void deleteItemFromShoppingList(String listName, String oldItem) {
     var documentReference = FirebaseFirestore.instance.collection('shoppingLists').doc(listName);
 
     documentReference.update({
-      'listItems': FieldValue.arrayRemove([{'itemName': oldItem, 'itemTicked': oldItemTicked}])
+      'listItems.$oldItem': FieldValue.delete(),
     }).catchError((error) {
       print('Error deleting item: $error');
     });
@@ -80,7 +80,7 @@ class ShoppingList with ChangeNotifier {
   void deleteShoppingList(String listName) {
     // open modal and ask are you sure
     FirebaseFirestore.instance.collection("shoppingLists").doc(listName).delete().catchError((error) {
-      print('Error creating list: $error');
+      print('Error deleting list: $error');
     });
     notifyListeners();
   }
