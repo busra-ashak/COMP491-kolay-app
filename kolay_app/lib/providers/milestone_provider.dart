@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -64,30 +62,6 @@ class Milestone with ChangeNotifier {
     });
 
     notifyListeners();
-  }
-
-  Future<double> getMilestonePercentage(String milestoneName) async {
-
-    int ticked = 0;
-    int len = 0;
-    try {
-
-      var queryReference = await FirebaseFirestore.instance.collection('milestones').doc(milestoneName).get();
-      var content = queryReference.data();
-      len = content?['subgoals'].values.length;
-      if(content != null){
-        for(Map subgoal in content['subgoals']){
-          if(subgoal['subgoalTicked']){
-            ticked++;
-          }
-        }
-      }
-        
-      
-    } catch (e) {
-      print('Error fetching document IDs: $e');
-    }
-    return ticked/len;
   }
 
   void createMilestone(String milestoneName) {
