@@ -56,7 +56,7 @@ class TodoList with ChangeNotifier {
     var documentReference = FirebaseFirestore.instance.collection('todoLists').doc(listName);
 
     documentReference.update({
-      'listItems': FieldValue.arrayRemove([{'itemName': oldItem, 'itemTicked': oldItemTicked}])
+      'listItems.$oldItem': FieldValue.delete(),
     }).catchError((error) {
       print('Error deleting item: $error');
     });
