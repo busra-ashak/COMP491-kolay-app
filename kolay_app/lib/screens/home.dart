@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kolay_app/providers/routine_provider.dart';
 import 'package:kolay_app/providers/todo_provider.dart';
 import 'package:provider/provider.dart';
 import '../widgets/sideabar_menu.dart';
@@ -24,7 +25,49 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      body: TodaysPlan(),
+      body: FutureBuilder<List<String>>(
+        future: _fetchData(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+            return Center(
+              child: Text(
+                'No tasks or routines for today!',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            );
+          } else {
+            List<String> tasksAndRoutines = snapshot.data!;
+
+            return ListView.builder(
+              padding: const EdgeInsets.all(8),
+              itemCount: tasksAndRoutines.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Card(
+                  color: Colors.teal[200],
+                  elevation: 3,
+                  margin: EdgeInsets.symmetric(vertical: 8),
+                  child: ListTile(
+                    title: Text(
+                      tasksAndRoutines[index],
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
+          }
+        },
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Add functionality to open a dialog or navigate to a new screen for adding tasks.
@@ -34,55 +77,12 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}
 
-class TodaysPlan extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<List<String>>(
-      future: context.read<TodoList>().getIncompleteTasksForHomeScreen(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (snapshot.data == null || snapshot.data!.isEmpty) {
-          return Center(
-            child: Text(
-              'No incomplete tasks for today!',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          );
-        } else {
-          List<String> incompleteTasks = snapshot.data!;
+  Future<List<String>> _fetchData() async {
+    List<String> todos = await context.read<TodoList>().getIncompleteTasksForHomeScreen();
+    List<String> routines = await context.read<Routine>().getRoutinesWithFrequencyGreaterThanTwo();
 
-          return ListView.builder(
-            padding: const EdgeInsets.all(8),
-            itemCount: incompleteTasks.length,
-            itemBuilder: (BuildContext context, int index) {
-              return Card(
-                color: Colors.teal[200],
-                elevation: 3,
-                margin: EdgeInsets.symmetric(vertical: 8),
-                child: ListTile(
-                  title: Text(
-                    incompleteTasks[index],
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  // You can add additional elements like icons here.
-                  // Example: trailing: Icon(Icons.check),
-                ),
-              );
-            },
-          );
-        }
-      },
-    );
+    // Combine both lists and remove duplicates if any.
+    return [...todos, ...routines.toSet().toList()];
   }
 }

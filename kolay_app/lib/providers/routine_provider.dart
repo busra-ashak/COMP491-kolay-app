@@ -28,6 +28,24 @@ class Routine with ChangeNotifier {
     return Future.value(documents);
   }
 
+  //A function that fetches routines to show in homescreen
+  Future<List<String>> getRoutinesWithFrequencyGreaterThanTwo() async {
+  List<String> routines = [];
+
+  try {
+    var collectionReference = FirebaseFirestore.instance.collection('routines');
+    QuerySnapshot querySnapshot = await collectionReference.where('frequency', isGreaterThan: 2).get();
+
+    for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
+      routines.add(documentSnapshot.get('routineName'));
+    }
+  } catch (e) {
+    print('Error fetching routines: $e');
+  }
+
+  return routines;
+}
+
   void createRoutine(String routineName, String frequencyMeasure, int frequency) {
     FirebaseFirestore.instance.collection("routines").doc(routineName).set(
       {
