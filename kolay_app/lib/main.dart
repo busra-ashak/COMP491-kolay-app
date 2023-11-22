@@ -20,7 +20,6 @@ void main() async{
         ChangeNotifierProvider(create: (_) => Milestone()),
         ChangeNotifierProvider(create: (_) => Routine()),
         ChangeNotifierProvider(create: (_) => TodoList()),
-        ChangeNotifierProvider(create: (_) => Todo()),
       ],
       child: const MyApp(),
     ),
