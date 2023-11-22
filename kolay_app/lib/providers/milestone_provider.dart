@@ -77,7 +77,6 @@ class Milestone with ChangeNotifier {
   }
 
   void deleteMilestone(String milestoneName) {
-    // open modal and ask are you sure
     FirebaseFirestore.instance.collection("milestones").doc(milestoneName).delete().catchError((error) {
       print('Error deleting milestone: $error');
     });

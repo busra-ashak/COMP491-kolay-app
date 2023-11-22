@@ -7,7 +7,6 @@ class ShoppingListExpandable extends StatelessWidget {
   final String creationDatetime;
   final Map listItems;
 
-  // Constructor to accept the initial shopping list name
   const ShoppingListExpandable({
     Key? key, 
     required this.listName,
@@ -25,7 +24,7 @@ class ShoppingListExpandable extends StatelessWidget {
         ),
         Expanded(
           child: ExpansionTile(
-            title: Text(listName), // Use the initial shopping list name here
+            title: Text(listName),
             subtitle: Text(creationDatetime),
             children: <Widget>[
               Column(
