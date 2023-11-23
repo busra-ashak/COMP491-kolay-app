@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:kolay_app/providers/shopping_list_provider.dart';
+import '../providers/todo_provider.dart';
 
-class ShoppingListExpandable extends StatelessWidget {
+class TodoListExpandable extends StatelessWidget {
   final String listName;
   final String creationDatetime;
   final Map listItems;
 
-  const ShoppingListExpandable({
-    Key? key, 
+  // Constructor to accept the initial todo list name
+  const TodoListExpandable({
+    Key? key,
     required this.listName,
     required this.creationDatetime,
     required this.listItems}) : super(key: key);
@@ -19,12 +20,12 @@ class ShoppingListExpandable extends StatelessWidget {
       children: <Widget>[
         IconButton(
           alignment: Alignment.topLeft,
-          onPressed: () => _showDeleteListDialog(context, listName),
+          onPressed: () => context.read<TodoList>().deleteTodoList(listName),
           icon: const Icon(Icons.delete),
         ),
         Expanded(
           child: ExpansionTile(
-            title: Text(listName),
+            title: Text(listName), // Use the initial todo list name here
             subtitle: Text(creationDatetime),
             children: <Widget>[
               Column(
@@ -43,7 +44,7 @@ class ShoppingListExpandable extends StatelessWidget {
 
   List<Widget> _buildExpandableContent(
       BuildContext context, String listName, Map listItems) {
-    
+
     List<Widget> columnContent = [];
 
     if (listItems.isNotEmpty) {
@@ -51,14 +52,16 @@ class ShoppingListExpandable extends StatelessWidget {
         columnContent.add(
           ListTile(
             leading: Checkbox(
-              value: content['itemTicked'],
-              onChanged: (bool? val) {
-                context
-                    .read<ShoppingList>()
-                    .toggleItemCheckbox(listName, content['itemName'], content['itemTicked']);
-              }),
+                value: content['itemTicked'],
+                onChanged: (bool? val) {
+                  context
+                      .read<TodoList>()
+                      .toggleItemCheckbox(listName, content['itemName'], content['itemTicked']);
+                }),
             trailing: IconButton(
-                onPressed: () => _showDeleteItemFromListDialog(context, listName, content['itemName']),
+                onPressed: () => context
+                    .read<TodoList>()
+                    .deleteTodoItemFromList(listName, content['itemName'], content['itemTicked']),
                 icon: const Icon(Icons.delete)),
             title: Text(content['itemName']),
           ),
@@ -70,7 +73,7 @@ class ShoppingListExpandable extends StatelessWidget {
       ListTile(
         title: IconButton(
             onPressed: () =>
-              _showAddItemToListDialog(context, listName),
+                _showAddItemToListDialog(context, listName),
             icon: const Icon(Icons.add)),
       ),
     );
@@ -84,7 +87,7 @@ class ShoppingListExpandable extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Add a new item to the shopping list'),
+          title: const Text('Add a new item to the Todo list'),
           content: TextField(
             controller: controller,
             decoration: const InputDecoration(labelText: 'New Item'),
@@ -100,63 +103,11 @@ class ShoppingListExpandable extends StatelessWidget {
               onPressed: () {
                 String newItemName = controller.text;
                 if (newItemName.isNotEmpty) {
-                  context.read<ShoppingList>().addItemToShoppingList(listName, newItemName);
+                  context.read<TodoList>().addTodoItemToList(listName, newItemName);
                   Navigator.of(context).pop();
                 }
               },
               child: const Text('Add'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-  
-  void _showDeleteListDialog(BuildContext context, String listName) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Are you sure you want to delete $listName?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('No'),
-            ),
-            TextButton(
-              onPressed: () {
-                context.read<ShoppingList>().deleteShoppingList(listName);
-                Navigator.of(context).pop();
-              },
-              child: const Text('Yes'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showDeleteItemFromListDialog(BuildContext context, String listName, String oldItem) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Are you sure you want to delete $oldItem?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('No'),
-            ),
-            TextButton(
-              onPressed: () {
-                context.read<ShoppingList>().deleteItemFromShoppingList(listName, oldItem);
-                Navigator.of(context).pop();
-              },
-              child: const Text('Yes'),
             ),
           ],
         );

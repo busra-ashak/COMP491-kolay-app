@@ -1,0 +1,210 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:kolay_app/widgets/routine_widget.dart';
+import 'package:provider/provider.dart';
+import '../widgets/sideabar_menu.dart';
+import '../widgets/milestone_expandable.dart';
+import '../providers/milestone_provider.dart';
+import '../providers/routine_provider.dart';
+
+enum FrequencyMeasure{
+  daily('Daily'),
+  weekly('Weekly'),
+  monthly('Monthly');
+
+  const FrequencyMeasure(this.label);
+  final String label;
+}
+class AmbitionsPage extends StatefulWidget {
+ @override
+ State<AmbitionsPage> createState() => _AmbitionsPageState();
+}
+class _AmbitionsPageState extends State<AmbitionsPage> {
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        drawer: SideBarMenu(),
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: const Text('Your Ambitions', style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
+          bottom: const TabBar(
+                tabs: [
+                  Tab(icon: Icon(Icons.checklist_outlined), text: "Milestones"),
+                  Tab(icon: Icon(Icons.published_with_changes), text: "Routines"),
+                ],
+            ),
+          ),
+        body: TabBarView(
+            children: [ 
+              ListView(
+                children: [
+                  FutureBuilder<Map<String, Map>>(
+                    future: context.watch<Milestone>().getAllMilestones(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Padding(padding: EdgeInsets.all(16), child: Center(child: CircularProgressIndicator(),)); // Display a loading indicator while the future is being resolved
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else if (!snapshot.hasData || (snapshot.data != null && snapshot.data!.isEmpty)) {
+                        return const Padding(padding: EdgeInsets.all(16), child: Center(child: Text('No milestones available.')));
+                      } else {
+                        return Column(
+                          children: (snapshot.data ?? {}).values.map(
+                            (doc) => MilestoneExpandable(
+                              milestoneName: doc['milestoneName'],
+                              subgoals: doc['subgoals'],
+                              )).toList(),
+                        );
+                      }
+                    },
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      _showCreateMilestoneDialog(context);
+                    },
+                    icon: const Icon(Icons.add),
+                  ),
+                ],
+              ), 
+              ListView(
+                children: [
+                  FutureBuilder<Map<String, Map>>(
+                    future: context.watch<Routine>().getAllRoutines(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Padding(padding: EdgeInsets.all(16), child: Center(child: CircularProgressIndicator(),)); // Display a loading indicator while the future is being resolved
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else if (!snapshot.hasData || (snapshot.data != null && snapshot.data!.isEmpty)) {
+                        return const Padding(padding: EdgeInsets.all(16), child: Center(child: Text('No routines available.')));
+                      } else {
+                        return Column(
+                          children: (snapshot.data ?? {}).values.map(
+                            (doc) => RoutineWidget(
+                              routineName: doc['routineName'],
+                              frequency: doc['frequency'],
+                              frequencyMeasure: doc['frequencyMeasure'],
+                              )).toList(),
+                        );
+                      }
+                    },
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      _showCreateRoutineDialog(context);
+                    },
+                    icon: const Icon(Icons.add),
+                  ),
+                ],
+              )
+            ]
+          )
+        ),
+      );
+    }
+
+  void _showCreateMilestoneDialog(BuildContext context) {
+    TextEditingController controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Create a new milestone'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(labelText: 'The name of your milestone'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String newMilestoneName = controller.text;
+                if (newMilestoneName.isNotEmpty) {
+                  context.read<Milestone>().createMilestone(newMilestoneName);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Create'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showCreateRoutineDialog(BuildContext context) {
+    TextEditingController nameController = TextEditingController();
+    TextEditingController dropdownController = TextEditingController();
+    TextEditingController frequencyController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Create a new routine'),
+          content: Column(children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: 'The name of your routine'),
+            ),
+            Padding(
+              padding:const EdgeInsets.only(top: 40, bottom: 20), 
+              child:DropdownMenu<FrequencyMeasure>(
+                initialSelection: FrequencyMeasure.daily,
+                controller: dropdownController,
+                requestFocusOnTap: false,
+                label: const Text('Frequency Measure'),
+                dropdownMenuEntries: FrequencyMeasure.values
+                    .map<DropdownMenuEntry<FrequencyMeasure>>(
+                        (FrequencyMeasure measure) {
+                  return DropdownMenuEntry<FrequencyMeasure>(
+                    value: measure,
+                    label: measure.label,
+                  );
+                }).toList(),
+              )
+            ),
+            TextField(
+              controller: frequencyController,
+              decoration: const InputDecoration(labelText: 'How frequent?'),
+              keyboardType: TextInputType.number,
+              inputFormatters: <TextInputFormatter>[
+                FilteringTextInputFormatter.digitsOnly
+              ],
+            ),
+            ]
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String newRoutineName = nameController.text;
+                String frequencyMeasure = dropdownController.text;
+                int frequency = int.parse(frequencyController.text);
+                if (newRoutineName.isNotEmpty) {
+                  context.read<Routine>().createRoutine(newRoutineName,frequencyMeasure, frequency);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Create'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
