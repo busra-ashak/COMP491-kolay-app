@@ -43,27 +43,19 @@ class _HomePageState extends State<HomePage> {
               ),
             );
           } else {
-            List<String> tasksAndRoutines = snapshot.data!;
+            List<String> tasks = snapshot.data!
+                .where((item) => item.startsWith('Task:'))
+                .toList();
+            List<String> routines = snapshot.data!
+                .where((item) => item.startsWith('Routine:'))
+                .toList();
 
-            return ListView.builder(
+            return ListView(
               padding: const EdgeInsets.all(8),
-              itemCount: tasksAndRoutines.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Card(
-                  color: Colors.teal[200],
-                  elevation: 3,
-                  margin: EdgeInsets.symmetric(vertical: 8),
-                  child: ListTile(
-                    title: Text(
-                      tasksAndRoutines[index],
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                );
-              },
+              children: [
+                _buildListWithTitle('Todo', tasks),
+                _buildListWithTitle('Routines', routines),
+              ],
             );
           }
         },
@@ -78,9 +70,52 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildListWithTitle(String title, List<String> items) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: items.length,
+          itemBuilder: (BuildContext context, int index) {
+            return Card(
+              color: Colors.teal[200],
+              elevation: 3,
+              margin: EdgeInsets.symmetric(vertical: 8),
+              child: ListTile(
+                title: Text(
+                  items[index],
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
   Future<List<String>> _fetchData() async {
     List<String> todos = await context.read<TodoList>().getIncompleteTasksForHomeScreen();
     List<String> routines = await context.read<Routine>().getRoutinesWithFrequencyGreaterThanTwo();
+
+    // Add prefixes to distinguish between tasks and routines.
+    todos = todos.map((task) => 'Task: $task').toList();
+    routines = routines.map((routine) => 'Routine: $routine').toList();
 
     // Combine both lists and remove duplicates if any.
     return [...todos, ...routines.toSet().toList()];
