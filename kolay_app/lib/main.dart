@@ -3,6 +3,7 @@ import 'package:kolay_app/providers/shopping_list_provider.dart';
 import 'package:kolay_app/providers/milestone_provider.dart';
 import 'package:kolay_app/providers/routine_provider.dart';
 import 'package:kolay_app/providers/todo_provider.dart';
+import 'package:kolay_app/providers/meal_plan_provider.dart';
 import 'package:provider/provider.dart';
 import 'screens/home.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -20,6 +21,7 @@ void main() async{
         ChangeNotifierProvider(create: (_) => Milestone()),
         ChangeNotifierProvider(create: (_) => Routine()),
         ChangeNotifierProvider(create: (_) => TodoList()),
+        ChangeNotifierProvider(create: (_) => MealPlanList()),
       ],
       child: const MyApp(),
     ),
