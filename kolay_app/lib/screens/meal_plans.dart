@@ -83,7 +83,7 @@ class _MealPlansPageState extends State<MealPlansPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Confirm Meal Plan'),
-          content: const Text('Are you sure you want to save this meal plans?'),
+          content: const Text('Are you sure you want to save this meal plan?'),
           actions: [
             TextButton(
               onPressed: () {

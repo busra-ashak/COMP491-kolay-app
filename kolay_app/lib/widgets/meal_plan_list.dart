@@ -5,7 +5,7 @@ import '../providers/meal_plan_provider.dart';
 
 class MealPlanWidget extends StatelessWidget {
   final String listName;
-  final String datetime;
+  final DateTime datetime;
   final Map listItems;
   final VoidCallback onSave;
 
@@ -29,7 +29,7 @@ class MealPlanWidget extends StatelessWidget {
         Expanded(
           child: ExpansionTile(
             title: Text(listName), // Use the list name here
-            subtitle: Text(datetime),
+            subtitle: Text(datetime.toString()),
             children: <Widget>[
               Column(
                 children: _buildExpandableContent(
@@ -47,10 +47,10 @@ class MealPlanWidget extends StatelessWidget {
           },
           icon: const Icon(Icons.edit),
         ),
-        ElevatedButton(
-          onPressed: onSave,
-          child: const Text('Confirm'),
-        ),
+        // ElevatedButton(
+        //   onPressed: onSave,
+        //   child: const Text('Confirm'),
+        // ),
       ],
     );
   }

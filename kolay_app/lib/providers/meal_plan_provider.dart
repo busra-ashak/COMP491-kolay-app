@@ -19,7 +19,7 @@ class MealPlanList with ChangeNotifier {
         {documentSnapshot.id :
         {
           'listName': documentSnapshot.get('listName'),
-          'datetime': DateTime.fromMillisecondsSinceEpoch(datetime).toString(),
+          'datetime': DateTime.fromMillisecondsSinceEpoch(datetime),
           'listItems': documentSnapshot.get('listItems')
         }
         };
@@ -45,7 +45,7 @@ class MealPlanList with ChangeNotifier {
 
   Future<void> confirmAndUploadMealPlans() async {
     for (var mealPlan in _localMealPlans) {
-      await createMealPlan(mealPlan['listName'], mealPlan['datetime']); // Assuming 'datetime' is the date property
+      await createMealPlan(mealPlan['listName'], mealPlan['datetime']);
       for (var itemName in mealPlan['listItems'].keys) {
         await addMealPlanItem(mealPlan['listName'], itemName);
         var itemDetails = mealPlan['listItems'][itemName];
