@@ -52,11 +52,11 @@ class TodoList with ChangeNotifier {
     return incompleteTasks;
   }
 
-  void addTodoItemToList(String listName, String newItem) {
+  void addTodoItemToList(String listName, String newItem, String deadline) {
     var documentReference = FirebaseFirestore.instance.collection('todoLists').doc(listName);
 
     documentReference.update({
-      'listItems.$newItem': {'itemName': newItem, 'itemTicked': false}
+      'listItems.$newItem': {'itemName': newItem, 'itemTicked': false, 'itemDeadline': deadline}
     }).catchError((error) {
       print('Error adding item: $error');
     });
@@ -64,11 +64,11 @@ class TodoList with ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleItemCheckbox(String listName, String itemName, bool itemTicked) async {
+  void toggleItemCheckbox(String listName, String itemName, bool itemTicked, String deadline) async {
     var documentReference = FirebaseFirestore.instance.collection('todoLists').doc(listName);
 
     documentReference.update({
-      'listItems.$itemName': {'itemName': itemName, 'itemTicked': !itemTicked}
+      'listItems.$itemName': {'itemName': itemName, 'itemTicked': !itemTicked, 'itemDeadline': deadline}
     }).catchError((error) {
       print('Error adding item: $error');
     });
