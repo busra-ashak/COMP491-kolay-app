@@ -21,7 +21,7 @@ class _ToDosPageState extends State<ToDosPage> {
       ),
       body: ListView(
         children: [
-          // Use FutureBuilder to asynchronously build the UI based on the result of getAllShoppingLists
+          // Use FutureBuilder to asynchronously build the UI based on the result of getAllTodoLists
           FutureBuilder<Map<String, Map>>(
             future: context.watch<TodoList>().getAllTodoLists(),
             builder: (context, snapshot) {

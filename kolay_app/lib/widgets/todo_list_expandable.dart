@@ -56,7 +56,7 @@ class TodoListExpandable extends StatelessWidget {
                 onChanged: (bool? val) {
                   context
                       .read<TodoList>()
-                      .toggleItemCheckbox(listName, content['itemName'], content['itemTicked']);
+                      .toggleItemCheckbox(listName, content['itemName'], content['itemTicked'], content['itemDeadline']);
                 }),
             trailing: IconButton(
                 onPressed: () => context
@@ -64,6 +64,7 @@ class TodoListExpandable extends StatelessWidget {
                     .deleteTodoItemFromList(listName, content['itemName'], content['itemTicked']),
                 icon: const Icon(Icons.delete)),
             title: Text(content['itemName']),
+            subtitle: Text(content['itemDeadline']),
           ),
         );
       }
@@ -82,15 +83,28 @@ class TodoListExpandable extends StatelessWidget {
   }
 
   void _showAddItemToListDialog(BuildContext context, String listName) {
-    TextEditingController controller = TextEditingController();
+    TextEditingController itemNameController = TextEditingController();
+    TextEditingController itemDeadlineController = TextEditingController();
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Add a new item to the Todo list'),
-          content: TextField(
-            controller: controller,
-            decoration: const InputDecoration(labelText: 'New Item'),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            //position
+            mainAxisSize: MainAxisSize.min,
+            // wrap content in flutter
+            children: [
+              TextField(
+                controller: itemNameController,
+                decoration: const InputDecoration(labelText: 'New Item'),
+              ),
+              TextField(
+                controller: itemDeadlineController,
+                decoration: const InputDecoration(labelText: 'Deadline'),
+              )]
           ),
           actions: [
             TextButton(
@@ -101,9 +115,10 @@ class TodoListExpandable extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                String newItemName = controller.text;
+                String newItemName = itemNameController.text;
+                String itemDeadline = itemDeadlineController.text;
                 if (newItemName.isNotEmpty) {
-                  context.read<TodoList>().addTodoItemToList(listName, newItemName);
+                  context.read<TodoList>().addTodoItemToList(listName, newItemName, itemDeadline);
                   Navigator.of(context).pop();
                 }
               },
