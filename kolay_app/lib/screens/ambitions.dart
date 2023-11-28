@@ -16,6 +16,8 @@ enum FrequencyMeasure{
   final String label;
 }
 class AmbitionsPage extends StatefulWidget {
+  const AmbitionsPage({super.key});
+
  @override
  State<AmbitionsPage> createState() => _AmbitionsPageState();
 }
@@ -32,13 +34,13 @@ class _AmbitionsPageState extends State<AmbitionsPage> {
           title: const Text('Your Ambitions', style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
           bottom: const TabBar(
                 tabs: [
-                  Tab(icon: Icon(Icons.checklist_outlined), text: "Milestones"),
+                  Tab(icon: Icon(Icons.rocket_launch_outlined), text: "Milestones"),
                   Tab(icon: Icon(Icons.published_with_changes), text: "Routines"),
                 ],
             ),
           ),
         body: TabBarView(
-            children: [ 
+            children: [
               ListView(
                 children: [
                   FutureBuilder<Map<String, Map>>(
@@ -68,7 +70,7 @@ class _AmbitionsPageState extends State<AmbitionsPage> {
                     icon: const Icon(Icons.add),
                   ),
                 ],
-              ), 
+              ),
               ListView(
                 children: [
                   FutureBuilder<Map<String, Map>>(
@@ -157,7 +159,7 @@ class _AmbitionsPageState extends State<AmbitionsPage> {
               decoration: const InputDecoration(labelText: 'The name of your routine'),
             ),
             Padding(
-              padding:const EdgeInsets.only(top: 40, bottom: 20), 
+              padding:const EdgeInsets.only(top: 40, bottom: 20),
               child:DropdownMenu<FrequencyMeasure>(
                 initialSelection: FrequencyMeasure.daily,
                 controller: dropdownController,

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-class TodoList with ChangeNotifier {
+class ReminderList with ChangeNotifier {
 
-  Future<Map<String, Map>> getAllTodoLists() async {
+  Future<Map<String, Map>> getAllReminderLists() async {
     Map<String, Map> documents = {};
 
     try {
-      var collectionReference = FirebaseFirestore.instance.collection('todoLists');
+      var collectionReference = FirebaseFirestore.instance.collection('reminderLists');
       QuerySnapshot querySnapshot = await collectionReference.get();
 
       for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
@@ -15,7 +15,7 @@ class TodoList with ChangeNotifier {
         {documentSnapshot.id :
         {
           'listName': documentSnapshot.get('listName'),
-          'creationDatetime': DateTime.fromMillisecondsSinceEpoch(datetime).toString(),
+          'creationDatetime': DateTime.fromMillisecondsSinceEpoch(datetime),
           'listItems': documentSnapshot.get('listItems')
         }
         };
@@ -33,7 +33,7 @@ class TodoList with ChangeNotifier {
     List<String> incompleteTasks = [];
 
     try {
-      var collectionReference = FirebaseFirestore.instance.collection('todoLists');
+      var collectionReference = FirebaseFirestore.instance.collection('reminderLists');
       QuerySnapshot querySnapshot = await collectionReference.get();
 
       for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
@@ -52,8 +52,8 @@ class TodoList with ChangeNotifier {
     return incompleteTasks;
   }
 
-  void addTodoItemToList(String listName, String newItem, String deadline) {
-    var documentReference = FirebaseFirestore.instance.collection('todoLists').doc(listName);
+  void addReminderItemToList(String listName, String newItem, String deadline) {
+    var documentReference = FirebaseFirestore.instance.collection('reminderLists').doc(listName);
 
     documentReference.update({
       'listItems.$newItem': {'itemName': newItem, 'itemTicked': false, 'itemDeadline': deadline}
@@ -65,7 +65,7 @@ class TodoList with ChangeNotifier {
   }
 
   void toggleItemCheckbox(String listName, String itemName, bool itemTicked, String deadline) async {
-    var documentReference = FirebaseFirestore.instance.collection('todoLists').doc(listName);
+    var documentReference = FirebaseFirestore.instance.collection('reminderLists').doc(listName);
 
     documentReference.update({
       'listItems.$itemName': {'itemName': itemName, 'itemTicked': !itemTicked, 'itemDeadline': deadline}
@@ -76,8 +76,8 @@ class TodoList with ChangeNotifier {
     notifyListeners();
   }
 
-  void deleteTodoItemFromList(String listName, String oldItem, bool oldItemTicked) {
-    var documentReference = FirebaseFirestore.instance.collection('todoLists').doc(listName);
+  void deleteReminderItemFromList(String listName, String oldItem, bool oldItemTicked) {
+    var documentReference = FirebaseFirestore.instance.collection('reminderLists').doc(listName);
 
     documentReference.update({
       'listItems.$oldItem': FieldValue.delete(),
@@ -88,8 +88,8 @@ class TodoList with ChangeNotifier {
     notifyListeners();
   }
 
-  void createTodoList(String listName) {
-    FirebaseFirestore.instance.collection("todoLists").doc(listName).set(
+  void createReminderList(String listName) {
+    FirebaseFirestore.instance.collection("reminderLists").doc(listName).set(
         {
           "listName": listName,
           "creationDatetime": DateTime.now().millisecondsSinceEpoch,
@@ -101,12 +101,11 @@ class TodoList with ChangeNotifier {
     notifyListeners();
   }
 
-  void deleteTodoList(String listName) {
+  void deleteReminderList(String listName) {
     // open modal and ask are you sure
-    FirebaseFirestore.instance.collection("todoLists").doc(listName).delete().catchError((error) {
+    FirebaseFirestore.instance.collection("reminderLists").doc(listName).delete().catchError((error) {
       print('Error creating list: $error');
     });
     notifyListeners();
   }
-
 }
