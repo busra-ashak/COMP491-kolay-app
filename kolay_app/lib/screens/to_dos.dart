@@ -11,6 +11,18 @@ class ToDosPage extends StatefulWidget {
 
 class _ToDosPageState extends State<ToDosPage> {
   @override
+  void initState() {
+    super.initState();
+    loadTodoLists();
+  }
+
+  loadTodoLists() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      context.read<TodoList>().getAllTodoLists();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
 
     return Scaffold(
@@ -19,39 +31,24 @@ class _ToDosPageState extends State<ToDosPage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text('Your Todo Lists', style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
       ),
-      body: ListView(
-        children: [
-          // Use FutureBuilder to asynchronously build the UI based on the result of getAllTodoLists
-          FutureBuilder<Map<String, Map>>(
-            future: context.watch<TodoList>().getAllTodoLists(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Padding(padding: EdgeInsets.all(16), child: Center(child: CircularProgressIndicator(),)); // Display a loading indicator while the future is being resolved
-              } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else if (!snapshot.hasData || (snapshot.data != null && snapshot.data!.isEmpty)) {
-                return const Padding(padding: EdgeInsets.all(16), child: Center(child: Text('No Todo lists available.')));
-              } else {
-                // Dynamically create TodoListExpandable widgets based on available shopping lists
-                return Column(
-                  children: (snapshot.data ?? {}).values.map(
-                          (doc) => TodoListExpandable(
-                        listName: doc['listName'],
-                        creationDatetime: doc['creationDatetime'],
-                        listItems: doc['listItems'],
+      body: Consumer<TodoList>(
+          builder: (context, viewModel, child) {
+            return ListView(
+              children: viewModel.todoLists.values.map(
+                    (doc) => TodoListExpandable(
+                      listName: doc['listName'],
+                      creationDatetime: doc['creationDatetime'],
+                      listItems: doc['listItems'],
                       )).toList(),
-                );
-              }
-            },
-          ),
-          IconButton(
+            );
+          }
+      ),
+      floatingActionButton: IconButton(
             onPressed: () {
               _showCreateListDialog(context);
             },
             icon: const Icon(Icons.add),
           ),
-        ],
-      ),
     );
   }
 

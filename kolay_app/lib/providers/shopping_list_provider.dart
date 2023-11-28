@@ -1,87 +1,70 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-class ShoppingList with ChangeNotifier {
+import 'package:flutter/material.dart';
+import '../service/firestore_service.dart';
 
-  Future<Map<String, Map>> getAllShoppingLists() async {
-    Map<String, Map> documents = {};
+class ShoppingList extends ChangeNotifier {
+  final FireStoreService _firestoreService = FireStoreService();
+  Map<String, dynamic> shoppingLists = {};
 
-    try {
-      var collectionReference = FirebaseFirestore.instance.collection('shoppingLists');
-      QuerySnapshot querySnapshot = await collectionReference.get();
 
-      for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
-        var datetime = documentSnapshot.get('creationDatetime');
-        Map<String, Map> doc = 
-        {documentSnapshot.id : 
-          {
-          'listName': documentSnapshot.get('listName'),
-          'creationDatetime': DateTime.fromMillisecondsSinceEpoch(datetime).toString(),
-          'listItems': documentSnapshot.get('listItems')
-          }
-        };
-        documents.addAll(doc);
+  Future addShoppingList(String listName) async {
+    await _firestoreService.createShoppingList(listName);
+    Map<String, dynamic> doc = {
+      listName: {
+        "listName": listName,
+        "creationDatetime": DateTime.now().millisecondsSinceEpoch.toString(),
+        "listItems": {}
       }
-    } catch (e) {
-      print('Error fetching document IDs: $e');
+    };
+    shoppingLists.addAll(doc);
+    notifyListeners();
+  }
+
+  Future readShoppingList() async {
+    var querySnapshot = await _firestoreService.getAllShoppingLists();
+    shoppingLists.clear();
+    for (DocumentSnapshot d in querySnapshot.docs) {
+      var datetime = d.get('creationDatetime');
+      Map<String, dynamic> doc = {
+        d.get('listName'): {
+          'listName': d.get('listName') as String,
+          'creationDatetime': DateTime.fromMillisecondsSinceEpoch(datetime).toString(),
+          'listItems': d.get('listItems') as Map<dynamic, dynamic>
+        }
+      };
+      shoppingLists.addAll(doc);
     }
 
-    return Future.value(documents);
-  }
-
-  void addItemToShoppingList(String listName, String newItem) {
-    var documentReference = FirebaseFirestore.instance.collection('shoppingLists').doc(listName);
-
-    documentReference.update({
-      'listItems.$newItem': {'itemName': newItem, 'itemTicked': false}
-    }).catchError((error) {
-      print('Error adding item: $error');
-    });
-    
     notifyListeners();
   }
 
-  void toggleItemCheckbox(String listName, String itemName, bool itemTicked) {
-    var documentReference = FirebaseFirestore.instance.collection('shoppingLists').doc(listName);
-
-    documentReference.update({
-      'listItems.$itemName.itemTicked': !itemTicked
-    }).catchError((error) {
-      print('Error updating checkbox: $error');
-    });
-    
+  Future updateToggle(String listName, String itemName, bool itemChecked) async {
+    await _firestoreService.toggleShopItemCheckbox(listName, itemName, itemChecked);
+    shoppingLists[listName]['listItems'][itemName]['itemTicked'] = !itemChecked;
     notifyListeners();
   }
 
-  void deleteItemFromShoppingList(String listName, String oldItem) {
-    var documentReference = FirebaseFirestore.instance.collection('shoppingLists').doc(listName);
-
-    documentReference.update({
-      'listItems.$oldItem': FieldValue.delete(),
-    }).catchError((error) {
-      print('Error deleting item: $error');
-    });
-
-    notifyListeners();
-  }
-
-  void createShoppingList(String listName) {
-    FirebaseFirestore.instance.collection("shoppingLists").doc(listName).set(
-      {
-      "listName": listName,
-      "creationDatetime": DateTime.now().millisecondsSinceEpoch,
-      "listItems": {}
+  Future addShoppingListItem(String listName, String itemName) async {
+    await _firestoreService.addItemToShoppingList(listName, itemName);
+    Map<String, dynamic> doc = {
+      itemName: {
+        "itemName": itemName,
+        "itemTicked": false
       }
-    ).catchError((error) {
-      print('Error creating list: $error');
-    });
+    };
+    shoppingLists[listName]['listItems'].addAll(doc);
     notifyListeners();
   }
 
-  void deleteShoppingList(String listName) {
-    // open modal and ask are you sure
-    FirebaseFirestore.instance.collection("shoppingLists").doc(listName).delete().catchError((error) {
-      print('Error deleting list: $error');
-    });
+  Future removeShoppingListItem(String listName, String itemName) async {
+    await _firestoreService.deleteItemFromShoppingList(listName, itemName);
+    shoppingLists[listName]['listItems'].remove(itemName);
+    notifyListeners();
+  }
+  
+  Future removeShoppingList(String listName) async {
+    await _firestoreService.deleteShoppingList(listName);
+    shoppingLists.remove(listName);
     notifyListeners();
   }
 }

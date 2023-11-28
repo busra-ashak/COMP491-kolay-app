@@ -20,6 +20,18 @@ class AmbitionsPage extends StatefulWidget {
  State<AmbitionsPage> createState() => _AmbitionsPageState();
 }
 class _AmbitionsPageState extends State<AmbitionsPage> {
+  @override
+  void initState() {
+    super.initState();
+    loadAmbitions();
+  }
+
+  loadAmbitions() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      context.read<Routine>().getAllRoutines();
+      context.read<Milestone>().getAllMilestones();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,77 +49,75 @@ class _AmbitionsPageState extends State<AmbitionsPage> {
                 ],
             ),
           ),
-        body: TabBarView(
-            children: [ 
-              ListView(
-                children: [
-                  FutureBuilder<Map<String, Map>>(
-                    future: context.watch<Milestone>().getAllMilestones(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Padding(padding: EdgeInsets.all(16), child: Center(child: CircularProgressIndicator(),)); // Display a loading indicator while the future is being resolved
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else if (!snapshot.hasData || (snapshot.data != null && snapshot.data!.isEmpty)) {
-                        return const Padding(padding: EdgeInsets.all(16), child: Center(child: Text('No milestones available.')));
-                      } else {
-                        return Column(
-                          children: (snapshot.data ?? {}).values.map(
-                            (doc) => MilestoneExpandable(
-                              milestoneName: doc['milestoneName'],
-                              subgoals: doc['subgoals'],
-                              )).toList(),
-                        );
-                      }
-                    },
+        body: Consumer2<Milestone, Routine>(
+          builder: (context, milestoneProvider, routineProvider, child) {
+            return(
+              TabBarView(
+                children: [ 
+                  ListView(
+                    children: milestoneProvider.milestones.values.map(
+                                (doc) => MilestoneExpandable(
+                                  milestoneName: doc['milestoneName'],
+                                  subgoals: doc['subgoals'],
+                                  )).toList(),
+                            
                   ),
-                  IconButton(
-                    onPressed: () {
-                      _showCreateMilestoneDialog(context);
-                    },
-                    icon: const Icon(Icons.add),
+                  ListView(
+                    children: routineProvider.routines.values.map(
+                                (doc) => RoutineWidget(
+                                  routineName: doc['routineName'],
+                                  frequency: doc['frequency'],
+                                  frequencyMeasure: doc['frequencyMeasure'],
+                                  )).toList(),
                   ),
-                ],
-              ), 
-              ListView(
-                children: [
-                  FutureBuilder<Map<String, Map>>(
-                    future: context.watch<Routine>().getAllRoutines(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Padding(padding: EdgeInsets.all(16), child: Center(child: CircularProgressIndicator(),)); // Display a loading indicator while the future is being resolved
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else if (!snapshot.hasData || (snapshot.data != null && snapshot.data!.isEmpty)) {
-                        return const Padding(padding: EdgeInsets.all(16), child: Center(child: Text('No routines available.')));
-                      } else {
-                        return Column(
-                          children: (snapshot.data ?? {}).values.map(
-                            (doc) => RoutineWidget(
-                              routineName: doc['routineName'],
-                              frequency: doc['frequency'],
-                              frequencyMeasure: doc['frequencyMeasure'],
-                              )).toList(),
-                        );
-                      }
-                    },
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      _showCreateRoutineDialog(context);
-                    },
-                    icon: const Icon(Icons.add),
-                  ),
-                ],
+                ]
               )
-            ]
-          )
+            );
+          }
         ),
-      );
+        floatingActionButton: IconButton(
+            onPressed: () {
+              _showCreateDialog(context);
+            },
+            icon: const Icon(Icons.add),
+          ),
+      ));
     }
+
+  void _showCreateDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Create a new ambition'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                _showCreateMilestoneDialog(context);
+              },
+              child: const Text('Milestone'),
+            ),
+            TextButton(
+              onPressed: () {
+                _showCreateRoutineDialog(context);
+              },
+              child: const Text('Routine'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void _showCreateMilestoneDialog(BuildContext context) {
     TextEditingController controller = TextEditingController();
+    Navigator.of(context).pop();
 
     showDialog(
       context: context,
@@ -145,6 +155,7 @@ class _AmbitionsPageState extends State<AmbitionsPage> {
     TextEditingController nameController = TextEditingController();
     TextEditingController dropdownController = TextEditingController();
     TextEditingController frequencyController = TextEditingController();
+    Navigator.of(context).pop();
 
     showDialog(
       context: context,

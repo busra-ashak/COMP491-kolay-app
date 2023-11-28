@@ -1,68 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../service/firestore_service.dart';
 
 class Routine with ChangeNotifier {
 
-  Future<Map<String, Map>> getAllRoutines() async {
-    Map<String, Map> documents = {};
+  final FireStoreService _firestoreService = FireStoreService();
+  Map<String, dynamic> routines = {};
 
-    try {
-      var collectionReference = FirebaseFirestore.instance.collection('routines');
-      QuerySnapshot querySnapshot = await collectionReference.get();
 
-      for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
-        Map<String, Map> doc = 
-        {documentSnapshot.id : 
-          {
-          'routineName': documentSnapshot.get('routineName'),
-          'frequency': documentSnapshot.get('frequency'),
-          'frequencyMeasure': documentSnapshot.get('frequencyMeasure')
-          }
-        };
-        documents.addAll(doc);
+  Future createRoutine(String routineName, String frequencyMeasure, int frequency) async {
+    await _firestoreService.createRoutine(routineName, frequencyMeasure, frequency);
+    Map<String, dynamic> doc = {
+      routineName: {
+        "routineName": routineName,
+        "frequencyMeasure": frequencyMeasure,
+        "frequency": frequency,
       }
-    } catch (e) {
-      print('Error fetching document IDs: $e');
-    }
-
-    return Future.value(documents);
-  }
-
-  //A function that fetches routines to show in homescreen
-  Future<List<String>> getRoutinesWithFrequencyGreaterThanTwo() async {
-  List<String> routines = [];
-
-  try {
-    var collectionReference = FirebaseFirestore.instance.collection('routines');
-    QuerySnapshot querySnapshot = await collectionReference.where('frequency', isGreaterThan: 2).get();
-
-    for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
-      routines.add(documentSnapshot.get('routineName'));
-    }
-  } catch (e) {
-    print('Error fetching routines: $e');
-  }
-
-  return routines;
-}
-
-  void createRoutine(String routineName, String frequencyMeasure, int frequency) {
-    FirebaseFirestore.instance.collection("routines").doc(routineName).set(
-      {
-      'routineName': routineName,
-      'frequency': frequency,
-      'frequencyMeasure': frequencyMeasure
-      }
-    ).catchError((error) {
-      print('Error creating routine: $error');
-    });
+    };
+    routines.addAll(doc);
     notifyListeners();
   }
 
-  void deleteRoutine(String routineName) {
-    FirebaseFirestore.instance.collection("routines").doc(routineName).delete().catchError((error) {
-      print('Error deleting routine: $error');
-    });
+  Future getAllRoutines() async {
+    var querySnapshot = await _firestoreService.getAllRoutines();
+    routines.clear();
+    for (DocumentSnapshot d in querySnapshot.docs) {
+      Map<String, dynamic> doc = {
+        d.get('routineName'): {
+          'routineName': d.get('routineName') as String,
+          'frequencyMeasure': d.get('frequencyMeasure') as String,
+          'frequency': d.get('frequency') as int
+        }
+      };
+      routines.addAll(doc);
+    }
+
+    notifyListeners();
+  }
+  
+  Future deleteRoutine(String routineName) async {
+    await _firestoreService.deleteRoutine(routineName);
+    routines.remove(routineName);
     notifyListeners();
   }
 }

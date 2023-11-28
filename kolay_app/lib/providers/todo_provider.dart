@@ -1,111 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../service/firestore_service.dart';
 class TodoList with ChangeNotifier {
+  final FireStoreService _firestoreService = FireStoreService();
+  Map<String, dynamic> todoLists = {};
 
-  Future<Map<String, Map>> getAllTodoLists() async {
-    Map<String, Map> documents = {};
 
-    try {
-      var collectionReference = FirebaseFirestore.instance.collection('todoLists');
-      QuerySnapshot querySnapshot = await collectionReference.get();
+  Future createTodoList(String listName) async {
+    await _firestoreService.createTodoList(listName);
+    Map<String, dynamic> doc = {
+      listName: {
+        "listName": listName,
+        "creationDatetime": DateTime.now().millisecondsSinceEpoch.toString(),
+        "listItems": {}
+      }
+    };
+    todoLists.addAll(doc);
+    notifyListeners();
+  }
 
-      for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
-        var datetime = documentSnapshot.get('creationDatetime');
-        Map<String, Map> doc =
-        {documentSnapshot.id :
-        {
-          'listName': documentSnapshot.get('listName'),
+  Future getAllTodoLists() async {
+    var querySnapshot = await _firestoreService.getAllTodoLists();
+    todoLists.clear();
+    for (DocumentSnapshot d in querySnapshot.docs) {
+      var datetime = d.get('creationDatetime');
+      Map<String, dynamic> doc = {
+        d.get('listName'): {
+          'listName': d.get('listName') as String,
           'creationDatetime': DateTime.fromMillisecondsSinceEpoch(datetime).toString(),
-          'listItems': documentSnapshot.get('listItems')
+          'listItems': d.get('listItems') as Map<dynamic, dynamic>
         }
-        };
-        documents.addAll(doc);
-      }
-    } catch (e) {
-      print('Error fetching document IDs: $e');
+      };
+      todoLists.addAll(doc);
     }
 
-    return Future.value(documents);
+    notifyListeners();
   }
 
-  //A function that fetches incompleted tasks to represent in homescreen
-  Future<List<String>> getIncompleteTasksForHomeScreen() async {
-    List<String> incompleteTasks = [];
+  Future toggleItemCheckbox(String listName, String itemName, bool itemChecked) async {
+    await _firestoreService.toggleTodoItemCheckbox(listName, itemName, itemChecked);
+    todoLists[listName]['listItems'][itemName]['itemTicked'] = !itemChecked;
+    notifyListeners();
+  }
 
-    try {
-      var collectionReference = FirebaseFirestore.instance.collection('todoLists');
-      QuerySnapshot querySnapshot = await collectionReference.get();
-
-      for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
-        Map<String, dynamic> listItems = documentSnapshot.get('listItems');
-
-        listItems.forEach((itemName, itemDetails) {
-          if (itemDetails['itemTicked'] == false) {
-            incompleteTasks.add(itemName);
-          }
-        });
+  Future addTodoItemToList(String listName, String itemName, String itemDeadline) async {
+    await _firestoreService.addItemToTodoList(listName, itemName, itemDeadline);
+    Map<String, dynamic> doc = {
+      itemName: {
+        "itemName": itemName,
+        "itemDeadline": itemDeadline,
+        "itemTicked": false
       }
-    } catch (e) {
-      print('Error fetching incomplete tasks: $e');
-    }
-
-    return incompleteTasks;
-  }
-
-  void addTodoItemToList(String listName, String newItem, String deadline) {
-    var documentReference = FirebaseFirestore.instance.collection('todoLists').doc(listName);
-
-    documentReference.update({
-      'listItems.$newItem': {'itemName': newItem, 'itemTicked': false, 'itemDeadline': deadline}
-    }).catchError((error) {
-      print('Error adding item: $error');
-    });
-
+    };
+    todoLists[listName]['listItems'].addAll(doc);
     notifyListeners();
   }
 
-  void toggleItemCheckbox(String listName, String itemName, bool itemTicked, String deadline) async {
-    var documentReference = FirebaseFirestore.instance.collection('todoLists').doc(listName);
-
-    documentReference.update({
-      'listItems.$itemName': {'itemName': itemName, 'itemTicked': !itemTicked, 'itemDeadline': deadline}
-    }).catchError((error) {
-      print('Error adding item: $error');
-    });
-
+  Future deleteTodoItemFromList(String listName, String itemName) async {
+    await _firestoreService.deleteItemFromTodoList(listName, itemName);
+    todoLists[listName]['listItems'].remove(itemName);
     notifyListeners();
   }
-
-  void deleteTodoItemFromList(String listName, String oldItem, bool oldItemTicked) {
-    var documentReference = FirebaseFirestore.instance.collection('todoLists').doc(listName);
-
-    documentReference.update({
-      'listItems.$oldItem': FieldValue.delete(),
-    }).catchError((error) {
-      print('Error deleting item: $error');
-    });
-
-    notifyListeners();
-  }
-
-  void createTodoList(String listName) {
-    FirebaseFirestore.instance.collection("todoLists").doc(listName).set(
-        {
-          "listName": listName,
-          "creationDatetime": DateTime.now().millisecondsSinceEpoch,
-          "listItems": {}
-        }
-    ).catchError((error) {
-      print('Error creating list: $error');
-    });
-    notifyListeners();
-  }
-
-  void deleteTodoList(String listName) {
-    // open modal and ask are you sure
-    FirebaseFirestore.instance.collection("todoLists").doc(listName).delete().catchError((error) {
-      print('Error creating list: $error');
-    });
+  
+  Future deleteTodoList(String listName) async {
+    await _firestoreService.deleteTodoList(listName);
+    todoLists.remove(listName);
     notifyListeners();
   }
 }

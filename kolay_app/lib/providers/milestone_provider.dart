@@ -1,85 +1,68 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../service/firestore_service.dart';
 
 class Milestone with ChangeNotifier {
+  
+  final FireStoreService _firestoreService = FireStoreService();
+  Map<String, dynamic> milestones = {};
 
-  Future<Map<String, Map>> getAllMilestones() async {
-    Map<String, Map> documents = {};
 
-    try {
-      var collectionReference = FirebaseFirestore.instance.collection('milestones');
-      QuerySnapshot querySnapshot = await collectionReference.get();
-
-      for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
-        Map<String, Map> doc = 
-        {documentSnapshot.id : 
-          {
-          'milestoneName': documentSnapshot.get('milestoneName'),
-          'subgoals': documentSnapshot.get('subgoals')
-          }
-        };
-        documents.addAll(doc);
+  Future createMilestone(String milestoneName) async {
+    await _firestoreService.createMilestone(milestoneName);
+    Map<String, dynamic> doc = {
+      milestoneName: {
+        "milestoneName": milestoneName,
+        "subgoals": {}
       }
-    } catch (e) {
-      print('Error fetching document IDs: $e');
+    };
+    milestones.addAll(doc);
+    notifyListeners();
+  }
+
+  Future getAllMilestones() async {
+    var querySnapshot = await _firestoreService.getAllMilestones();
+    milestones.clear();
+    for (DocumentSnapshot d in querySnapshot.docs) {
+      Map<String, dynamic> doc = {
+        d.get('milestoneName'): {
+          'milestoneName': d.get('milestoneName') as String,
+          'subgoals': d.get('subgoals') as Map<dynamic, dynamic>
+        }
+      };
+      milestones.addAll(doc);
     }
 
-    return Future.value(documents);
-  }
-
-  
-  void addSubgoalToMilestone(String milestoneName, String newSubgoal) {
-    var documentReference = FirebaseFirestore.instance.collection('milestones').doc(milestoneName);
-
-    documentReference.update({
-      'subgoals.$newSubgoal': {'subgoalName': newSubgoal, 'subgoalTicked': false}
-    }).catchError((error) {
-      print('Error adding subgoal: $error');
-    });
-    
     notifyListeners();
   }
 
-  void toggleSubgoalCheckbox(String milestoneName, String subgoalName, bool subgoalTicked) {
-    var documentReference = FirebaseFirestore.instance.collection('milestones').doc(milestoneName);
-
-    documentReference.update({
-      'subgoals.$subgoalName.subgoalTicked': !subgoalTicked
-    }).catchError((error) {
-      print('Error updating checkbox: $error');
-    });
-    
+  Future toggleSubgoalCheckbox(String milestoneName, String subgoalName, bool subgoalTicked) async {
+    await _firestoreService.toggleSubgoalCheckbox(milestoneName, subgoalName, subgoalTicked);
+    milestones[milestoneName]['subgoals'][subgoalName]['subgoalTicked'] = !subgoalTicked;
     notifyListeners();
   }
 
-  void deleteSubgoalFromMilestone(String milestoneName, String oldSubgoal) {
-    var documentReference = FirebaseFirestore.instance.collection('milestones').doc(milestoneName);
-
-    documentReference.update({
-      'subgoals.$oldSubgoal': FieldValue.delete(),
-    }).catchError((error) {
-      print('Error deleting subgoal: $error');
-    });
-
-    notifyListeners();
-  }
-
-  void createMilestone(String milestoneName) {
-    FirebaseFirestore.instance.collection("milestones").doc(milestoneName).set(
-      {
-      "milestoneName": milestoneName,
-      "subgoals": {}
+  Future addSubgoalToMilestone(String milestoneName, String newSubgoalName) async {
+    await _firestoreService.addSubgoalToMilestone(milestoneName, newSubgoalName);
+    Map<String, dynamic> doc = {
+      newSubgoalName: {
+        "subgoalName": newSubgoalName,
+        "subgoalTicked": false
       }
-    ).catchError((error) {
-      print('Error creating milestone: $error');
-    });
+    };
+    milestones[milestoneName]['subgoals'].addAll(doc);
     notifyListeners();
   }
 
-  void deleteMilestone(String milestoneName) {
-    FirebaseFirestore.instance.collection("milestones").doc(milestoneName).delete().catchError((error) {
-      print('Error deleting milestone: $error');
-    });
+  Future deleteSubgoalFromMilestone(String milestoneName, String oldSubgoalName) async {
+    await _firestoreService.deleteSubgoalFromMilestone(milestoneName, oldSubgoalName);
+    milestones[milestoneName]['subgoals'].remove(oldSubgoalName);
+    notifyListeners();
+  }
+  
+  Future deleteMilestone(String milestoneName) async {
+    await _firestoreService.deleteMilestone(milestoneName);
+    milestones.remove(milestoneName);
     notifyListeners();
   }
 }
