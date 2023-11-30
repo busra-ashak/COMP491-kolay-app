@@ -56,12 +56,12 @@ class TodoListExpandable extends StatelessWidget {
                 onChanged: (bool? val) {
                   context
                       .read<TodoList>()
-                      .toggleItemCheckbox(listName, content['itemName'], content['itemTicked'], content['itemDeadline']);
+                      .toggleItemCheckbox(listName, content['itemName'], content['itemTicked']);
                 }),
             trailing: IconButton(
                 onPressed: () => context
                     .read<TodoList>()
-                    .deleteTodoItemFromList(listName, content['itemName'], content['itemTicked']),
+                    .deleteTodoItemFromList(listName, content['itemName']),
                 icon: const Icon(Icons.delete)),
             title: Text(content['itemName']),
             subtitle: Text(content['itemDeadline']),

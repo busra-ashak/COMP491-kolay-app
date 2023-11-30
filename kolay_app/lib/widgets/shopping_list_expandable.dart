@@ -55,7 +55,7 @@ class ShoppingListExpandable extends StatelessWidget {
               onChanged: (bool? val) {
                 context
                     .read<ShoppingList>()
-                    .toggleItemCheckbox(listName, content['itemName'], content['itemTicked']);
+                    .updateToggle(listName, content['itemName'], content['itemTicked']);
               }),
             trailing: IconButton(
                 onPressed: () => _showDeleteItemFromListDialog(context, listName, content['itemName']),
@@ -100,7 +100,7 @@ class ShoppingListExpandable extends StatelessWidget {
               onPressed: () {
                 String newItemName = controller.text;
                 if (newItemName.isNotEmpty) {
-                  context.read<ShoppingList>().addItemToShoppingList(listName, newItemName);
+                  context.read<ShoppingList>().addShoppingListItem(listName, newItemName);
                   Navigator.of(context).pop();
                 }
               },
@@ -127,7 +127,7 @@ class ShoppingListExpandable extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                context.read<ShoppingList>().deleteShoppingList(listName);
+                context.read<ShoppingList>().removeShoppingList(listName);
                 Navigator.of(context).pop();
               },
               child: const Text('Yes'),
@@ -153,7 +153,7 @@ class ShoppingListExpandable extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                context.read<ShoppingList>().deleteItemFromShoppingList(listName, oldItem);
+                context.read<ShoppingList>().removeShoppingListItem(listName, oldItem);
                 Navigator.of(context).pop();
               },
               child: const Text('Yes'),
