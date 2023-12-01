@@ -7,14 +7,12 @@ class MealPlanWidget extends StatelessWidget {
   final String listName;
   final DateTime datetime;
   final Map listItems;
-  final VoidCallback onSave;
 
   const MealPlanWidget({
     Key? key,
     required this.listName,
     required this.datetime,
     required this.listItems,
-    required this.onSave,
   }) : super(key: key);
 
   @override
@@ -23,7 +21,7 @@ class MealPlanWidget extends StatelessWidget {
       children: <Widget>[
         IconButton(
           alignment: Alignment.topLeft,
-          onPressed: () => context.read<MealPlanList>().deleteMealPlan(listName),
+          onPressed: () => context.read<MealPlan>().deleteMealPlan(listName),
           icon: const Icon(Icons.delete),
         ),
         Expanded(
@@ -47,10 +45,6 @@ class MealPlanWidget extends StatelessWidget {
           },
           icon: const Icon(Icons.edit),
         ),
-        // ElevatedButton(
-        //   onPressed: onSave,
-        //   child: const Text('Confirm'),
-        // ),
       ],
     );
   }
@@ -68,13 +62,13 @@ class MealPlanWidget extends StatelessWidget {
                 value: content['itemTicked'],
                 onChanged: (bool? val) {
                   context
-                      .read<MealPlanList>()
-                      .IngredientCheckbox(listName, content['itemName'], content['itemTicked']);
+                      .read<MealPlan>()
+                      .toggleIngredientCheckbox(listName, content['itemName'], content['itemTicked']);
                 }),
             trailing: IconButton(
                 onPressed: () => context
-                    .read<MealPlanList>()
-                    .deleteIngredientFromList(listName, content['itemName'], content['itemTicked']),
+                    .read<MealPlan>()
+                    .deleteIngredientFromList(listName, content['itemName']),
                 icon: const Icon(Icons.delete)),
             title: Text(content['itemName']),
           ),
@@ -116,7 +110,7 @@ class MealPlanWidget extends StatelessWidget {
               onPressed: () {
                 String newItemName = controller.text;
                 if (newItemName.isNotEmpty) {
-                  context.read<MealPlanList>().addMealPlanItem(listName, newItemName);
+                  context.read<MealPlan>().addIngredientToList(listName, newItemName);
                   Navigator.of(context).pop();
                 }
               },
@@ -155,9 +149,7 @@ class MealPlanWidget extends StatelessWidget {
               child: const Text('Cancel'),
             ),
             TextButton(
-              onPressed: () {
-                _renameMealPlan(context, listName, controller.text);
-              },
+              onPressed: () {},
               child: const Text('Rename'),
             ),
           ],
@@ -165,40 +157,5 @@ class MealPlanWidget extends StatelessWidget {
       },
     );
   }
-
-  void _renameMealPlan(BuildContext context, String oldListName, String newListName) {
-    var mealPlanList = context.read<MealPlanList>();
-    mealPlanList.renameMealPlan(oldListName, newListName);
-    Navigator.of(context).pop(); // Dismiss the dialog
-  }
 }
 
-
-
-
-
-// class MealPlanWidget extends StatelessWidget {
-//   final String description;
-//   final DateTime? date;
-//   final bool? isCompleted;
-//   final Function(bool?)? onCheckboxChanged; // Update the function signature
-
-//   MealPlanWidget({
-//     required this.description,
-//     this.date,
-//     this.isCompleted,
-//     this.onCheckboxChanged,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return ListTile(
-//       title: Text(description),
-//       subtitle: Text('Date: $date'),
-//       trailing: Checkbox(
-//         value: isCompleted,
-//         onChanged: onCheckboxChanged,
-//       ),
-//     );
-//   }
-// }

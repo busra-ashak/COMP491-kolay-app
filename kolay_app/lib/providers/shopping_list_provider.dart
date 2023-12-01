@@ -12,7 +12,7 @@ class ShoppingList extends ChangeNotifier {
     Map<String, dynamic> doc = {
       listName: {
         "listName": listName,
-        "creationDatetime": DateTime.now().millisecondsSinceEpoch.toString(),
+        "creationDatetime": DateTime.now().toString(),
         "listItems": {}
       }
     };

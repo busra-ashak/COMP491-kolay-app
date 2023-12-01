@@ -157,4 +157,56 @@ class FireStoreService {
     final QuerySnapshot _ref = await _fireStoreService.collection('todoLists').get();
     return _ref;
   }
+
+  /* MEAL PLANS */
+
+  Future addIngredientToMealPlan(String listName, String newItem) async {
+    final DocumentReference documentReference = _fireStoreService.collection('meals').doc(listName);
+
+    await documentReference.update({
+      'listItems.$newItem': {'itemName': newItem, 'itemTicked': false}
+    });
+  }
+
+  Future toggleIngredientCheckbox(String listName, String itemName, bool itemTicked) async {
+    final DocumentReference documentReference = _fireStoreService.collection('meals').doc(listName);
+
+    await documentReference.update({
+      'listItems.$itemName.itemTicked': !itemTicked
+    });
+  }
+
+  Future deleteIngreidentFromMealPlan(String listName, String oldItem) async {
+    final DocumentReference documentReference = _fireStoreService.collection('meals').doc(listName);
+
+    await documentReference.update({
+      'listItems.$oldItem': FieldValue.delete(),
+    });
+  }
+
+  Future createShoppingListFromMeal(String listName, List<String> listItems) async {
+    await createShoppingList(listName);
+    for(String item in listItems) {
+      await addItemToShoppingList(listName, item);
+    }
+  }
+
+  Future createMealPlan(String listName, DateTime dateTime) async {
+    await _fireStoreService.collection('meals').doc(listName).set(
+      {
+      "listName": listName,
+      "datetime": dateTime,
+      "listItems": {}
+      }
+    );
+  }
+
+  Future deleteMealPlan(String listName) async {
+    await _fireStoreService.collection('meals').doc(listName).delete();
+  }
+
+  Future<QuerySnapshot> getAllMealPlans() async {
+    final QuerySnapshot _ref = await _fireStoreService.collection('meals').get();
+    return _ref;
+  }
 }
