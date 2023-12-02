@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:kolay_app/providers/shopping_list_provider.dart';
+import 'package:intl/intl.dart';
 
 class ShoppingListExpandable extends StatelessWidget {
   final String listName;
-  final String creationDatetime;
+  final DateTime datetime;
   final Map listItems;
 
   const ShoppingListExpandable({
     Key? key, 
     required this.listName,
-    required this.creationDatetime,
+    required this.datetime,
     required this.listItems}) : super(key: key);
 
   @override
@@ -25,7 +26,7 @@ class ShoppingListExpandable extends StatelessWidget {
         Expanded(
           child: ExpansionTile(
             title: Text(listName),
-            subtitle: Text(creationDatetime),
+            subtitle: Text(DateFormat('dd/MM/yyyy').format(datetime)),
             children: <Widget>[
               Column(
                 children: _buildExpandableContent(

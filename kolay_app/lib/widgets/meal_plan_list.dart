@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/meal_plan_provider.dart';
+import 'package:intl/intl.dart';
 
 
 class MealPlanWidget extends StatelessWidget {
@@ -21,13 +22,13 @@ class MealPlanWidget extends StatelessWidget {
       children: <Widget>[
         IconButton(
           alignment: Alignment.topLeft,
-          onPressed: () => context.read<MealPlan>().deleteMealPlan(listName),
+          onPressed: () => _showDeleteMealPlanDialog(context, listName),
           icon: const Icon(Icons.delete),
         ),
         Expanded(
           child: ExpansionTile(
             title: Text(listName), // Use the list name here
-            subtitle: Text(datetime.toString()),
+            subtitle: Text(DateFormat('dd/MM/yyyy').format(datetime)),
             children: <Widget>[
               Column(
                 children: _buildExpandableContent(
@@ -66,9 +67,7 @@ class MealPlanWidget extends StatelessWidget {
                       .toggleIngredientCheckbox(listName, content['itemName'], content['itemTicked']);
                 }),
             trailing: IconButton(
-                onPressed: () => context
-                    .read<MealPlan>()
-                    .deleteIngredientFromList(listName, content['itemName']),
+                onPressed: () => _showDeleteItemFromMealPlanDialog(context, listName, content['itemName']),
                 icon: const Icon(Icons.delete)),
             title: Text(content['itemName']),
           ),
@@ -132,7 +131,7 @@ class MealPlanWidget extends StatelessWidget {
           title: const Text('Rename Meal Plan'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text('Enter a new name:'),
               TextField(
@@ -157,5 +156,58 @@ class MealPlanWidget extends StatelessWidget {
       },
     );
   }
+
+  void _showDeleteMealPlanDialog(BuildContext context, String mealplanName) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Are you sure you want to delete $mealplanName?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                context.read<MealPlan>().deleteMealPlan(mealplanName);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showDeleteItemFromMealPlanDialog(BuildContext context, String mealplanName, String oldItem) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Are you sure you want to delete $oldItem?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                context.read<MealPlan>().deleteIngredientFromList(mealplanName, oldItem);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }
 

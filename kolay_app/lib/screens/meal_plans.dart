@@ -47,7 +47,7 @@ class _MealPlansPageState extends State<MealPlansPage> {
                           onPressed: () {
                             _showConfirmDialog(context, doc['listName']);
                           },
-                          child: const Text('Create Shopping List'),
+                          child: const Text('Add to a Shopping List'),
                         ),
                       ],
                     ),
@@ -57,33 +57,34 @@ class _MealPlansPageState extends State<MealPlansPage> {
       ),
       floatingActionButton: IconButton(
             onPressed: () {
-              _showCreateListDialog(context);
+              _showCreateMealPlanDialog(context);
             },
             icon: const Icon(Icons.add),
           ),
     );
   }
 
-  void _showConfirmDialog(BuildContext context, String listName) {
+  void _showConfirmDialog(BuildContext context, String mealPlanName) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Create Shopping List'),
-          content: const Text('Are you sure you want to create shopping list with missing ingredients?'),
+          title: const Text('Add to a Shopping List'),
+          content: const Text('Do you want to add to an existing shopping list or create a new one?'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
+                _showAddToListDialog(context, mealPlanName);
               },
-              child: const Text('Cancel'),
+              child: const Text('Add to existing'),
             ),
             TextButton(
               onPressed: () {
-                _createShoppingList(context, listName);
                 Navigator.of(context).pop();
+                _showCreateListDialog(context, mealPlanName);
               },
-              child: const Text('Confirm'),
+              child: const Text('Create a new one'),
             ),
           ],
         );
@@ -91,16 +92,9 @@ class _MealPlansPageState extends State<MealPlansPage> {
     );
   }
 
-  Future _createShoppingList(BuildContext context, String listName) async {
-    print("a");
-    List<String> listItems = context.read<MealPlan>().getUntickedIngredients(listName);
-    print(listItems);
-    await context.read<MealPlan>().createShoppingListFromMeal(listName, listItems);
-  }
-
-  void _showCreateListDialog(BuildContext context) {
+  void _showCreateMealPlanDialog(BuildContext context) {
     TextEditingController nameController = TextEditingController();
-    DateTime selectedDate = DateTime.now(); // Initial date
+    DateTime selectedDate = DateTime.now();
 
     showDialog(
       context: context,
@@ -109,7 +103,7 @@ class _MealPlansPageState extends State<MealPlansPage> {
           title: const Text('Create a new Meal Plan'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextField(
                 controller: nameController,
@@ -142,11 +136,106 @@ class _MealPlansPageState extends State<MealPlansPage> {
             ),
             TextButton(
               onPressed: () {
-                String newListName = nameController.text;
-                if (newListName.isNotEmpty) {
-                  context.read<MealPlan>().createMealPlan(newListName, selectedDate);
+                String mealPlanName = nameController.text;
+                if (mealPlanName.isNotEmpty) {
+                  context.read<MealPlan>().createMealPlan(mealPlanName, selectedDate);
                   Navigator.of(context).pop();
                 }
+              },
+              child: const Text('Create'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showAddToListDialog(BuildContext context, String mealPlanName) {
+    TextEditingController controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Add to a shopping list'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(labelText: 'The name of your shopping list'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String listName = controller.text;
+                List<String> listItems = context.read<MealPlan>().getUntickedIngredients(mealPlanName);
+                if (listName.isNotEmpty && listItems.isNotEmpty) {
+                  context.read<MealPlan>().addToShoppingListFromMeal(listName, listItems);
+                }
+                Navigator.of(context).pop();
+              },
+              child: const Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showCreateListDialog(BuildContext context, String mealPlanName) {
+    TextEditingController controller = TextEditingController();
+    DateTime selectedDate = DateTime.now();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Create a shopping list'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(labelText: 'The name of your Shopping List'),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: selectedDate,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                  );
+
+                  if (pickedDate != null && pickedDate != selectedDate) {
+                    selectedDate = pickedDate;
+                  }
+                },
+                child: const Text('Pick Date'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String listName = controller.text;
+                List<String> listItems = context.read<MealPlan>().getUntickedIngredients(mealPlanName);
+                if (listName.isNotEmpty && listItems.isNotEmpty) {
+                  context.read<MealPlan>().createShoppingListFromMeal(listName, listItems, selectedDate);
+                }
+                Navigator.of(context).pop();
               },
               child: const Text('Create'),
             ),

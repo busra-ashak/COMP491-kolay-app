@@ -1,18 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../service/firestore_service.dart';
+import 'package:intl/intl.dart';
 
 class ShoppingList extends ChangeNotifier {
   final FireStoreService _firestoreService = FireStoreService();
   Map<String, dynamic> shoppingLists = {};
+  List<String> shoppingListsHome = [];
 
 
-  Future addShoppingList(String listName) async {
-    await _firestoreService.createShoppingList(listName);
+  Future addShoppingList(String listName, DateTime datetime) async {
+    await _firestoreService.createShoppingList(listName, datetime);
     Map<String, dynamic> doc = {
       listName: {
         "listName": listName,
-        "creationDatetime": DateTime.now().toString(),
+        "datetime": datetime,
         "listItems": {}
       }
     };
@@ -24,11 +26,10 @@ class ShoppingList extends ChangeNotifier {
     var querySnapshot = await _firestoreService.getAllShoppingLists();
     shoppingLists.clear();
     for (DocumentSnapshot d in querySnapshot.docs) {
-      var datetime = d.get('creationDatetime');
       Map<String, dynamic> doc = {
         d.get('listName'): {
           'listName': d.get('listName') as String,
-          'creationDatetime': DateTime.fromMillisecondsSinceEpoch(datetime).toString(),
+          'datetime': d.get('datetime').toDate() as DateTime,
           'listItems': d.get('listItems') as Map<dynamic, dynamic>
         }
       };
@@ -65,6 +66,19 @@ class ShoppingList extends ChangeNotifier {
   Future removeShoppingList(String listName) async {
     await _firestoreService.deleteShoppingList(listName);
     shoppingLists.remove(listName);
+    notifyListeners();
+  }
+
+  Future getShoppingListsForHomeScreen() async {
+    var now = DateFormat('dd/MM/yyyy').format(DateTime.now());
+    var querySnapshot = await _firestoreService.getAllShoppingLists();
+    shoppingListsHome.clear();
+    for (DocumentSnapshot d in querySnapshot.docs) {
+      var taskDueDate = DateFormat('dd/MM/yyyy').format(d.get('datetime').toDate() as DateTime);
+      if(now==taskDueDate){
+        shoppingListsHome.add(d.get('listName'));
+      }
+    }
     notifyListeners();
   }
 }
