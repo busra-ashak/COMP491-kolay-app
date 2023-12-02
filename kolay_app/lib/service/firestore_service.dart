@@ -29,11 +29,11 @@ class FireStoreService {
     });
   }
 
-  Future createShoppingList(String listName) async {
+  Future createShoppingList(String listName, DateTime datetime) async {
     await _fireStoreService.collection('shoppingLists').doc(listName).set(
       {
       "listName": listName,
-      "creationDatetime": DateTime.now().millisecondsSinceEpoch,
+      "datetime": datetime,
       "listItems": {}
       }
     );
@@ -115,7 +115,7 @@ class FireStoreService {
 
   /* TO DO LISTS */
 
-  Future addItemToTodoList(String listName, String newItem, String itemDeadline) async {
+  Future addItemToTodoList(String listName, String newItem, DateTime itemDeadline) async {
     final DocumentReference documentReference = _fireStoreService.collection('todoLists').doc(listName);
 
     await documentReference.update({
@@ -139,11 +139,11 @@ class FireStoreService {
     });
   }
 
-  Future createTodoList(String listName) async {
+  Future createTodoList(String listName, DateTime datetime) async {
     await _fireStoreService.collection('todoLists').doc(listName).set(
       {
       "listName": listName,
-      "creationDatetime": DateTime.now().millisecondsSinceEpoch,
+      "dueDatetime": datetime,
       "listItems": {}
       }
     );
@@ -184,8 +184,14 @@ class FireStoreService {
     });
   }
 
-  Future createShoppingListFromMeal(String listName, List<String> listItems) async {
-    await createShoppingList(listName);
+  Future createShoppingListFromMeal(String listName, List<String> listItems, DateTime datetime) async {
+    await createShoppingList(listName, datetime);
+    for(String item in listItems) {
+      await addItemToShoppingList(listName, item);
+    }
+  }
+  
+  Future addToShoppingListFromMeal(String listName, List<String> listItems) async {
     for(String item in listItems) {
       await addItemToShoppingList(listName, item);
     }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../service/firestore_service.dart';
+import 'package:intl/intl.dart';
 class MealPlan with ChangeNotifier {
   final FireStoreService _firestoreService = FireStoreService();
   Map<String, dynamic> mealPlans = {};
+  List<String> mealPlansHome = [];
 
 
   Future createMealPlan(String listName, DateTime dateTime) async {
@@ -23,11 +25,10 @@ class MealPlan with ChangeNotifier {
     var querySnapshot = await _firestoreService.getAllMealPlans();
     mealPlans.clear();
     for (DocumentSnapshot d in querySnapshot.docs) {
-      var datetime = d.get('datetime');
       Map<String, dynamic> doc = {
         d.get('listName'): {
           'listName': d.get('listName') as String,
-          'datetime': DateTime.fromMillisecondsSinceEpoch(datetime),
+          'datetime': d.get('datetime').toDate() as DateTime,
           'listItems': d.get('listItems') as Map<dynamic, dynamic>
         }
       };
@@ -37,18 +38,25 @@ class MealPlan with ChangeNotifier {
     notifyListeners();
   }
 
-  Future createShoppingListFromMeal(String listName, List<String> listItems) async {
-    await _firestoreService.createShoppingListFromMeal(listName, listItems);
+  Future createShoppingListFromMeal(String listName, List<String> listItems, DateTime datetime) async {
+    await _firestoreService.createShoppingListFromMeal(listName, listItems, datetime);
+    notifyListeners();
+  }
+
+  Future addToShoppingListFromMeal(String listName, List<String> listItems) async {
+    await _firestoreService.addToShoppingListFromMeal(listName, listItems);
     notifyListeners();
   }
 
   List<String> getUntickedIngredients(String listName){
     List<String> untickedIngredients = [];
-    mealPlans[listName]['listItems'].values.map((item) => {
-      if(!item['itemTicked']){
-        untickedIngredients.add(item['itemName'] as String)
-      }
-    }).toList();
+    if(mealPlans[listName]['listItems'].values.isNotEmpty){
+      mealPlans[listName]['listItems'].values.map((item) => {
+        if(!item['itemTicked']){
+          untickedIngredients.add(item['itemName'] as String)
+        }
+      }).toList();
+    }
     return untickedIngredients;
   }
 
@@ -77,8 +85,21 @@ class MealPlan with ChangeNotifier {
   }
   
   Future deleteMealPlan(String listName) async {
-    await _firestoreService.deleteTodoList(listName);
+    await _firestoreService.deleteMealPlan(listName);
     mealPlans.remove(listName);
+    notifyListeners();
+  }
+
+   Future getMealPlansForHomeScreen() async {
+    var now = DateFormat('dd/MM/yyyy').format(DateTime.now());
+    var querySnapshot = await _firestoreService.getAllMealPlans();
+    mealPlansHome.clear();
+    for (DocumentSnapshot d in querySnapshot.docs) {
+      var taskDueDate = DateFormat('dd/MM/yyyy').format(d.get('datetime').toDate() as DateTime);
+      if(now==taskDueDate){
+        mealPlansHome.add(d.get('listName'));
+      }
+    }
     notifyListeners();
   }
 }

@@ -36,7 +36,7 @@ class _ShoppingListsPageState extends State<ShoppingListsPage> {
               children: viewModel.shoppingLists.values.map(
                     (doc) => ShoppingListExpandable(
                       listName: doc['listName'],
-                      creationDatetime: doc['creationDatetime'],
+                      datetime: doc['datetime'],
                       listItems: doc['listItems'],
                       )).toList(),
             );
@@ -53,15 +53,38 @@ class _ShoppingListsPageState extends State<ShoppingListsPage> {
 
    void _showCreateListDialog(BuildContext context) {
     TextEditingController controller = TextEditingController();
+    DateTime selectedDate = DateTime.now();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Create a new shopping list'),
-          content: TextField(
-            controller: controller,
-            decoration: const InputDecoration(labelText: 'The name of your shopping list'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(labelText: 'The name of your Shopping List'),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: selectedDate,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                  );
+
+                  if (pickedDate != null && pickedDate != selectedDate) {
+                    selectedDate = pickedDate;
+                  }
+                },
+                child: const Text('Pick Date'),
+              ),
+            ],
           ),
           actions: [
             TextButton(
@@ -74,7 +97,7 @@ class _ShoppingListsPageState extends State<ShoppingListsPage> {
               onPressed: () {
                 String newListName = controller.text;
                 if (newListName.isNotEmpty) {
-                  context.read<ShoppingList>().addShoppingList(newListName);
+                  context.read<ShoppingList>().addShoppingList(newListName, selectedDate);
                   Navigator.of(context).pop();
                 }
               },
