@@ -4,6 +4,7 @@ import 'package:kolay_app/providers/milestone_provider.dart';
 import 'package:kolay_app/providers/routine_provider.dart';
 import 'package:kolay_app/providers/todo_provider.dart';
 import 'package:kolay_app/providers/meal_plan_provider.dart';
+import 'package:kolay_app/service/notification_service.dart';
 import 'package:provider/provider.dart';
 import 'screens/home.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -14,6 +15,7 @@ void main() async{
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await NotificationApi().initNotifications();
   runApp(
     MultiProvider(
       providers: [
