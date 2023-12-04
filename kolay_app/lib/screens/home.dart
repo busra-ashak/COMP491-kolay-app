@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kolay_app/providers/reminder_provider.dart';
 import 'package:kolay_app/providers/shopping_list_provider.dart';
 import 'package:kolay_app/providers/meal_plan_provider.dart';
 import 'package:kolay_app/providers/todo_provider.dart';
@@ -18,7 +19,7 @@ class _HomePageState extends State<HomePage> {
 
   fetchData() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      context.read<TodoList>().getIncompleteToDoTasksForHomeScreen();
+      context.read<ReminderList>().getIncompleteToDoTasksForHomeScreen();
       context.read<ShoppingList>().getShoppingListsForHomeScreen();
       context.read<MealPlan>().getMealPlansForHomeScreen();
     });

@@ -115,11 +115,11 @@ class FireStoreService {
 
   /* TO DO LISTS */
 
-  Future addItemToTodoList(String listName, String newItem, DateTime itemDeadline) async {
+  Future addItemToTodoList(String listName, String newItem) async {
     final DocumentReference documentReference = _fireStoreService.collection('todoLists').doc(listName);
 
     await documentReference.update({
-      'listItems.$newItem': {'itemName': newItem, 'itemTicked': false, 'itemDeadline': itemDeadline}
+      'listItems.$newItem': {'itemName': newItem, 'itemTicked': false}
     });
   }
 

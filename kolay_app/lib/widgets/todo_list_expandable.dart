@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/todo_provider.dart';
 import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TodoListExpandable extends StatelessWidget {
   final String listName;
@@ -51,9 +50,6 @@ class TodoListExpandable extends StatelessWidget {
 
     if (listItems.isNotEmpty) {
       for (Map content in listItems.values) {
-        var itemDeadline = content['itemDeadline'].runtimeType == Timestamp
-            ? content['itemDeadline'].toDate()
-            : content['itemDeadline'];
         columnContent.add(
           ListTile(
             leading: Checkbox(
@@ -67,7 +63,6 @@ class TodoListExpandable extends StatelessWidget {
                     context, listName, content['itemName']),
                 icon: const Icon(Icons.delete)),
             title: Text(content['itemName']),
-            subtitle: Text(DateFormat('dd/MM/yyyy HH:mm').format(itemDeadline)),
           ),
         );
       }
@@ -86,7 +81,6 @@ class TodoListExpandable extends StatelessWidget {
 
   void _showAddItemToListDialog(BuildContext context, String listName) {
     TextEditingController itemNameController = TextEditingController();
-    DateTime selectedDate = DateTime.now();
 
     showDialog(
       context: context,
@@ -102,21 +96,6 @@ class TodoListExpandable extends StatelessWidget {
                   decoration: const InputDecoration(labelText: 'New Item'),
                 ),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () async {
-                    DateTime? pickedDate = await showDateTimePicker(
-                      context: context,
-                      initialDate: selectedDate,
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2101),
-                    );
-
-                    if (pickedDate != null && pickedDate != selectedDate) {
-                      selectedDate = pickedDate;
-                    }
-                  },
-                  child: const Text('Add Deadline'),
-                ),
               ]),
           actions: [
             TextButton(
@@ -131,7 +110,7 @@ class TodoListExpandable extends StatelessWidget {
                 if (newItemName.isNotEmpty) {
                   context
                       .read<TodoList>()
-                      .addTodoItemToList(listName, newItemName, selectedDate);
+                      .addTodoItemToList(listName, newItemName);
                   Navigator.of(context).pop();
                 }
               },
