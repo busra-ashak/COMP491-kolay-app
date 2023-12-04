@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:kolay_app/providers/shopping_list_provider.dart';
+import 'package:intl/intl.dart';
 
 class ShoppingListExpandable extends StatelessWidget {
   final String listName;
-  final String creationDatetime;
+  final DateTime datetime;
   final Map listItems;
 
   const ShoppingListExpandable({
     Key? key, 
     required this.listName,
-    required this.creationDatetime,
+    required this.datetime,
     required this.listItems}) : super(key: key);
 
   @override
@@ -25,7 +26,7 @@ class ShoppingListExpandable extends StatelessWidget {
         Expanded(
           child: ExpansionTile(
             title: Text(listName),
-            subtitle: Text(creationDatetime),
+            subtitle: Text(DateFormat('dd/MM/yyyy').format(datetime)),
             children: <Widget>[
               Column(
                 children: _buildExpandableContent(
@@ -55,7 +56,7 @@ class ShoppingListExpandable extends StatelessWidget {
               onChanged: (bool? val) {
                 context
                     .read<ShoppingList>()
-                    .toggleItemCheckbox(listName, content['itemName'], content['itemTicked']);
+                    .updateToggle(listName, content['itemName'], content['itemTicked']);
               }),
             trailing: IconButton(
                 onPressed: () => _showDeleteItemFromListDialog(context, listName, content['itemName']),
@@ -100,7 +101,7 @@ class ShoppingListExpandable extends StatelessWidget {
               onPressed: () {
                 String newItemName = controller.text;
                 if (newItemName.isNotEmpty) {
-                  context.read<ShoppingList>().addItemToShoppingList(listName, newItemName);
+                  context.read<ShoppingList>().addShoppingListItem(listName, newItemName);
                   Navigator.of(context).pop();
                 }
               },
@@ -127,7 +128,7 @@ class ShoppingListExpandable extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                context.read<ShoppingList>().deleteShoppingList(listName);
+                context.read<ShoppingList>().removeShoppingList(listName);
                 Navigator.of(context).pop();
               },
               child: const Text('Yes'),
@@ -153,7 +154,7 @@ class ShoppingListExpandable extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                context.read<ShoppingList>().deleteItemFromShoppingList(listName, oldItem);
+                context.read<ShoppingList>().removeShoppingListItem(listName, oldItem);
                 Navigator.of(context).pop();
               },
               child: const Text('Yes'),

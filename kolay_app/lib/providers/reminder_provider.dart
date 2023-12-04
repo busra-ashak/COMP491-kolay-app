@@ -1,111 +1,104 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../service/firestore_service.dart';
+import 'package:intl/intl.dart';
 class ReminderList with ChangeNotifier {
+  final FireStoreService _firestoreService = FireStoreService();
+  Map<String, dynamic> reminderLists = {};
+  List<String> reminderListsHome = [];
+  List<String> reminderTasksHome = [];
 
-  Future<Map<String, Map>> getAllReminderLists() async {
-    Map<String, Map> documents = {};
 
-    try {
-      var collectionReference = FirebaseFirestore.instance.collection('reminderLists');
-      QuerySnapshot querySnapshot = await collectionReference.get();
-
-      for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
-        var datetime = documentSnapshot.get('creationDatetime');
-        Map<String, Map> doc =
-        {documentSnapshot.id :
-        {
-          'listName': documentSnapshot.get('listName'),
-          'creationDatetime': DateTime.fromMillisecondsSinceEpoch(datetime),
-          'listItems': documentSnapshot.get('listItems')
-        }
-        };
-        documents.addAll(doc);
+  Future createReminderList(String listName, DateTime datetime) async {
+    await _firestoreService.createReminderList(listName, datetime);
+    Map<String, dynamic> doc = {
+      listName: {
+        "listName": listName,
+        "dueDatetime": datetime,
+        "listItems": {}
       }
-    } catch (e) {
-      print('Error fetching document IDs: $e');
+    };
+    reminderLists.addAll(doc);
+    notifyListeners();
+  }
+
+  Future getAllReminderLists() async {
+    var querySnapshot = await _firestoreService.getAllReminderLists();
+    reminderLists.clear();
+    for (DocumentSnapshot d in querySnapshot.docs) {
+      Map<String, dynamic> doc = {
+        d.get('listName'): {
+          'listName': d.get('listName') as String,
+          'dueDatetime': d.get('dueDatetime').toDate() as DateTime,
+          'listItems': d.get('listItems') as Map<dynamic, dynamic>
+        }
+      };
+      reminderLists.addAll(doc);
     }
 
-    return Future.value(documents);
+    notifyListeners();
   }
 
-  //A function that fetches incompleted tasks to represent in homescreen
-  Future<List<String>> getIncompleteTasksForHomeScreen() async {
-    List<String> incompleteTasks = [];
+  Future toggleItemCheckbox(String listName, String itemName, bool itemChecked) async {
+    await _firestoreService.toggleReminderItemCheckbox(listName, itemName, itemChecked);
+    reminderLists[listName]['listItems'][itemName]['itemTicked'] = !itemChecked;
+    notifyListeners();
+  }
 
-    try {
-      var collectionReference = FirebaseFirestore.instance.collection('reminderLists');
-      QuerySnapshot querySnapshot = await collectionReference.get();
-
-      for (QueryDocumentSnapshot documentSnapshot in querySnapshot.docs) {
-        Map<String, dynamic> listItems = documentSnapshot.get('listItems');
-
-        listItems.forEach((itemName, itemDetails) {
-          if (itemDetails['itemTicked'] == false) {
-            incompleteTasks.add(itemName);
-          }
-        });
+  Future addReminderItemToList(String listName, String itemName, DateTime itemDeadline) async {
+    await _firestoreService.addItemToReminderList(listName, itemName, itemDeadline);
+    Map<String, dynamic> doc = {
+      itemName: {
+        "itemName": itemName,
+        "itemDeadline": itemDeadline,
+        "itemTicked": false
       }
-    } catch (e) {
-      print('Error fetching incomplete tasks: $e');
+    };
+    reminderLists[listName]['listItems'].addAll(doc);
+    notifyListeners();
+  }
+
+  Future deleteReminderItemFromList(String listName, String itemName) async {
+    await _firestoreService.deleteItemFromReminderList(listName, itemName);
+    reminderLists[listName]['listItems'].remove(itemName);
+    notifyListeners();
+  }
+
+  Future deleteReminderList(String listName) async {
+    await _firestoreService.deleteReminderList(listName);
+    reminderLists.remove(listName);
+    notifyListeners();
+  }
+
+  Future getToDoListsForHomeScreen() async {
+    var now = DateFormat('dd/MM/yyyy').format(DateTime.now());
+    var querySnapshot = await _firestoreService.getAllReminderLists();
+    reminderListsHome.clear();
+    for (DocumentSnapshot d in querySnapshot.docs) {
+      var taskDueDate = DateFormat('dd/MM/yyyy').format(d.get('dueDatetime').toDate() as DateTime);
+      if(now==taskDueDate){
+        reminderListsHome.add(d.get('listName'));
+      }
     }
-
-    return incompleteTasks;
-  }
-
-  void addReminderItemToList(String listName, String newItem, String deadline) {
-    var documentReference = FirebaseFirestore.instance.collection('reminderLists').doc(listName);
-
-    documentReference.update({
-      'listItems.$newItem': {'itemName': newItem, 'itemTicked': false, 'itemDeadline': deadline}
-    }).catchError((error) {
-      print('Error adding item: $error');
-    });
-
     notifyListeners();
   }
 
-  void toggleItemCheckbox(String listName, String itemName, bool itemTicked, String deadline) async {
-    var documentReference = FirebaseFirestore.instance.collection('reminderLists').doc(listName);
-
-    documentReference.update({
-      'listItems.$itemName': {'itemName': itemName, 'itemTicked': !itemTicked, 'itemDeadline': deadline}
-    }).catchError((error) {
-      print('Error adding item: $error');
-    });
-
-    notifyListeners();
-  }
-
-  void deleteReminderItemFromList(String listName, String oldItem, bool oldItemTicked) {
-    var documentReference = FirebaseFirestore.instance.collection('reminderLists').doc(listName);
-
-    documentReference.update({
-      'listItems.$oldItem': FieldValue.delete(),
-    }).catchError((error) {
-      print('Error deleting item: $error');
-    });
-
-    notifyListeners();
-  }
-
-  void createReminderList(String listName) {
-    FirebaseFirestore.instance.collection("reminderLists").doc(listName).set(
-        {
-          "listName": listName,
-          "creationDatetime": DateTime.now().millisecondsSinceEpoch,
-          "listItems": {}
+  Future getIncompleteToDoTasksForHomeScreen() async {
+    var now = DateFormat('dd/MM/yyyy').format(DateTime.now());
+    var querySnapshot = await _firestoreService.getAllReminderLists();
+    reminderTasksHome.clear();
+    for (DocumentSnapshot d in querySnapshot.docs) {
+      String listName = d.get('listName');
+      var tasks = d.get('listItems');
+      for(var task in tasks.values){
+        var taskDueDate = DateFormat('dd/MM/yyyy').format(task['itemDeadline'].toDate() as DateTime);
+        if(now==taskDueDate){
+          String itemName = task['itemName'];
+          reminderTasksHome.add('$itemName - $listName');
         }
-    ).catchError((error) {
-      print('Error creating list: $error');
-    });
+      }
+    }
     notifyListeners();
   }
 
-  void deleteReminderList(String listName) {
-    // open modal and ask are you sure
-    FirebaseFirestore.instance.collection("reminderLists").doc(listName).delete().catchError((error) {
-      print('Error creating list: $error');
-    });
-    notifyListeners();
-  }
 }
