@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:kolay_app/providers/reminder_provider.dart';
 import 'package:kolay_app/providers/shopping_list_provider.dart';
 import 'package:kolay_app/providers/meal_plan_provider.dart';
-import 'package:kolay_app/providers/todo_provider.dart';
 import 'package:provider/provider.dart';
 import '../widgets/sideabar_menu.dart';
 
@@ -34,12 +33,12 @@ class _HomePageState extends State<HomePage> {
         title: const Text("Today's Plan", style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
         ),
       ),
-      body: Consumer3<TodoList, ShoppingList, MealPlan>(
-          builder: (context, todosProvider, shoppingProvider, mealProvider, child) {
+      body: Consumer3<ReminderList, ShoppingList, MealPlan>(
+          builder: (context, reminderProvider, shoppingProvider, mealProvider, child) {
             return ListView(
               padding: const EdgeInsets.all(8),
               children: [
-                _buildListWithTitle('To dos', todosProvider.todoTasksHome),
+                _buildListWithTitle('Reminders', reminderProvider.reminderTasksHome),
                 _buildListWithTitle('Shopping Lists', shoppingProvider.shoppingListsHome),
                 _buildListWithTitle('Meal Plans', mealProvider.mealPlansHome),
               ],
