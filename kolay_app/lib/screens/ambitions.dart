@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:kolay_app/screens/profile.dart';
+import 'package:kolay_app/screens/settings.dart';
 import 'package:kolay_app/widgets/routine_widget.dart';
 import 'package:provider/provider.dart';
-import '../widgets/sideabar_menu.dart';
 import '../widgets/milestone_expandable.dart';
 import '../providers/milestone_provider.dart';
 import '../providers/routine_provider.dart';
@@ -41,11 +42,28 @@ class _AmbitionsPageState extends State<AmbitionsPage> {
     return DefaultTabController(
         length: 2,
         child: Scaffold(
-          drawer: SideBarMenu(),
           appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.settings),
+              iconSize: 31.0,
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SettingsPage()));
+              },
+            ),
             backgroundColor: Theme.of(context).colorScheme.inversePrimary,
             title: const Text('Your Ambitions',
                 style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.person),
+                iconSize: 31.0,
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => ProfilePage()));
+                },
+              )
+            ],
             bottom: const TabBar(
               tabs: [
                 Tab(

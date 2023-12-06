@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:kolay_app/screens/profile.dart';
+import 'package:kolay_app/screens/settings.dart';
 import 'package:provider/provider.dart';
 import '../providers/reminder_provider.dart';
 import '../providers/todo_provider.dart';
 import '../widgets/reminder_list_expandable.dart';
-import '../widgets/sideabar_menu.dart';
 import '../widgets/todo_list_expandable.dart';
 
 class ToDosPage extends StatefulWidget {
@@ -30,11 +31,28 @@ class _ToDosPageState extends State<ToDosPage> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        drawer: SideBarMenu(),
         appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.settings),
+            iconSize: 31.0,
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => SettingsPage()));
+            },
+          ),
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: const Text('Your Tasks',
               style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.person),
+              iconSize: 31.0,
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => ProfilePage()));
+              },
+            )
+          ],
           bottom: const TabBar(
             tabs: [
               Tab(icon: Icon(Icons.checklist_outlined), text: "Todos"),
@@ -215,7 +233,9 @@ class _ToDosPageState extends State<ToDosPage> {
               onPressed: () {
                 String newListName = controller.text;
                 if (newListName.isNotEmpty) {
-                  context.read<ReminderList>().createReminderList(newListName, selectedDate);
+                  context
+                      .read<ReminderList>()
+                      .createReminderList(newListName, selectedDate);
                   Navigator.of(context).pop();
                 }
               },
@@ -256,12 +276,11 @@ class _ToDosPageState extends State<ToDosPage> {
     return selectedTime == null
         ? selectedDate
         : DateTime(
-      selectedDate.year,
-      selectedDate.month,
-      selectedDate.day,
-      selectedTime.hour,
-      selectedTime.minute,
-    );
+            selectedDate.year,
+            selectedDate.month,
+            selectedDate.day,
+            selectedTime.hour,
+            selectedTime.minute,
+          );
   }
-
 }

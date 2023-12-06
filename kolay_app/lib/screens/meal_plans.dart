@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import '../widgets/sideabar_menu.dart';
+import 'package:kolay_app/screens/profile.dart';
+import 'package:kolay_app/screens/settings.dart';
 import '../widgets/meal_plan_list.dart';
 import 'package:provider/provider.dart';
 import '../providers/meal_plan_provider.dart';
 
 class MealPlansPage extends StatefulWidget {
- @override
- State<MealPlansPage> createState() => _MealPlansPageState();
+  @override
+  State<MealPlansPage> createState() => _MealPlansPageState();
 }
 
 class _MealPlansPageState extends State<MealPlansPage> {
@@ -25,42 +26,60 @@ class _MealPlansPageState extends State<MealPlansPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: SideBarMenu(),
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.settings),
+          iconSize: 31.0,
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => SettingsPage()));
+          },
+        ),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: const Text(
           'Your Meal Plans',
           style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
         ),
-      ),
-      body: Consumer<MealPlan>(
-          builder: (context, viewModel, child) {
-            return ListView(
-              children: viewModel.mealPlans.values.map(
-                    (doc) => Column(
-                      children: [
-                        MealPlanWidget(
-                          listName: doc['listName'],
-                          datetime: doc['datetime'],
-                          listItems: doc['listItems'],),
-                        ElevatedButton(
-                          onPressed: () {
-                            _showConfirmDialog(context, doc['listName']);
-                          },
-                          child: const Text('Add to a Shopping List'),
-                        ),
-                      ],
-                    ),
-                  ).toList(),
-            );
-          }
-      ),
-      floatingActionButton: IconButton(
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.person),
+            iconSize: 31.0,
             onPressed: () {
-              _showCreateMealPlanDialog(context);
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ProfilePage()));
             },
-            icon: const Icon(Icons.add),
-          ),
+          )
+        ],
+      ),
+      body: Consumer<MealPlan>(builder: (context, viewModel, child) {
+        return ListView(
+          children: viewModel.mealPlans.values
+              .map(
+                (doc) => Column(
+                  children: [
+                    MealPlanWidget(
+                      listName: doc['listName'],
+                      datetime: doc['datetime'],
+                      listItems: doc['listItems'],
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        _showConfirmDialog(context, doc['listName']);
+                      },
+                      child: const Text('Add to a Shopping List'),
+                    ),
+                  ],
+                ),
+              )
+              .toList(),
+        );
+      }),
+      floatingActionButton: IconButton(
+        onPressed: () {
+          _showCreateMealPlanDialog(context);
+        },
+        icon: const Icon(Icons.add),
+      ),
     );
   }
 
@@ -70,7 +89,8 @@ class _MealPlansPageState extends State<MealPlansPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Add to a Shopping List'),
-          content: const Text('Do you want to add to an existing shopping list or create a new one?'),
+          content: const Text(
+              'Do you want to add to an existing shopping list or create a new one?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -107,7 +127,8 @@ class _MealPlansPageState extends State<MealPlansPage> {
             children: [
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(labelText: 'The name of your Meal Plan'),
+                decoration: const InputDecoration(
+                    labelText: 'The name of your Meal Plan'),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
@@ -138,7 +159,9 @@ class _MealPlansPageState extends State<MealPlansPage> {
               onPressed: () {
                 String mealPlanName = nameController.text;
                 if (mealPlanName.isNotEmpty) {
-                  context.read<MealPlan>().createMealPlan(mealPlanName, selectedDate);
+                  context
+                      .read<MealPlan>()
+                      .createMealPlan(mealPlanName, selectedDate);
                   Navigator.of(context).pop();
                 }
               },
@@ -160,7 +183,8 @@ class _MealPlansPageState extends State<MealPlansPage> {
           title: const Text('Add to a shopping list'),
           content: TextField(
             controller: controller,
-            decoration: const InputDecoration(labelText: 'The name of your shopping list'),
+            decoration: const InputDecoration(
+                labelText: 'The name of your shopping list'),
           ),
           actions: [
             TextButton(
@@ -172,9 +196,13 @@ class _MealPlansPageState extends State<MealPlansPage> {
             TextButton(
               onPressed: () {
                 String listName = controller.text;
-                List<String> listItems = context.read<MealPlan>().getUntickedIngredients(mealPlanName);
+                List<String> listItems = context
+                    .read<MealPlan>()
+                    .getUntickedIngredients(mealPlanName);
                 if (listName.isNotEmpty && listItems.isNotEmpty) {
-                  context.read<MealPlan>().addToShoppingListFromMeal(listName, listItems);
+                  context
+                      .read<MealPlan>()
+                      .addToShoppingListFromMeal(listName, listItems);
                 }
                 Navigator.of(context).pop();
               },
@@ -201,7 +229,8 @@ class _MealPlansPageState extends State<MealPlansPage> {
             children: [
               TextField(
                 controller: controller,
-                decoration: const InputDecoration(labelText: 'The name of your Shopping List'),
+                decoration: const InputDecoration(
+                    labelText: 'The name of your Shopping List'),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
@@ -231,9 +260,12 @@ class _MealPlansPageState extends State<MealPlansPage> {
             TextButton(
               onPressed: () {
                 String listName = controller.text;
-                List<String> listItems = context.read<MealPlan>().getUntickedIngredients(mealPlanName);
+                List<String> listItems = context
+                    .read<MealPlan>()
+                    .getUntickedIngredients(mealPlanName);
                 if (listName.isNotEmpty && listItems.isNotEmpty) {
-                  context.read<MealPlan>().createShoppingListFromMeal(listName, listItems, selectedDate);
+                  context.read<MealPlan>().createShoppingListFromMeal(
+                      listName, listItems, selectedDate);
                 }
                 Navigator.of(context).pop();
               },
