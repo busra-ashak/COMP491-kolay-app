@@ -115,11 +115,11 @@ class FireStoreService {
 
   /* TO DO LISTS */
 
-  Future addItemToTodoList(String listName, String newItem, DateTime itemDeadline) async {
+  Future addItemToTodoList(String listName, String newItem) async {
     final DocumentReference documentReference = _fireStoreService.collection('todoLists').doc(listName);
 
     await documentReference.update({
-      'listItems.$newItem': {'itemName': newItem, 'itemTicked': false, 'itemDeadline': itemDeadline}
+      'listItems.$newItem': {'itemName': newItem, 'itemTicked': false}
     });
   }
 
@@ -157,6 +157,52 @@ class FireStoreService {
     final QuerySnapshot _ref = await _fireStoreService.collection('todoLists').get();
     return _ref;
   }
+
+/* REMINDER LISTS */
+
+  Future addItemToReminderList(String listName, String newItem, DateTime itemDeadline) async {
+    final DocumentReference documentReference = _fireStoreService.collection('reminderLists').doc(listName);
+
+    await documentReference.update({
+      'listItems.$newItem': {'itemName': newItem, 'itemTicked': false, 'itemDeadline': itemDeadline}
+    });
+  }
+
+  Future toggleReminderItemCheckbox(String listName, String itemName, bool itemTicked) async {
+    final DocumentReference documentReference = _fireStoreService.collection('reminderLists').doc(listName);
+
+    await documentReference.update({
+      'listItems.$itemName.itemTicked': !itemTicked
+    });
+  }
+
+  Future deleteItemFromReminderList(String listName, String oldItem) async {
+    final DocumentReference documentReference = _fireStoreService.collection('reminderLists').doc(listName);
+
+    await documentReference.update({
+      'listItems.$oldItem': FieldValue.delete(),
+    });
+  }
+
+  Future createReminderList(String listName, DateTime datetime) async {
+    await _fireStoreService.collection('reminderLists').doc(listName).set(
+        {
+          "listName": listName,
+          "dueDatetime": datetime,
+          "listItems": {}
+        }
+    );
+  }
+
+  Future deleteReminderList(String listName) async {
+    await _fireStoreService.collection('reminderLists').doc(listName).delete();
+  }
+
+  Future<QuerySnapshot> getAllReminderLists() async {
+    final QuerySnapshot _ref = await _fireStoreService.collection('reminderLists').get();
+    return _ref;
+  }
+
 
   /* MEAL PLANS */
 
