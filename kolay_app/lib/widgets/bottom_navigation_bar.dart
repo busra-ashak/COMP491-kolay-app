@@ -52,7 +52,7 @@ class _BottomNavigationBarControllerState
             BottomNavigationBarItem(
                 icon: Icon(Icons.home_filled), label: 'Home'),
             BottomNavigationBarItem(
-                icon: Icon(Icons.done_outline_outlined), label: 'Todos'),
+                icon: Icon(Icons.done_outline_outlined), label: 'To-do'),
             BottomNavigationBarItem(icon: Icon(Icons.star), label: 'Ambitions'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.shopping_cart), label: 'Shopping List'),
