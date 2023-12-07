@@ -7,7 +7,7 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 
 
-exports.scheduledFunctionCrontab = onSchedule('*/15 * * * *', async (event) => {
+exports.scheduledFunctionCrontab = onSchedule('*/1 * * * *', async (event) => {
   // Create a list containing up to 500 registration tokens.
   // These registration tokens come from the client FCM SDKs.
   const registrationTokens = [
