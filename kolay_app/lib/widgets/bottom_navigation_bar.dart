@@ -15,12 +15,12 @@ class BottomNavigationBarController extends StatefulWidget {
 
 class _BottomNavigationBarControllerState
     extends State<BottomNavigationBarController> {
-  int _currentIndex = 0; // index of HomePage()
+  int _currentIndex = 2; // index of HomePage()
 
   final List<Widget> _children = [
-    HomePage(),
     ToDosPage(),
     AmbitionsPage(),
+    HomePage(),
     ShoppingListsPage(),
     MealPlansPage()
   ];
@@ -50,10 +50,10 @@ class _BottomNavigationBarControllerState
           currentIndex: _currentIndex,
           items: const [
             BottomNavigationBarItem(
-                icon: Icon(Icons.home_filled), label: 'Home'),
-            BottomNavigationBarItem(
                 icon: Icon(Icons.done_outline_outlined), label: 'To-do'),
             BottomNavigationBarItem(icon: Icon(Icons.star), label: 'Ambitions'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.home_filled), label: 'Home'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.shopping_cart), label: 'Shopping List'),
             BottomNavigationBarItem(
