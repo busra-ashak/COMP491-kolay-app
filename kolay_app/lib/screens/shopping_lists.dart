@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:kolay_app/screens/profile.dart';
+import 'package:kolay_app/screens/settings.dart';
 import 'package:provider/provider.dart';
-import '../widgets/sideabar_menu.dart';
 import '../widgets/shopping_list_expandable.dart';
 import '../providers/shopping_list_provider.dart';
 
@@ -25,33 +26,50 @@ class _ShoppingListsPageState extends State<ShoppingListsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: SideBarMenu(),
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.settings),
+          iconSize: 31.0,
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => SettingsPage()));
+          },
+        ),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Your Shopping Lists', style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),   
-      ),
-      body:Consumer<ShoppingList>(
-          builder: (context, viewModel, child) {
-            return ListView(
-              children: viewModel.shoppingLists.values.map(
-                    (doc) => ShoppingListExpandable(
-                      listName: doc['listName'],
-                      datetime: doc['datetime'],
-                      listItems: doc['listItems'],
-                      )).toList(),
-            );
-          }
-      ),
-      floatingActionButton: IconButton(
+        title: const Text('Your Shopping Lists',
+            style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.person),
+            iconSize: 31.0,
             onPressed: () {
-              _showCreateListDialog(context);
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ProfilePage()));
             },
-            icon: const Icon(Icons.add),
-          ),
+          )
+        ],
+      ),
+      body: Consumer<ShoppingList>(builder: (context, viewModel, child) {
+        return ListView(
+          children: viewModel.shoppingLists.values
+              .map((doc) => ShoppingListExpandable(
+                    listName: doc['listName'],
+                    datetime: doc['datetime'],
+                    listItems: doc['listItems'],
+                  ))
+              .toList(),
+        );
+      }),
+      floatingActionButton: IconButton(
+        onPressed: () {
+          _showCreateListDialog(context);
+        },
+        icon: const Icon(Icons.add),
+      ),
     );
   }
 
-   void _showCreateListDialog(BuildContext context) {
+  void _showCreateListDialog(BuildContext context) {
     TextEditingController controller = TextEditingController();
     DateTime selectedDate = DateTime.now();
 
@@ -66,7 +84,8 @@ class _ShoppingListsPageState extends State<ShoppingListsPage> {
             children: [
               TextField(
                 controller: controller,
-                decoration: const InputDecoration(labelText: 'The name of your Shopping List'),
+                decoration: const InputDecoration(
+                    labelText: 'The name of your Shopping List'),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
@@ -97,7 +116,9 @@ class _ShoppingListsPageState extends State<ShoppingListsPage> {
               onPressed: () {
                 String newListName = controller.text;
                 if (newListName.isNotEmpty) {
-                  context.read<ShoppingList>().addShoppingList(newListName, selectedDate);
+                  context
+                      .read<ShoppingList>()
+                      .addShoppingList(newListName, selectedDate);
                   Navigator.of(context).pop();
                 }
               },
@@ -108,5 +129,4 @@ class _ShoppingListsPageState extends State<ShoppingListsPage> {
       },
     );
   }
-
 }

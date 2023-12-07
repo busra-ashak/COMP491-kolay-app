@@ -5,13 +5,13 @@ import 'package:kolay_app/providers/milestone_provider.dart';
 import 'package:kolay_app/providers/routine_provider.dart';
 import 'package:kolay_app/providers/todo_provider.dart';
 import 'package:kolay_app/providers/meal_plan_provider.dart';
+import 'package:kolay_app/widgets/bottom_navigation_bar.dart';
 import 'package:kolay_app/service/notification_service.dart';
 import 'package:provider/provider.dart';
-import 'screens/home.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
- 
-void main() async{
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -56,10 +56,11 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red, brightness: Brightness.light),
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.red, brightness: Brightness.light),
         useMaterial3: true,
       ),
-      home: HomePage(),
+      home: const BottomNavigationBarController(),
     );
   }
 }
