@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kolay_app/screens/home.dart';
 import 'package:kolay_app/screens/sign_up.dart';
+import 'package:kolay_app/widgets/bottom_navigation_bar.dart';
 import 'package:kolay_app/widgets/form_container_widget.dart';
 import 'package:kolay_app/service/firebase_auth_services.dart';
 
@@ -108,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
     if (user!= null){
       print("User is successfully signedIn");
       Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomePage()));
+                  MaterialPageRoute(builder: (context) => BottomNavigationBarController()));
     } else{
       print("Some error happend");
     }
