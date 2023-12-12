@@ -1,5 +1,7 @@
 // DrawerPage.dart
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:kolay_app/screens/log_in.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -48,7 +50,11 @@ class _ProfilePageState extends State<ProfilePage> {
           ListTile(
             title: const Text('Log Out'),
             leading: const Icon(Icons.exit_to_app),
-            onTap: () => {},
+            onTap: (){
+              FirebaseAuth.instance.signOut();
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => LoginPage()));
+              },
           ),
         ],
       ),

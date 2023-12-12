@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kolay_app/providers/reminder_provider.dart';
 import 'package:kolay_app/providers/shopping_list_provider.dart';
@@ -5,6 +6,7 @@ import 'package:kolay_app/providers/milestone_provider.dart';
 import 'package:kolay_app/providers/routine_provider.dart';
 import 'package:kolay_app/providers/todo_provider.dart';
 import 'package:kolay_app/providers/meal_plan_provider.dart';
+import 'package:kolay_app/screens/log_in.dart';
 import 'package:kolay_app/widgets/bottom_navigation_bar.dart';
 import 'package:kolay_app/service/notification_service.dart';
 import 'package:provider/provider.dart';
@@ -51,7 +53,7 @@ class MyApp extends StatelessWidget {
         // the command line to start the app).
         //
         // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
+        // state is not lost during the reload. To reset the state, use hot 
         // restart instead.
         //
         // This works for code too, not just values: Most code changes can be
@@ -60,7 +62,24 @@ class MyApp extends StatelessWidget {
             seedColor: Colors.red, brightness: Brightness.light),
         useMaterial3: true,
       ),
-      home: const BottomNavigationBarController(),
+      home:  FutureBuilder(
+        future: FirebaseAuth.instance.authStateChanges().first,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // Return a loading indicator if the Future is still running
+            return CircularProgressIndicator();
+          } else {
+            // Check if the user is logged in
+            if (snapshot.hasData) {
+              // User is logged in, show home page
+              return BottomNavigationBarController();
+            } else {
+              // User is not logged in, show login page
+              return LoginPage();
+            }
+          }
+        },
+      ),
     );
   }
 }
