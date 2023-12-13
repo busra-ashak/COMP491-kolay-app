@@ -25,46 +25,74 @@ class _ShoppingListsPageState extends State<ShoppingListsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.settings),
-          iconSize: 31.0,
-          onPressed: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => SettingsPage()));
-          },
+    return Theme(
+      data: Theme.of(context).copyWith(
+        dividerTheme: const DividerThemeData(
+          color: Colors.transparent,
         ),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text('Your Shopping Lists',
-            style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.person),
+      ),
+      child: Scaffold(
+        backgroundColor: const Color(0xFFFAF5E6),
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.settings, color: Colors.white),
             iconSize: 31.0,
             onPressed: () {
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePage()));
+                  MaterialPageRoute(builder: (context) => SettingsPage()));
             },
-          )
+          ),
+          backgroundColor: const Color(0xFFF7B9CB),
+          centerTitle: true,
+          title: const Text('Your Shopping Lists',
+              style: TextStyle(
+                  color: Color(0xFF77BBB4),
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold)),
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.person, color: Colors.white),
+              iconSize: 31.0,
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => ProfilePage()));
+              },
+            )
+          ],
+        ),
+        body: Consumer<ShoppingList>(builder: (context, viewModel, child) {
+          return ListView(
+            children: viewModel.shoppingLists.values
+                .map((doc) => ShoppingListExpandable(
+                      listName: doc['listName'],
+                      datetime: doc['datetime'],
+                      listItems: doc['listItems'],
+                    ))
+                .toList(),
+          );
+        }),
+        persistentFooterButtons: [
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(50),
+              color: const Color(0xDDB2F7EF),
+              boxShadow: const [
+                BoxShadow(color: Color(0xFF77BBB4), spreadRadius: 3),
+              ],
+            ),
+            child: IconButton(
+              color: const Color(0xFF77BBB4),
+              onPressed: () {
+                _showCreateListDialog(context);
+              },
+              icon: const Icon(
+                Icons.add,
+                size: 30,
+              ),
+            ),
+          ),
         ],
-      ),
-      body: Consumer<ShoppingList>(builder: (context, viewModel, child) {
-        return ListView(
-          children: viewModel.shoppingLists.values
-              .map((doc) => ShoppingListExpandable(
-                    listName: doc['listName'],
-                    datetime: doc['datetime'],
-                    listItems: doc['listItems'],
-                  ))
-              .toList(),
-        );
-      }),
-      floatingActionButton: IconButton(
-        onPressed: () {
-          _showCreateListDialog(context);
-        },
-        icon: const Icon(Icons.add),
+        persistentFooterAlignment: AlignmentDirectional.bottomCenter,
       ),
     );
   }

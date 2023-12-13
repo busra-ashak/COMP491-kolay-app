@@ -43,6 +43,7 @@ dependencies:
   percent_indicator: ^4.0.1
   intl: ^0.18.1
   firebase_messaging: ^14.7.6
+  flutter_slidable: ^3.0.1
 
 dev_dependencies:
   flutter_test:

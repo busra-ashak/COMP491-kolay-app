@@ -1,78 +1,147 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:kolay_app/providers/shopping_list_provider.dart';
+import 'package:kolay_app/providers/slide_expandable_provider.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class ShoppingListExpandable extends StatelessWidget {
   final String listName;
   final DateTime datetime;
   final Map listItems;
 
-  const ShoppingListExpandable({
-    Key? key, 
-    required this.listName,
-    required this.datetime,
-    required this.listItems}) : super(key: key);
+  const ShoppingListExpandable(
+      {Key? key,
+      required this.listName,
+      required this.datetime,
+      required this.listItems})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        IconButton(
-          alignment: Alignment.topLeft,
-          onPressed: () => _showDeleteListDialog(context, listName),
-          icon: const Icon(Icons.delete),
-        ),
-        Expanded(
-          child: ExpansionTile(
-            title: Text(listName),
-            subtitle: Text(DateFormat('dd/MM/yyyy').format(datetime)),
-            children: <Widget>[
-              Column(
-                children: _buildExpandableContent(
-                  context,
-                  listName,
-                  listItems,
+    return ChangeNotifierProvider(
+        create: (context) => SlidableState(),
+        child: Card(
+            color: const Color(0xFF8B85C1),
+            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+            child: Consumer<SlidableState>(
+                builder: (context, slidableState, child) {
+              return Slidable(
+                closeOnScroll: false,
+                enabled: slidableState.isSlidableEnabled,
+                startActionPane: ActionPane(
+                  motion: const BehindMotion(),
+                  children: [
+                    SlidableAction(
+                      onPressed: (context) {},
+                      backgroundColor: Colors.green,
+                      borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(10),
+                          bottomLeft: Radius.circular(10)),
+                      icon: Icons.edit,
+                      label: 'Edit',
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
+                endActionPane: ActionPane(
+                  motion: const BehindMotion(),
+                  children: [
+                    SlidableAction(
+                      onPressed: (context) {
+                        _showDeleteListDialog(context, listName);
+                      },
+                      backgroundColor: Colors.red,
+                      borderRadius: const BorderRadius.only(
+                          topRight: Radius.circular(10),
+                          bottomRight: Radius.circular(10)),
+                      icon: Icons.delete,
+                      label: 'Delete',
+                    ),
+                  ],
+                ),
+                child: ExpansionTile(
+                  textColor: Colors.white,
+                  onExpansionChanged: (isExpanded) {
+                    slidableState.setSlidableEnabled(!isExpanded);
+                  },
+                  collapsedTextColor: Colors.white,
+                  iconColor: Colors.white,
+                  collapsedIconColor: Colors.white,
+                  shape: const Border(),
+                  title: Text(listName, style: const TextStyle(fontSize: 20)),
+                  subtitle: Text(DateFormat('dd/MM/yyyy').format(datetime),
+                      style: const TextStyle(fontSize: 12)),
+                  children: <Widget>[
+                    Column(
+                      children: _buildExpandableContent(
+                        context,
+                        listName,
+                        listItems,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            })));
   }
 
   List<Widget> _buildExpandableContent(
       BuildContext context, String listName, Map listItems) {
-    
     List<Widget> columnContent = [];
 
     if (listItems.isNotEmpty) {
       for (Map content in listItems.values) {
-        columnContent.add(
-          ListTile(
-            leading: Checkbox(
-              value: content['itemTicked'],
-              onChanged: (bool? val) {
-                context
-                    .read<ShoppingList>()
-                    .updateToggle(listName, content['itemName'], content['itemTicked']);
-              }),
-            trailing: IconButton(
-                onPressed: () => _showDeleteItemFromListDialog(context, listName, content['itemName']),
-                icon: const Icon(Icons.delete)),
-            title: Text(content['itemName']),
+        columnContent.add(Slidable(
+          startActionPane: ActionPane(
+            motion: const BehindMotion(),
+            children: [
+              SlidableAction(
+                onPressed: (context) {},
+                backgroundColor: Colors.green,
+                icon: Icons.edit,
+                label: 'Edit',
+              ),
+            ],
           ),
-        );
+          endActionPane: ActionPane(
+            motion: const BehindMotion(),
+            children: [
+              SlidableAction(
+                onPressed: (context) {
+                  _showDeleteItemFromListDialog(
+                      context, listName, content['itemName']);
+                },
+                backgroundColor: Colors.red,
+                icon: Icons.delete,
+                label: 'Delete',
+              ),
+            ],
+          ),
+          child: ListTile(
+            textColor: Colors.white,
+            leading: Checkbox(
+                side: const BorderSide(color: Colors.white, width: 1.5),
+                shape: const CircleBorder(),
+                value: content['itemTicked'],
+                activeColor: const Color(0xFF77BBB4),
+                onChanged: (bool? val) {
+                  context.read<ShoppingList>().updateToggle(
+                      listName, content['itemName'], content['itemTicked']);
+                }),
+            title:
+                Text(content['itemName'], style: const TextStyle(fontSize: 16)),
+          ),
+        ));
       }
     }
 
     columnContent.add(
       ListTile(
         title: IconButton(
-            onPressed: () =>
-              _showAddItemToListDialog(context, listName),
-            icon: const Icon(Icons.add)),
+          onPressed: () => _showAddItemToListDialog(context, listName),
+          icon: const Icon(Icons.add),
+          color: Colors.white,
+        ),
       ),
     );
 
@@ -101,7 +170,9 @@ class ShoppingListExpandable extends StatelessWidget {
               onPressed: () {
                 String newItemName = controller.text;
                 if (newItemName.isNotEmpty) {
-                  context.read<ShoppingList>().addShoppingListItem(listName, newItemName);
+                  context
+                      .read<ShoppingList>()
+                      .addShoppingListItem(listName, newItemName);
                   Navigator.of(context).pop();
                 }
               },
@@ -112,7 +183,7 @@ class ShoppingListExpandable extends StatelessWidget {
       },
     );
   }
-  
+
   void _showDeleteListDialog(BuildContext context, String listName) {
     showDialog(
       context: context,
@@ -139,7 +210,8 @@ class ShoppingListExpandable extends StatelessWidget {
     );
   }
 
-  void _showDeleteItemFromListDialog(BuildContext context, String listName, String oldItem) {
+  void _showDeleteItemFromListDialog(
+      BuildContext context, String listName, String oldItem) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -154,7 +226,9 @@ class ShoppingListExpandable extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
-                context.read<ShoppingList>().removeShoppingListItem(listName, oldItem);
+                context
+                    .read<ShoppingList>()
+                    .removeShoppingListItem(listName, oldItem);
                 Navigator.of(context).pop();
               },
               child: const Text('Yes'),
