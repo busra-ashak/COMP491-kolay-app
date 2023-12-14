@@ -36,16 +36,10 @@ class _BottomNavigationBarControllerState
     return Scaffold(
       body: _children[_currentIndex],
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-            border: Border(
-                top: BorderSide(
-          color: Colors.grey,
-          width: 0.5,
-        ))),
         child: BottomNavigationBar(
           iconSize: 31.0,
-          selectedItemColor: const Color.fromARGB(255, 85, 12, 6),
-          unselectedItemColor: Color.fromARGB(255, 185, 100, 91),
+          selectedItemColor: const Color(0xFF77BBB4),
+          unselectedItemColor: const Color(0xFFF7B9CB),
           onTap: onTabTapped,
           currentIndex: _currentIndex,
           items: const [
