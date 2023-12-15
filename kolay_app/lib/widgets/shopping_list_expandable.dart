@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:kolay_app/providers/shopping_list_provider.dart';
-import 'package:kolay_app/providers/slide_expandable_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:kolay_app/providers/shopping_list_provider.dart';
+import 'package:kolay_app/providers/slide_expandable_provider.dart';
 
 class ShoppingListExpandable extends StatelessWidget {
   final String listName;
@@ -135,15 +135,17 @@ class ShoppingListExpandable extends StatelessWidget {
       }
     }
 
-    columnContent.add(
-      ListTile(
-        title: IconButton(
+    columnContent.add(ListTile(
+      title: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+        ElevatedButton(
           onPressed: () => _showAddItemToListDialog(context, listName),
-          icon: const Icon(Icons.add),
-          color: Colors.white,
+          child: const Text(
+            "Add item",
+            style: TextStyle(color: Color(0xFF6C64B3)),
+          ),
         ),
-      ),
-    );
+      ]),
+    ));
 
     return columnContent;
   }
