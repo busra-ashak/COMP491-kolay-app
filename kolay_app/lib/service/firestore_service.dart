@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FireStoreService {
   final _fireStoreService = FirebaseFirestore.instance;
@@ -6,11 +7,19 @@ class FireStoreService {
   /* SHOPPING LIST */
 
   Future addItemToShoppingList(String listName, String newItem) async {
-    final DocumentReference documentReference = _fireStoreService.collection('shoppingLists').doc(listName);
+    
+    // Get the UID of the currently authenticated user
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
 
-    await documentReference.update({
-      'listItems.$newItem': {'itemName': newItem, 'itemTicked': false}
-    });
+    if (uid != null) {
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('shoppingLists').doc(listName);
+
+      await documentReference.update({
+        'listItems.$newItem': {'itemName': newItem, 'itemTicked': false}
+      });
+    }else{
+      print('User is not authneticated');
+    }
   }
 
   Future toggleShopItemCheckbox(String listName, String itemName, bool itemTicked) async {
@@ -30,13 +39,19 @@ class FireStoreService {
   }
 
   Future createShoppingList(String listName, DateTime datetime) async {
-    await _fireStoreService.collection('shoppingLists').doc(listName).set(
-      {
-      "listName": listName,
-      "datetime": datetime,
-      "listItems": {}
-      }
-    );
+    // Get the UID of the currently authenticated user
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      await _fireStoreService.collection('USERS').doc(uid).collection('shoppingLists').doc(listName).set(
+        {
+        "listName": listName,
+        "datetime": datetime,
+        "listItems": {}
+        }
+      );
+    }else{
+      print("User is not authenticated");
+    }
   }
 
   Future deleteShoppingList(String listName) async {
