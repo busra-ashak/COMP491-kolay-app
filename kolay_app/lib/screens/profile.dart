@@ -52,8 +52,8 @@ class _ProfilePageState extends State<ProfilePage> {
             leading: const Icon(Icons.exit_to_app),
             onTap: (){
               FirebaseAuth.instance.signOut();
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => LoginPage()));
+              Navigator.pushAndRemoveUntil(
+                            context, MaterialPageRoute(builder: (context) => LoginPage()), (route) => false);
               },
           ),
         ],
