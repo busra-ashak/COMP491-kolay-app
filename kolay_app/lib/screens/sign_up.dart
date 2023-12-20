@@ -1,45 +1,41 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kolay_app/screens/home.dart';
-import 'package:kolay_app/screens/sign_up.dart';
+import 'package:kolay_app/screens/log_in.dart';
 import 'package:kolay_app/widgets/bottom_navigation_bar.dart';
 import 'package:kolay_app/widgets/form_container_widget.dart';
 import 'package:kolay_app/service/firebase_auth_services.dart';
 
 
-
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class SignUpPage extends StatefulWidget {
+  const SignUpPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
-
-  bool _isSigning = false;
-
-
+class _SignUpPageState extends State<SignUpPage> {
 
   final FirebaseAuthService _auth = FirebaseAuthService();
 
+  TextEditingController _usernameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
 
 
   @override
   void dispose() {
+    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Login"),
+        title: Text("SignUp"),
       ),
       body: Center(
         child: Padding(
@@ -48,26 +44,40 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "Login",
+                "Sign Up",
                 style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
               ),
               SizedBox(
                 height: 30,
               ),
               FormContainerWidget(
-                controller: _emailController,
+controller: _usernameController,
+                hintText: "Username",
+                isPasswordField: false,
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              FormContainerWidget(
+
+controller: _emailController,
                 hintText: "Email",
                 isPasswordField: false,
               ),
-              SizedBox(height: 10,),
+              SizedBox(
+                height: 10,
+              ),
               FormContainerWidget(
-                controller: _passwordController,
+controller: _passwordController,
+
                 hintText: "Password",
                 isPasswordField: true,
               ),
-              SizedBox(height: 30,),
+              SizedBox(
+                height: 30,
+              ),
               GestureDetector(
-                onTap: _signIn,
+                onTap: _signUp,
                 child: Container(
                   width: double.infinity,
                   height: 45,
@@ -75,23 +85,26 @@ class _LoginPageState extends State<LoginPage> {
                     color: Colors.blue,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Center(child:Text("Login",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),)),
+                  child: Center(
+                      child: Text(
+                        "Sign Up",
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      )),
                 ),
               ),
               SizedBox(height: 20,),
               Row(mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Don't have an account?"),
+                  Text("Already have an account?"),
                   SizedBox(width: 5,),
                   GestureDetector(
-                      onTap: (){
-                        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => SignUpPage()), (route) => false);
+                      onTap: () {
+                        Navigator.pushAndRemoveUntil(
+                            context, MaterialPageRoute(builder: (context) => LoginPage()), (route) => false);
                       },
-                      child: Text("Sign Up",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold),))
+                      child: Text("Login", style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),))
                 ],
               )
-
-
             ],
           ),
         ),
@@ -99,15 +112,15 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void _signIn() async {
-
+  void _signUp() async {
+    String username = _usernameController.text;
     String email = _emailController.text;
     String password = _passwordController.text;
 
-    User? user = await _auth.signInWithEmailAndPassword(email, password);
+    User? user = await _auth.signUpWithEmailAndPassword(email, password);
 
     if (user!= null){
-      print("User is successfully signedIn");
+      print("User is successfully created");
       Navigator.push(context,
                   MaterialPageRoute(builder: (context) => BottomNavigationBarController()));
     } else{
@@ -115,4 +128,5 @@ class _LoginPageState extends State<LoginPage> {
     }
 
   }
+
 }
