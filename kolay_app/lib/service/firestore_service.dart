@@ -273,7 +273,7 @@ class FireStoreService {
   Future<QuerySnapshot> getAllTodoLists() async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
-      final QuerySnapshot _ref = await _fireStoreService.collection('todoLists').get();
+      final QuerySnapshot _ref = await _fireStoreService.collection('USERS').doc(uid).collection('todoLists').get();
       return _ref;
     }else{
       throw Exception("User is not authenticated");
