@@ -45,12 +45,11 @@ class TodoList with ChangeNotifier {
     notifyListeners();
   }
 
-  Future addTodoItemToList(String listName, String itemName, DateTime itemDeadline) async {
-    await _firestoreService.addItemToTodoList(listName, itemName, itemDeadline);
+  Future addTodoItemToList(String listName, String itemName) async {
+    await _firestoreService.addItemToTodoList(listName, itemName);
     Map<String, dynamic> doc = {
       itemName: {
         "itemName": itemName,
-        "itemDeadline": itemDeadline,
         "itemTicked": false
       }
     };
@@ -83,21 +82,4 @@ class TodoList with ChangeNotifier {
     notifyListeners();
   }
 
-  Future getIncompleteToDoTasksForHomeScreen() async {
-    var now = DateFormat('dd/MM/yyyy').format(DateTime.now());
-    var querySnapshot = await _firestoreService.getAllTodoLists();
-    todoTasksHome.clear();
-    for (DocumentSnapshot d in querySnapshot.docs) {
-      String listName = d.get('listName');
-      var tasks = d.get('listItems');
-      for(var task in tasks.values){
-        var taskDueDate = DateFormat('dd/MM/yyyy').format(task['itemDeadline'].toDate() as DateTime);
-        if(now==taskDueDate){
-          String itemName = task['itemName'];
-          todoTasksHome.add('$itemName - $listName');
-        }
-      }
-    }
-    notifyListeners();
-  }
 }
