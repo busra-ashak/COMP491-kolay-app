@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:kolay_app/service/encryption_service.dart';
 
 class FireStoreService {
   final _fireStoreService = FirebaseFirestore.instance;
+
+  final EncryptionService _encryptionService = EncryptionService();
 
   /* SHOPPING LIST */
 
@@ -54,12 +57,15 @@ class FireStoreService {
   }
 
   Future createShoppingList(String listName, DateTime datetime) async {
+    _fireStoreService.collection('falans').doc('encrypt').set(
+      {"busra":_encryptionService.encryptText('busra')}
+    );
     // Get the UID of the currently authenticated user
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
-      await _fireStoreService.collection('USERS').doc(uid).collection('shoppingLists').doc(listName).set(
+      await _fireStoreService.collection('USERS').doc(uid).collection('shoppingLists').doc(_encryptionService.encryptText(listName)).set(
         {
-        "listName": listName,
+        "listName": _encryptionService.encryptText(listName),
         "datetime": datetime,
         "listItems": {}
         }
@@ -70,6 +76,12 @@ class FireStoreService {
   }
 
   Future deleteShoppingList(String listName) async {
+    var querySnapshot = await _fireStoreService.collection('falans').get();
+
+    for (DocumentSnapshot d in querySnapshot.docs) {
+      print(d.get('busra'));
+      print(_encryptionService.decryptText(d.get('busra')));
+    }
     // Get the UID of the currently authenticated user
     String? uid = FirebaseAuth.instance.currentUser?.uid;
 

@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:kolay_app/service/encryption_service.dart';
 import '../service/firestore_service.dart';
 import 'package:intl/intl.dart';
 
 class ShoppingList extends ChangeNotifier {
   final FireStoreService _firestoreService = FireStoreService();
+  final EncryptionService _encryptionService = EncryptionService();
   Map<String, dynamic> shoppingLists = {};
   List<String> shoppingListsHome = [];
 
@@ -28,7 +30,7 @@ class ShoppingList extends ChangeNotifier {
     for (DocumentSnapshot d in querySnapshot.docs) {
       Map<String, dynamic> doc = {
         d.get('listName'): {
-          'listName': d.get('listName') as String,
+          'listName': _encryptionService.decryptText(d.get('listName')),
           'datetime': d.get('datetime').toDate() as DateTime,
           'listItems': d.get('listItems') as Map<dynamic, dynamic>
         }
