@@ -15,10 +15,10 @@ class FireStoreService {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid != null) {
-      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('shoppingLists').doc(listName);
-
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('shoppingLists').doc(_encryptionService.encryptText(listName));
+      String encryptedItemName = _encryptionService.encryptText(newItem);
       await documentReference.update({
-        'listItems.$newItem': {'itemName': newItem, 'itemTicked': false}
+        'listItems.$encryptedItemName': {'itemName': encryptedItemName, 'itemTicked': false}
       });
     }else{
       print('User is not authneticated');
@@ -30,10 +30,11 @@ class FireStoreService {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid != null) {
-      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('shoppingLists').doc(listName);
-
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('shoppingLists').doc(_encryptionService.encryptText(listName));
+      String encryptedItemName = _encryptionService.encryptText(itemName);
       await documentReference.update({
-        'listItems.$itemName.itemTicked': !itemTicked
+        
+        'listItems.$encryptedItemName.itemTicked': !itemTicked
       });
     }else{
       print('User is not authneticated');
@@ -46,10 +47,11 @@ class FireStoreService {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid != null) {
-      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('shoppingLists').doc(listName);
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('shoppingLists').doc(_encryptionService.encryptText(listName));
 
+      String encryptedOldItem = _encryptionService.encryptText(oldItem);
       await documentReference.update({
-        'listItems.$oldItem': FieldValue.delete(),
+        'listItems.$encryptedOldItem': FieldValue.delete(),
       });
     }else{
       print('User is not authneticated');
@@ -57,9 +59,9 @@ class FireStoreService {
   }
 
   Future createShoppingList(String listName, DateTime datetime) async {
-    _fireStoreService.collection('falans').doc('encrypt').set(
-      {"busra":_encryptionService.encryptText('busra')}
-    );
+    // _fireStoreService.collection('falans').doc('encrypt').set(
+    //   {"busra":_encryptionService.encryptText('busra')}
+    // );
     // Get the UID of the currently authenticated user
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
@@ -76,17 +78,17 @@ class FireStoreService {
   }
 
   Future deleteShoppingList(String listName) async {
-    var querySnapshot = await _fireStoreService.collection('falans').get();
+    //var querySnapshot = await _fireStoreService.collection('falans').get();
 
-    for (DocumentSnapshot d in querySnapshot.docs) {
-      print(d.get('busra'));
-      print(_encryptionService.decryptText(d.get('busra')));
-    }
+    // for (DocumentSnapshot d in querySnapshot.docs) {
+    //   print(d.get('busra'));
+    //   print(_encryptionService.decryptText(d.get('busra')));
+    // }
     // Get the UID of the currently authenticated user
     String? uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid != null) {
-      await _fireStoreService.collection('USERS').doc(uid).collection('shoppingLists').doc(listName).delete();
+      await _fireStoreService.collection('USERS').doc(uid).collection('shoppingLists').doc(_encryptionService.encryptText(listName)).delete();
     }else{
       print('User is not authneticated');
     }

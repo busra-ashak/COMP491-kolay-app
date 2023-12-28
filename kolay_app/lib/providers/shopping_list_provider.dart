@@ -28,11 +28,19 @@ class ShoppingList extends ChangeNotifier {
     var querySnapshot = await _firestoreService.getAllShoppingLists();
     shoppingLists.clear();
     for (DocumentSnapshot d in querySnapshot.docs) {
+      Map<dynamic, dynamic> notDecryptedListItems = d.get('listItems') as Map<dynamic, dynamic>;
+      Map<dynamic, dynamic> decryptedListItems = {};
+
+      notDecryptedListItems.forEach((key, value) {
+         dynamic decrpytedKey = _encryptionService.decryptText(key);
+         Map<dynamic, dynamic> decryptedValue = {'itemName': _encryptionService.decryptText(value['itemName']),'itemTicked': value['itemTicked']} ;
+         decryptedListItems[decrpytedKey] = decryptedValue;
+      });
       Map<String, dynamic> doc = {
         d.get('listName'): {
           'listName': _encryptionService.decryptText(d.get('listName')),
           'datetime': d.get('datetime').toDate() as DateTime,
-          'listItems': d.get('listItems') as Map<dynamic, dynamic>
+          'listItems': decryptedListItems
         }
       };
       shoppingLists.addAll(doc);
@@ -50,8 +58,8 @@ class ShoppingList extends ChangeNotifier {
   Future addShoppingListItem(String listName, String itemName) async {
     await _firestoreService.addItemToShoppingList(listName, itemName);
     Map<String, dynamic> doc = {
-      itemName: {
-        "itemName": itemName,
+      _encryptionService.encryptText(itemName): {
+        "itemName": _encryptionService.encryptText(itemName),
         "itemTicked": false
       }
     };
@@ -78,7 +86,7 @@ class ShoppingList extends ChangeNotifier {
     for (DocumentSnapshot d in querySnapshot.docs) {
       var taskDueDate = DateFormat('dd/MM/yyyy').format(d.get('datetime').toDate() as DateTime);
       if(now==taskDueDate){
-        shoppingListsHome.add(d.get('listName'));
+        shoppingListsHome.add(_encryptionService.decryptText(d.get('listName')));
       }
     }
     notifyListeners();
