@@ -106,83 +106,6 @@ class FireStoreService {
     }
   }
 
-  /* MILESTONES */
-
-  Future addSubgoalToMilestone(String milestoneName, String newSubgoal) async {
-    // Get the UID of the currently authenticated user
-    String? uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid != null) {
-      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('milestones').doc(milestoneName);
-
-      await documentReference.update({
-        'subgoals.$newSubgoal': {'subgoalName': newSubgoal, 'subgoalTicked': false}
-      });
-    }else{
-      print("User is not authenticated");
-    }
-  }
-
-  Future toggleSubgoalCheckbox(String milestoneName, String subgoalName, bool subgoalTicked) async {
-    // Get the UID of the currently authenticated user
-    String? uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid != null) {
-      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('milestones').doc(milestoneName);
-
-      await documentReference.update({
-        'subgoals.$subgoalName.subgoalTicked': !subgoalTicked
-      });
-    }else{
-      print("User is not authenticated");
-    }
-  }
-
-  Future deleteSubgoalFromMilestone(String milestoneName, String oldSubgoal) async {
-    // Get the UID of the currently authenticated user
-    String? uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid != null) {
-      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('milestones').doc(milestoneName);
-
-      await documentReference.update({
-        'subgoals.$oldSubgoal': FieldValue.delete(),
-      });
-    }else{
-      print("User is not authenticated");
-    }
-  }
-
-  Future createMilestone(String milestoneName) async {
-    String? uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid != null) {
-      await _fireStoreService.collection('USERS').doc(uid).collection('milestones').doc(milestoneName).set(
-        {
-        "milestoneName": milestoneName,
-        "subgoals": {}
-        }
-      );
-    }else{
-      print("User is not authenticated");
-    }
-  }
-
-  Future deleteMilestone(String milestoneName) async {
-    String? uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid != null) {
-      await _fireStoreService.collection('USERS').doc(uid).collection('milestones').doc(milestoneName).delete();
-    }else{
-      print("User is not authenticated");
-    }
-  }
-
-  Future<QuerySnapshot> getAllMilestones() async {
-    String? uid = FirebaseAuth.instance.currentUser?.uid;
-    if (uid != null) {
-      final QuerySnapshot _ref = await _fireStoreService.collection('USERS').doc(uid).collection('milestones').get();
-      return _ref;
-    }else{
-      throw Exception("User is not authenticated");
-    }
-  }
-
   /* ROUTINES */
 
   Future createRoutine(String routineName, String frequencyMeasure, int frequency) async {
@@ -260,13 +183,12 @@ class FireStoreService {
     }
   }
 
-  Future createTodoList(String listName, DateTime datetime) async {
+  Future createTodoList(String listName) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
       await _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(listName).set(
         {
         "listName": listName,
-        "dueDatetime": datetime,
         "listItems": {}
         }
       );
