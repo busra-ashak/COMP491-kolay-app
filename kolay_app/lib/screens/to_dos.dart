@@ -1,11 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kolay_app/screens/profile.dart';
 import 'package:kolay_app/screens/settings.dart';
 import 'package:provider/provider.dart';
+import '../providers/routine_provider.dart';
 import '../providers/reminder_provider.dart';
 import '../providers/todo_provider.dart';
+import '../providers/tab_index_provider.dart';
+import '../widgets/routine_widget.dart';
 import '../widgets/reminder_list_expandable.dart';
 import '../widgets/todo_list_expandable.dart';
+
+enum FrequencyMeasure {
+  daily('Daily'),
+  weekly('Weekly'),
+  monthly('Monthly');
+
+  const FrequencyMeasure(this.label);
+
+  final String label;
+}
 
 class ToDosPage extends StatefulWidget {
   @override
@@ -16,11 +30,12 @@ class _ToDosPageState extends State<ToDosPage> {
   @override
   void initState() {
     super.initState();
-    loadTodoLists();
+    loadAmbitions();
   }
 
-  loadTodoLists() {
+  loadAmbitions() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      context.read<Routine>().getAllRoutines();
       context.read<TodoList>().getAllTodoLists();
       context.read<ReminderList>().getAllReminderLists();
     });
@@ -28,70 +43,137 @@ class _ToDosPageState extends State<ToDosPage> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.settings),
-            iconSize: 31.0,
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => SettingsPage()));
-            },
-          ),
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: const Text('Your Tasks',
-              style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.person),
-              iconSize: 31.0,
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ProfilePage()));
-              },
-            )
-          ],
-          bottom: const TabBar(
-            tabs: [
-              Tab(icon: Icon(Icons.checklist_outlined), text: "Todos"),
-              Tab(icon: Icon(Icons.access_alarms_outlined), text: "Reminders"),
-            ],
+    return Theme(
+        data: Theme.of(context).copyWith(
+          dividerTheme: const DividerThemeData(
+            color: Colors.transparent,
           ),
         ),
-        body: Consumer2<TodoList, ReminderList>(
-            builder: (context, todoProvider, reminderProvider, child) {
-          return TabBarView(children: [
-            ListView(
-              children: todoProvider.todoLists.values
-                  .map((doc) => TodoListExpandable(
-                        listName: doc['listName'],
-                        dueDatetime: doc['dueDatetime'],
-                        listItems: doc['listItems'],
-                      ))
-                  .toList(),
-            ),
-            ListView(
-              children: reminderProvider.reminderLists.values
-                  .map((doc) => ReminderListExpandable(
-                        listName: doc['listName'],
-                        dueDatetime: doc['dueDatetime'],
-                        listItems: doc['listItems'],
-                        creationDatetime: DateTime.now(),
-                      ))
-                  .toList(),
-            )
-          ]);
-        }),
-        floatingActionButton: IconButton(
-          onPressed: () {
-            _showCreateDialog(context);
-          },
-          icon: const Icon(Icons.add),
-        ),
-      ),
-    );
+        child: ChangeNotifierProvider(
+            create: (context) => TabIndexProvider(),
+            child: DefaultTabController(
+                length: 3,
+                child: Scaffold(
+                  backgroundColor: const Color(0xFFFAF5E6),
+                  appBar: AppBar(
+                      leading: IconButton(
+                        icon: const Icon(Icons.settings, color: Colors.white),
+                        iconSize: 31.0,
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SettingsPage()));
+                        },
+                      ),
+                      backgroundColor: const Color(0xFFF7B9CB),
+                      centerTitle: true,
+                      title: const Text("To-Do's",
+                          style: TextStyle(
+                              color: Color(0xFF77BBB4),
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold)),
+                      actions: <Widget>[
+                        IconButton(
+                          icon: const Icon(Icons.person, color: Colors.white),
+                          iconSize: 31.0,
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ProfilePage()));
+                          },
+                        )
+                      ],
+                      bottom: PreferredSize(
+                        preferredSize: const Size.fromHeight(kToolbarHeight),
+                        child: Consumer<TabIndexProvider>(
+                            builder: (context, tabIndexProvider, child) {
+                          return TabBar(
+                            onTap: (index) {
+                              tabIndexProvider.tabIndex = index;
+                            },
+                            labelColor: const Color(0xFF77BBB4),
+                            unselectedLabelColor: Colors.white,
+                            indicatorColor: const Color(0xFF77BBB4),
+                            tabs: [
+                              Tab(
+                                  icon: Icon(Icons.checklist_outlined,
+                                      color: tabIndexProvider.tabIndex == 0
+                                          ? const Color(0xFF77BBB4)
+                                          : Colors.white),
+                                  text: "Tasks"),
+                              Tab(
+                                  icon: Icon(Icons.published_with_changes,
+                                      color: tabIndexProvider.tabIndex == 1
+                                          ? const Color(0xFF77BBB4)
+                                          : Colors.white),
+                                  text: "Routines"),
+                              Tab(
+                                  icon: Icon(Icons.access_alarms_outlined,
+                                      color: tabIndexProvider.tabIndex == 2
+                                          ? const Color(0xFF77BBB4)
+                                          : Colors.white),
+                                  text: "Reminders"),
+                            ],
+                          );
+                        }),
+                      )),
+                  body: Consumer3<TodoList, Routine, ReminderList>(builder:
+                      (context, todoProvider, routineProvider, reminderProvider,
+                          child) {
+                    return (TabBarView(children: [
+                      ListView(
+                        children: todoProvider.todoLists.values
+                            .map((doc) => TodoListExpandable(
+                                  listName: doc['listName'],
+                                  listItems: doc['listItems'],
+                                ))
+                            .toList(),
+                      ),
+                      ListView(
+                        children: routineProvider.routines.values
+                            .map((doc) => RoutineWidget(
+                                  routineName: doc['routineName'],
+                                  frequency: doc['frequency'],
+                                  frequencyMeasure: doc['frequencyMeasure'],
+                                ))
+                            .toList(),
+                      ),
+                      ListView(
+                        children: reminderProvider.reminderLists.values
+                            .map((doc) => ReminderListExpandable(
+                                  listName: doc['listName'],
+                                  dueDatetime: doc['dueDatetime'],
+                                  listItems: doc['listItems'],
+                                ))
+                            .toList(),
+                      ),
+                    ]));
+                  }),
+                  persistentFooterButtons: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        color: const Color(0xDDB2F7EF),
+                        boxShadow: const [
+                          BoxShadow(color: Color(0xFF77BBB4), spreadRadius: 3),
+                        ],
+                      ),
+                      child: IconButton(
+                        color: const Color(0xFF77BBB4),
+                        onPressed: () {
+                          _showCreateDialog(context);
+                        },
+                        icon: const Icon(
+                          Icons.add,
+                          size: 30,
+                        ),
+                      ),
+                    ),
+                  ],
+                  persistentFooterAlignment: AlignmentDirectional.bottomCenter,
+                ))));
   }
 
   void _showCreateDialog(BuildContext context) {
@@ -99,7 +181,7 @@ class _ToDosPageState extends State<ToDosPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Create a new task'),
+          title: const Text('Create a new to-do'),
           actions: [
             TextButton(
               onPressed: () {
@@ -109,12 +191,21 @@ class _ToDosPageState extends State<ToDosPage> {
             ),
             TextButton(
               onPressed: () {
+                Navigator.of(context).pop();
                 _showCreateTodoListDialog(context);
               },
-              child: const Text('Todo'),
+              child: const Text('Task'),
             ),
             TextButton(
               onPressed: () {
+                Navigator.of(context).pop();
+                _showCreateRoutineDialog(context);
+              },
+              child: const Text('Routine'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
                 _showCreateReminderListDialog(context);
               },
               child: const Text('Reminder'),
@@ -127,13 +218,12 @@ class _ToDosPageState extends State<ToDosPage> {
 
   void _showCreateTodoListDialog(BuildContext context) {
     TextEditingController controller = TextEditingController();
-    DateTime selectedDate = DateTime.now();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Create a new Todo list'),
+          title: const Text('Create a new to-do list'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -141,23 +231,7 @@ class _ToDosPageState extends State<ToDosPage> {
               TextField(
                 controller: controller,
                 decoration: const InputDecoration(
-                    labelText: 'The name of your To Do List'),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () async {
-                  DateTime? pickedDate = await showDateTimePicker(
-                    context: context,
-                    initialDate: selectedDate,
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2101),
-                  );
-
-                  if (pickedDate != null && pickedDate != selectedDate) {
-                    selectedDate = pickedDate;
-                  }
-                },
-                child: const Text('Pick Date'),
+                    labelText: 'The name of your to-do list'),
               ),
             ],
           ),
@@ -172,9 +246,74 @@ class _ToDosPageState extends State<ToDosPage> {
               onPressed: () {
                 String newListName = controller.text;
                 if (newListName.isNotEmpty) {
-                  context
-                      .read<TodoList>()
-                      .createTodoList(newListName, selectedDate);
+                  context.read<TodoList>().createTodoList(newListName);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Create'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showCreateRoutineDialog(BuildContext context) {
+    TextEditingController nameController = TextEditingController();
+    TextEditingController dropdownController = TextEditingController();
+    TextEditingController frequencyController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Create a new routine'),
+          content: Column(children: [
+            TextField(
+              controller: nameController,
+              decoration:
+                  const InputDecoration(labelText: 'The name of your routine'),
+            ),
+            Padding(
+                padding: const EdgeInsets.only(top: 40, bottom: 20),
+                child: DropdownMenu<FrequencyMeasure>(
+                  initialSelection: FrequencyMeasure.daily,
+                  controller: dropdownController,
+                  requestFocusOnTap: false,
+                  label: const Text('Frequency Measure'),
+                  dropdownMenuEntries: FrequencyMeasure.values
+                      .map<DropdownMenuEntry<FrequencyMeasure>>(
+                          (FrequencyMeasure measure) {
+                    return DropdownMenuEntry<FrequencyMeasure>(
+                      value: measure,
+                      label: measure.label,
+                    );
+                  }).toList(),
+                )),
+            TextField(
+              controller: frequencyController,
+              decoration: const InputDecoration(labelText: 'How frequent?'),
+              keyboardType: TextInputType.number,
+              inputFormatters: <TextInputFormatter>[
+                FilteringTextInputFormatter.digitsOnly
+              ],
+            ),
+          ]),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String newRoutineName = nameController.text;
+                String frequencyMeasure = dropdownController.text;
+                int frequency = int.parse(frequencyController.text);
+                if (newRoutineName.isNotEmpty) {
+                  context.read<Routine>().createRoutine(
+                      newRoutineName, frequencyMeasure, frequency);
                   Navigator.of(context).pop();
                 }
               },
@@ -194,7 +333,7 @@ class _ToDosPageState extends State<ToDosPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Create a new Reminder list'),
+          title: const Text('Create a new reminder list'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -202,7 +341,7 @@ class _ToDosPageState extends State<ToDosPage> {
               TextField(
                 controller: controller,
                 decoration: const InputDecoration(
-                    labelText: 'The name of your Reminder List'),
+                    labelText: 'The name of your reminder list'),
               ),
               const SizedBox(height: 16),
               ElevatedButton(

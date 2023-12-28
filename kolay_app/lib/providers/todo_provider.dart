@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../service/firestore_service.dart';
-import 'package:intl/intl.dart';
 class TodoList with ChangeNotifier {
   final FireStoreService _firestoreService = FireStoreService();
   Map<String, dynamic> todoLists = {};
-  List<String> todoListsHome = [];
-  List<String> todoTasksHome = [];
 
 
-  Future createTodoList(String listName, DateTime datetime) async {
-    await _firestoreService.createTodoList(listName, datetime);
+  Future createTodoList(String listName) async {
+    await _firestoreService.createTodoList(listName);
     Map<String, dynamic> doc = {
       listName: {
         "listName": listName,
-        "dueDatetime": datetime,
         "listItems": {}
       }
     };
@@ -29,7 +25,6 @@ class TodoList with ChangeNotifier {
       Map<String, dynamic> doc = {
         d.get('listName'): {
           'listName': d.get('listName') as String,
-          'dueDatetime': d.get('dueDatetime').toDate() as DateTime,
           'listItems': d.get('listItems') as Map<dynamic, dynamic>
         }
       };
@@ -66,19 +61,6 @@ class TodoList with ChangeNotifier {
   Future deleteTodoList(String listName) async {
     await _firestoreService.deleteTodoList(listName);
     todoLists.remove(listName);
-    notifyListeners();
-  }
-
-  Future getToDoListsForHomeScreen() async {
-    var now = DateFormat('dd/MM/yyyy').format(DateTime.now());
-    var querySnapshot = await _firestoreService.getAllTodoLists();
-    todoListsHome.clear();
-    for (DocumentSnapshot d in querySnapshot.docs) {
-      var taskDueDate = DateFormat('dd/MM/yyyy').format(d.get('dueDatetime').toDate() as DateTime);
-      if(now==taskDueDate){
-        todoListsHome.add(d.get('listName'));
-      }
-    }
     notifyListeners();
   }
 

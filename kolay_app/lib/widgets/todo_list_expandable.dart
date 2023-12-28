@@ -1,47 +1,115 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/todo_provider.dart';
-import 'package:intl/intl.dart';
+import 'package:percent_indicator/percent_indicator.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:kolay_app/providers/slide_expandable_provider.dart';
 
 class TodoListExpandable extends StatelessWidget {
   final String listName;
-  final DateTime dueDatetime;
   final Map listItems;
 
   // Constructor to accept the initial todo list name
   const TodoListExpandable(
-      {Key? key,
-      required this.listName,
-      required this.dueDatetime,
-      required this.listItems})
+      {Key? key, required this.listName, required this.listItems})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        IconButton(
-          alignment: Alignment.topLeft,
-          onPressed: () => _showDeleteListDialog(context, listName),
-          icon: const Icon(Icons.delete),
-        ),
-        Expanded(
-          child: ExpansionTile(
-            title: Text(listName),
-            subtitle: Text(DateFormat('dd/MM/yyyy HH:mm').format(dueDatetime)),
-            children: <Widget>[
-              Column(
-                children: _buildExpandableContent(
-                  context,
-                  listName,
-                  listItems,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
+    return ChangeNotifierProvider(
+        create: (context) => SlidableState(),
+        child: Card(
+            color: const Color(0xFF8B85C1),
+            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+            child: ClipRect(
+              child: Consumer<SlidableState>(
+                  builder: (context, slidableState, child) {
+                return Slidable(
+                  closeOnScroll: false,
+                  enabled: slidableState.isSlidableEnabled,
+                  startActionPane: ActionPane(
+                    motion: const BehindMotion(),
+                    children: [
+                      SlidableAction(
+                        onPressed: (context) {},
+                        backgroundColor: Colors.green,
+                        borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            bottomLeft: Radius.circular(10)),
+                        icon: Icons.edit,
+                        label: 'Edit',
+                      ),
+                    ],
+                  ),
+                  endActionPane: ActionPane(
+                    motion: const BehindMotion(),
+                    children: [
+                      SlidableAction(
+                        onPressed: (context) {
+                          _showDeleteTodoListDialog(context, listName);
+                        },
+                        backgroundColor: Colors.red,
+                        borderRadius: const BorderRadius.only(
+                            topRight: Radius.circular(10),
+                            bottomRight: Radius.circular(10)),
+                        icon: Icons.delete,
+                        label: 'Delete',
+                      ),
+                    ],
+                  ),
+                  child: ExpansionTile(
+                    textColor: Colors.white,
+                    onExpansionChanged: (isExpanded) {
+                      slidableState.isSlidableEnabled = !isExpanded;
+                    },
+                    collapsedTextColor: Colors.white,
+                    iconColor: Colors.white,
+                    collapsedIconColor: Colors.white,
+                    shape: const Border(),
+                    title: Text(listName, style: const TextStyle(fontSize: 20)),
+                    subtitle: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: LinearPercentIndicator(
+                          width: 210.0,
+                          lineHeight: 14.0,
+                          percent: _getTaskProgress(listItems),
+                          center: Text(
+                            _getTaskProgress(listItems).toStringAsFixed(2),
+                            style: const TextStyle(fontSize: 12.0),
+                          ),
+                          trailing: const Icon(Icons.mood),
+                          barRadius: const Radius.circular(10),
+                          backgroundColor: Colors.grey,
+                          progressColor: const Color(0xFF77BBB4),
+                        ),
+                      ),
+                    ),
+                    children: <Widget>[
+                      Column(
+                        children: _buildExpandableContent(
+                          context,
+                          listName,
+                          listItems,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            )));
+  }
+
+  double _getTaskProgress(Map listItems) {
+    if (listItems.isEmpty) return 0;
+    int len = listItems.values.length;
+    int ticked = 0;
+    for (Map item in listItems.values) {
+      if (item['itemTicked']) {
+        ticked++;
+      }
+    }
+    return ticked / len;
   }
 
   List<Widget> _buildExpandableContent(
@@ -50,43 +118,73 @@ class TodoListExpandable extends StatelessWidget {
 
     if (listItems.isNotEmpty) {
       for (Map content in listItems.values) {
-        columnContent.add(
-          ListTile(
+        columnContent.add(Slidable(
+          startActionPane: ActionPane(
+            motion: const BehindMotion(),
+            children: [
+              SlidableAction(
+                onPressed: (context) {},
+                backgroundColor: Colors.green,
+                icon: Icons.edit,
+                label: 'Edit',
+              ),
+            ],
+          ),
+          endActionPane: ActionPane(
+            motion: const BehindMotion(),
+            children: [
+              SlidableAction(
+                onPressed: (context) {
+                  _showDeleteTodoFromListDialog(
+                      context, listName, content['itemName']);
+                },
+                backgroundColor: Colors.red,
+                icon: Icons.delete,
+                label: 'Delete',
+              ),
+            ],
+          ),
+          child: ListTile(
+            textColor: Colors.white,
             leading: Checkbox(
+                side: const BorderSide(color: Colors.white, width: 1.5),
+                shape: const CircleBorder(),
                 value: content['itemTicked'],
+                activeColor: const Color(0xFF77BBB4),
                 onChanged: (bool? val) {
                   context.read<TodoList>().toggleItemCheckbox(
                       listName, content['itemName'], content['itemTicked']);
                 }),
-            trailing: IconButton(
-                onPressed: () => _showDeleteItemFromListDialog(
-                    context, listName, content['itemName']),
-                icon: const Icon(Icons.delete)),
-            title: Text(content['itemName']),
+            title:
+                Text(content['itemName'], style: const TextStyle(fontSize: 16)),
           ),
-        );
+        ));
       }
     }
 
-    columnContent.add(
-      ListTile(
-        title: IconButton(
-            onPressed: () => _showAddItemToListDialog(context, listName),
-            icon: const Icon(Icons.add)),
-      ),
-    );
+    columnContent.add(ListTile(
+      title: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+        ElevatedButton(
+          onPressed: () => _showAddTodoToListDialog(context, listName),
+          child: const Text(
+            "Add item",
+            style: TextStyle(color: Color(0xFF6C64B3)),
+          ),
+        ),
+      ]),
+    ));
 
     return columnContent;
   }
 
-  void _showAddItemToListDialog(BuildContext context, String listName) {
+  void _showAddTodoToListDialog(BuildContext context, String listName) {
     TextEditingController itemNameController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Add a new item to the Todo list'),
+          title: const Text('Add a new item to the to-do list'),
           content: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
@@ -122,44 +220,7 @@ class TodoListExpandable extends StatelessWidget {
     );
   }
 
-  Future<DateTime?> showDateTimePicker({
-    required BuildContext context,
-    DateTime? initialDate,
-    DateTime? firstDate,
-    DateTime? lastDate,
-  }) async {
-    initialDate ??= DateTime.now();
-    firstDate ??= initialDate.subtract(const Duration(days: 365 * 100));
-    lastDate ??= firstDate.add(const Duration(days: 365 * 200));
-
-    final DateTime? selectedDate = await showDatePicker(
-      context: context,
-      initialDate: initialDate,
-      firstDate: firstDate,
-      lastDate: lastDate,
-    );
-
-    if (selectedDate == null) return null;
-
-    if (!context.mounted) return selectedDate;
-
-    final TimeOfDay? selectedTime = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(selectedDate),
-    );
-
-    return selectedTime == null
-        ? selectedDate
-        : DateTime(
-            selectedDate.year,
-            selectedDate.month,
-            selectedDate.day,
-            selectedTime.hour,
-            selectedTime.minute,
-          );
-  }
-
-  void _showDeleteListDialog(BuildContext context, String listName) {
+  void _showDeleteTodoListDialog(BuildContext context, String listName) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -185,7 +246,7 @@ class TodoListExpandable extends StatelessWidget {
     );
   }
 
-  void _showDeleteItemFromListDialog(
+  void _showDeleteTodoFromListDialog(
       BuildContext context, String listName, String oldItem) {
     showDialog(
       context: context,

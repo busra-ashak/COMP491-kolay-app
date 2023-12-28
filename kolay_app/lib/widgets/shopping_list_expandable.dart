@@ -24,7 +24,7 @@ class ShoppingListExpandable extends StatelessWidget {
         child: Card(
             color: const Color(0xFF8B85C1),
             margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-            child: Consumer<SlidableState>(
+            child: ClipRect(child: Consumer<SlidableState>(
                 builder: (context, slidableState, child) {
               return Slidable(
                 closeOnScroll: false,
@@ -62,7 +62,7 @@ class ShoppingListExpandable extends StatelessWidget {
                 child: ExpansionTile(
                   textColor: Colors.white,
                   onExpansionChanged: (isExpanded) {
-                    slidableState.setSlidableEnabled(!isExpanded);
+                    slidableState.isSlidableEnabled = !isExpanded;
                   },
                   collapsedTextColor: Colors.white,
                   iconColor: Colors.white,
@@ -82,7 +82,7 @@ class ShoppingListExpandable extends StatelessWidget {
                   ],
                 ),
               );
-            })));
+            }))));
   }
 
   List<Widget> _buildExpandableContent(

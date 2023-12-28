@@ -22,68 +22,69 @@ class MealPlanWidget extends StatelessWidget {
     return ChangeNotifierProvider(
         create: (context) => SlidableState(),
         child: Card(
-          color: const Color(0xFF8B85C1),
-          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-          child:
-              Consumer<SlidableState>(builder: (context, slidableState, child) {
-            return Slidable(
-              closeOnScroll: false,
-              enabled: slidableState.isSlidableEnabled,
-              startActionPane: ActionPane(
-                motion: const BehindMotion(),
-                children: [
-                  SlidableAction(
-                    onPressed: (context) {},
-                    backgroundColor: Colors.green,
-                    borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(10),
-                        bottomLeft: Radius.circular(10)),
-                    icon: Icons.edit,
-                    label: 'Edit',
+            color: const Color(0xFF8B85C1),
+            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+            child: ClipRect(
+              child: Consumer<SlidableState>(
+                  builder: (context, slidableState, child) {
+                return Slidable(
+                  closeOnScroll: false,
+                  enabled: slidableState.isSlidableEnabled,
+                  startActionPane: ActionPane(
+                    motion: const BehindMotion(),
+                    children: [
+                      SlidableAction(
+                        onPressed: (context) {},
+                        backgroundColor: Colors.green,
+                        borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            bottomLeft: Radius.circular(10)),
+                        icon: Icons.edit,
+                        label: 'Edit',
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              endActionPane: ActionPane(
-                motion: const BehindMotion(),
-                children: [
-                  SlidableAction(
-                    onPressed: (context) {
-                      _showDeleteMealPlanDialog(context, listName);
+                  endActionPane: ActionPane(
+                    motion: const BehindMotion(),
+                    children: [
+                      SlidableAction(
+                        onPressed: (context) {
+                          _showDeleteMealPlanDialog(context, listName);
+                        },
+                        backgroundColor: Colors.red,
+                        borderRadius: const BorderRadius.only(
+                            topRight: Radius.circular(10),
+                            bottomRight: Radius.circular(10)),
+                        icon: Icons.delete,
+                        label: 'Delete',
+                      ),
+                    ],
+                  ),
+                  child: ExpansionTile(
+                    textColor: Colors.white,
+                    onExpansionChanged: (isExpanded) {
+                      slidableState.isSlidableEnabled = !isExpanded;
                     },
-                    backgroundColor: Colors.red,
-                    borderRadius: const BorderRadius.only(
-                        topRight: Radius.circular(10),
-                        bottomRight: Radius.circular(10)),
-                    icon: Icons.delete,
-                    label: 'Delete',
+                    collapsedTextColor: Colors.white,
+                    iconColor: Colors.white,
+                    collapsedIconColor: Colors.white,
+                    shape: const Border(),
+                    title: Text(listName, style: const TextStyle(fontSize: 20)),
+                    subtitle: Text(DateFormat('dd/MM/yyyy').format(datetime),
+                        style: const TextStyle(fontSize: 12)),
+                    children: <Widget>[
+                      Column(
+                        children: _buildExpandableContent(
+                          context,
+                          listName,
+                          listItems,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: ExpansionTile(
-                textColor: Colors.white,
-                onExpansionChanged: (isExpanded) {
-                  slidableState.setSlidableEnabled(!isExpanded);
-                },
-                collapsedTextColor: Colors.white,
-                iconColor: Colors.white,
-                collapsedIconColor: Colors.white,
-                shape: const Border(),
-                title: Text(listName, style: const TextStyle(fontSize: 20)),
-                subtitle: Text(DateFormat('dd/MM/yyyy').format(datetime),
-                    style: const TextStyle(fontSize: 12)),
-                children: <Widget>[
-                  Column(
-                    children: _buildExpandableContent(
-                      context,
-                      listName,
-                      listItems,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }),
-        ));
+                );
+              }),
+            )));
   }
 
   List<Widget> _buildExpandableContent(
@@ -169,7 +170,7 @@ class MealPlanWidget extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Add a new item to the Meal Plan'),
+          title: const Text('Add a new item to the meal plan'),
           content: TextField(
             controller: controller,
             decoration: const InputDecoration(labelText: 'New Item'),
