@@ -35,7 +35,7 @@ class TodoList with ChangeNotifier {
       Map<String, dynamic> doc = {
         d.get('listName'): {
           'listName': _encryptionService.decryptText(d.get('listName')),
-          'listItems': d.get('listItems') as Map<dynamic, dynamic>
+          'listItems': decryptedListItems
         }
       };
       todoLists.addAll(doc);
