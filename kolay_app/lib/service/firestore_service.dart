@@ -59,10 +59,7 @@ class FireStoreService {
   }
 
   Future createShoppingList(String listName, DateTime datetime) async {
-    // _fireStoreService.collection('falans').doc('encrypt').set(
-    //   {"busra":_encryptionService.encryptText('busra')}
-    // );
-    // Get the UID of the currently authenticated user
+
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
       await _fireStoreService.collection('USERS').doc(uid).collection('shoppingLists').doc(_encryptionService.encryptText(listName)).set(
@@ -78,13 +75,7 @@ class FireStoreService {
   }
 
   Future deleteShoppingList(String listName) async {
-    //var querySnapshot = await _fireStoreService.collection('falans').get();
 
-    // for (DocumentSnapshot d in querySnapshot.docs) {
-    //   print(d.get('busra'));
-    //   print(_encryptionService.decryptText(d.get('busra')));
-    // }
-    // Get the UID of the currently authenticated user
     String? uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid != null) {
@@ -110,10 +101,11 @@ class FireStoreService {
 
   Future createRoutine(String routineName, String frequencyMeasure, int frequency) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
+    String encryptedRoutineName = _encryptionService.encryptText(routineName);
     if (uid != null) {
-      await _fireStoreService.collection('USERS').doc(uid).collection('routines').doc(routineName).set(
+      await _fireStoreService.collection('USERS').doc(uid).collection('routines').doc(encryptedRoutineName).set(
         {
-        "routineName": routineName,
+        "routineName": encryptedRoutineName,
         "frequency": frequency,
         "frequencyMeasure": frequencyMeasure,
         }
@@ -124,9 +116,10 @@ class FireStoreService {
   }
 
   Future deleteRoutine(String routineName) async {
+    String encryptedRoutineName = _encryptionService.encryptText(routineName);
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
-      await _fireStoreService.collection('USERS').doc(uid).collection('routines').doc(routineName).delete();
+      await _fireStoreService.collection('USERS').doc(uid).collection('routines').doc(encryptedRoutineName).delete();
     }else{
       print("User is not authenticated");
     }
@@ -147,10 +140,10 @@ class FireStoreService {
   Future addItemToTodoList(String listName, String newItem) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
-      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(listName);
-
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(_encryptionService.encryptText(listName));
+      String encryptedItemName = _encryptionService.encryptText(newItem);
       await documentReference.update({
-        'listItems.$newItem': {'itemName': newItem, 'itemTicked': false}
+        'listItems.$encryptedItemName': {'itemName': encryptedItemName, 'itemTicked': false}
       });
     }else{
       print("User is not authenticated");
@@ -160,10 +153,10 @@ class FireStoreService {
   Future toggleTodoItemCheckbox(String listName, String itemName, bool itemTicked) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
-      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(listName);
-
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(_encryptionService.encryptText(listName));
+      String encryptedItemName = _encryptionService.encryptText(itemName);
       await documentReference.update({
-        'listItems.$itemName.itemTicked': !itemTicked
+        'listItems.$encryptedItemName.itemTicked': !itemTicked
       });
     }else{
       print("User is not authenticated");
@@ -173,10 +166,10 @@ class FireStoreService {
   Future deleteItemFromTodoList(String listName, String oldItem) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
-      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(listName);
-
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(_encryptionService.encryptText(listName));
+      String encryptedOldItem = _encryptionService.encryptText(oldItem);
       await documentReference.update({
-        'listItems.$oldItem': FieldValue.delete(),
+        'listItems.$encryptedOldItem': FieldValue.delete(),
       });
     }else{
       print("User is not authenticated");
@@ -186,9 +179,9 @@ class FireStoreService {
   Future createTodoList(String listName) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
-      await _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(listName).set(
+      await _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(_encryptionService.encryptText(listName)).set(
         {
-        "listName": listName,
+        "listName": _encryptionService.encryptText(listName),
         "listItems": {}
         }
       );
@@ -200,7 +193,7 @@ class FireStoreService {
   Future deleteTodoList(String listName) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
-      await _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(listName).delete();
+      await _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(_encryptionService.encryptText(listName)).delete();
     }else{
       print("User is not authenticated");
     }
@@ -221,10 +214,10 @@ class FireStoreService {
   Future addItemToReminderList(String listName, String newItem, DateTime itemDeadline) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
-      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('reminderLists').doc(listName);
-
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('reminderLists').doc(_encryptionService.encryptText(listName));
+      String encryptedItemName = _encryptionService.encryptText(newItem);
       await documentReference.update({
-        'listItems.$newItem': {'itemName': newItem, 'itemTicked': false, 'itemDeadline': itemDeadline}
+        'listItems.$encryptedItemName': {'itemName': encryptedItemName, 'itemTicked': false, 'itemDeadline': itemDeadline}
       });
     }else{
       print("User is not authenticated");
@@ -234,10 +227,10 @@ class FireStoreService {
   Future toggleReminderItemCheckbox(String listName, String itemName, bool itemTicked) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
-      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('reminderLists').doc(listName);
-
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('reminderLists').doc(_encryptionService.encryptText(listName));
+      String encryptedItemName = _encryptionService.encryptText(itemName);
       await documentReference.update({
-        'listItems.$itemName.itemTicked': !itemTicked
+        'listItems.$encryptedItemName.itemTicked': !itemTicked
       });
     }else{
       print("User is not authenticated");
@@ -247,10 +240,11 @@ class FireStoreService {
   Future deleteItemFromReminderList(String listName, String oldItem) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
-      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('reminderLists').doc(listName);
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('reminderLists').doc(_encryptionService.encryptText(listName));
 
+      String encryptedOldItem = _encryptionService.encryptText(oldItem);
       await documentReference.update({
-        'listItems.$oldItem': FieldValue.delete(),
+        'listItems.$encryptedOldItem': FieldValue.delete(),
       });
     }else{
       print("User is not authenticated");
@@ -260,9 +254,9 @@ class FireStoreService {
   Future createReminderList(String listName, DateTime datetime) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
-      await _fireStoreService.collection('USERS').doc(uid).collection('reminderLists').doc(listName).set(
+      await _fireStoreService.collection('USERS').doc(uid).collection('reminderLists').doc(_encryptionService.encryptText(listName)).set(
           {
-            "listName": listName,
+            "listName": _encryptionService.encryptText(listName),
             "dueDatetime": datetime,
             "listItems": {}
           }
@@ -275,7 +269,7 @@ class FireStoreService {
   Future deleteReminderList(String listName) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
-      await _fireStoreService.collection('USERS').doc(uid).collection('reminderLists').doc(listName).delete();
+      await _fireStoreService.collection('USERS').doc(uid).collection('reminderLists').doc(_encryptionService.encryptText(listName)).delete();
     }else{
       print("User is not authenticated");
     }
@@ -297,10 +291,10 @@ class FireStoreService {
   Future addIngredientToMealPlan(String listName, String newItem) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
-      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('meals').doc(listName);
-
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('meals').doc(_encryptionService.encryptText(listName));
+      String encryptedItemName = _encryptionService.encryptText(newItem);
       await documentReference.update({
-        'listItems.$newItem': {'itemName': newItem, 'itemTicked': false}
+        'listItems.$encryptedItemName': {'itemName': encryptedItemName, 'itemTicked': false}
       });
     }else{
       print("User is not authenticated");
@@ -310,10 +304,10 @@ class FireStoreService {
   Future toggleIngredientCheckbox(String listName, String itemName, bool itemTicked) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
-      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('meals').doc(listName);
-
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('meals').doc(_encryptionService.encryptText(listName));
+      String encryptedItemName = _encryptionService.encryptText(itemName);
       await documentReference.update({
-        'listItems.$itemName.itemTicked': !itemTicked
+        'listItems.$encryptedItemName.itemTicked': !itemTicked
       });
     }else{
       print("User is not authenticated");
@@ -323,10 +317,10 @@ class FireStoreService {
   Future deleteIngreidentFromMealPlan(String listName, String oldItem) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
-      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('meals').doc(listName);
-
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('meals').doc(_encryptionService.encryptText(listName));
+      String encryptedOldItem = _encryptionService.encryptText(oldItem);
       await documentReference.update({
-        'listItems.$oldItem': FieldValue.delete(),
+        'listItems.$encryptedOldItem': FieldValue.delete(),
       });
     }else{
       print("User is not authenticated");
@@ -359,9 +353,9 @@ class FireStoreService {
   Future createMealPlan(String listName, DateTime dateTime) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
-      await _fireStoreService.collection('USERS').doc(uid).collection('meals').doc(listName).set(
+      await _fireStoreService.collection('USERS').doc(uid).collection('meals').doc(_encryptionService.encryptText(listName)).set(
         {
-        "listName": listName,
+        "listName": _encryptionService.encryptText(listName),
         "datetime": dateTime,
         "listItems": {}
         }
@@ -374,7 +368,7 @@ class FireStoreService {
   Future deleteMealPlan(String listName) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
-      await _fireStoreService.collection('USERS').doc(uid).collection('meals').doc(listName).delete();
+      await _fireStoreService.collection('USERS').doc(uid).collection('meals').doc(_encryptionService.encryptText(listName)).delete();
     }else{
       print("User is not authenticated");
     }
