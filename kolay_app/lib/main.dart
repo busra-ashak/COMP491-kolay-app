@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:kolay_app/providers/reminder_provider.dart';
 import 'package:kolay_app/providers/shopping_list_provider.dart';
 import 'package:kolay_app/providers/routine_provider.dart';
+import 'package:kolay_app/providers/tab_index_provider.dart';
 import 'package:kolay_app/providers/todo_provider.dart';
 import 'package:kolay_app/providers/meal_plan_provider.dart';
 import 'package:kolay_app/screens/log_in.dart';
@@ -25,7 +26,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => Routine()),
         ChangeNotifierProvider(create: (_) => TodoList()),
         ChangeNotifierProvider(create: (_) => ReminderList()),
-        ChangeNotifierProvider(create: (_) => MealPlan())
+        ChangeNotifierProvider(create: (_) => MealPlan()),
+        ChangeNotifierProvider(create: (_) => TabIndexProvider())
       ],
       child: const MyApp(),
     ),

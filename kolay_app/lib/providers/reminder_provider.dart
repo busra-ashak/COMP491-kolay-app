@@ -6,7 +6,7 @@ class ReminderList with ChangeNotifier {
   final FireStoreService _firestoreService = FireStoreService();
   Map<String, dynamic> reminderLists = {};
   List<String> reminderListsHome = [];
-  List<String> reminderTasksHome = [];
+  List<List<String>> reminderTasksHome = [];
 
 
   Future createReminderList(String listName, DateTime datetime) async {
@@ -84,17 +84,18 @@ class ReminderList with ChangeNotifier {
   }
 
   Future getIncompleteToDoTasksForHomeScreen() async {
-    var now = DateFormat('dd/MM/yyyy').format(DateTime.now());
+    String now = DateFormat('dd/MM/yyyy').format(DateTime.now());
     var querySnapshot = await _firestoreService.getAllReminderLists();
     reminderTasksHome.clear();
     for (DocumentSnapshot d in querySnapshot.docs) {
       String listName = d.get('listName');
       var tasks = d.get('listItems');
       for(var task in tasks.values){
-        var taskDueDate = DateFormat('dd/MM/yyyy').format(task['itemDeadline'].toDate() as DateTime);
-        if(now==taskDueDate){
+        String taskDueDate = DateFormat('dd/MM/yyyy').format(task['itemDeadline'].toDate() as DateTime);
+        bool itemTicked = task['itemTicked'];
+        if(now==taskDueDate && !itemTicked){
           String itemName = task['itemName'];
-          reminderTasksHome.add('$itemName - $listName');
+          reminderTasksHome.add([itemName,listName]);
         }
       }
     }

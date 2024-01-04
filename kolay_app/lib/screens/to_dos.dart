@@ -22,10 +22,10 @@ enum FrequencyMeasure {
 
 class ToDosPage extends StatefulWidget {
   @override
-  State<ToDosPage> createState() => _ToDosPageState();
+  State<ToDosPage> createState() => ToDosPageState();
 }
 
-class _ToDosPageState extends State<ToDosPage> {
+class ToDosPageState extends State<ToDosPage> {
   @override
   void initState() {
     super.initState();
@@ -48,149 +48,147 @@ class _ToDosPageState extends State<ToDosPage> {
             color: Colors.transparent,
           ),
         ),
-        child: ChangeNotifierProvider(
-            create: (context) => TabIndexProvider(),
-            child: DefaultTabController(
-                length: 3,
-                child: Scaffold(
-                  backgroundColor: const Color(0xFFFAF5E6),
-                  appBar: AppBar(
-                      leading: IconButton(
-                        icon: const Icon(Icons.settings, color: Colors.white),
+        child: Consumer<TabIndexProvider>(
+            builder: (context, tabIndexProvider, child) {
+          return DefaultTabController(
+              initialIndex: tabIndexProvider.tabIndex,
+              length: 3,
+              child: Scaffold(
+                backgroundColor: const Color(0xFFFAF5E6),
+                appBar: AppBar(
+                    leading: IconButton(
+                      icon: const Icon(Icons.settings, color: Colors.white),
+                      iconSize: 31.0,
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SettingsPage()));
+                      },
+                    ),
+                    backgroundColor: const Color(0xFFF7B9CB),
+                    centerTitle: true,
+                    title: const Text("To-Do's",
+                        style: TextStyle(
+                            color: Color(0xFF77BBB4),
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold)),
+                    actions: <Widget>[
+                      IconButton(
+                        icon: const Icon(Icons.person, color: Colors.white),
                         iconSize: 31.0,
                         onPressed: () {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => SettingsPage()));
+                                  builder: (context) => ProfilePage()));
                         },
-                      ),
-                      backgroundColor: const Color(0xFFF7B9CB),
-                      centerTitle: true,
-                      title: const Text("To-Do's",
-                          style: TextStyle(
-                              color: Color(0xFF77BBB4),
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold)),
-                      actions: <Widget>[
-                        IconButton(
-                          icon: const Icon(Icons.person, color: Colors.white),
-                          iconSize: 31.0,
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ProfilePage()));
-                          },
-                        )
-                      ],
-                      bottom: PreferredSize(
+                      )
+                    ],
+                    bottom: PreferredSize(
                         preferredSize: const Size.fromHeight(kToolbarHeight),
-                        child: Consumer<TabIndexProvider>(
-                            builder: (context, tabIndexProvider, child) {
-                          return TabBar(
-                            onTap: (index) {
-                              tabIndexProvider.tabIndex = index;
-                            },
-                            labelColor: const Color(0xFF77BBB4),
-                            unselectedLabelColor: Colors.white,
-                            indicatorColor: const Color(0xFF77BBB4),
-                            tabs: [
-                              Tab(
-                                  icon: Icon(Icons.checklist_outlined,
-                                      color: tabIndexProvider.tabIndex == 0
-                                          ? const Color(0xFF77BBB4)
-                                          : Colors.white),
-                                  text: "Tasks"),
-                              Tab(
-                                  icon: Icon(Icons.published_with_changes,
-                                      color: tabIndexProvider.tabIndex == 1
-                                          ? const Color(0xFF77BBB4)
-                                          : Colors.white),
-                                  text: "Routines"),
-                              Tab(
-                                  icon: Icon(Icons.access_alarms_outlined,
-                                      color: tabIndexProvider.tabIndex == 2
-                                          ? const Color(0xFF77BBB4)
-                                          : Colors.white),
-                                  text: "Reminders"),
-                            ],
-                          );
-                        }),
-                      )),
-                  body: Consumer3<TodoList, Routine, ReminderList>(builder:
-                      (context, todoProvider, routineProvider, reminderProvider,
-                          child) {
-                    return (TabBarView(children: [
-                      ListView(
-                        children: todoProvider.todoLists.values
-                            .map((doc) => TodoListExpandable(
-                                  listName: doc['listName'],
-                                  listItems: doc['listItems'],
-                                ))
-                            .toList(),
-                      ),
-                      ListView(
-                        children: routineProvider.routines.values
-                            .map((doc) => RoutineWidget(
-                                  routineName: doc['routineName'],
-                                  frequency: doc['frequency'],
-                                  frequencyMeasure: doc['frequencyMeasure'],
-                                  currentProgress: doc['currentProgress'],
-                                ))
-                            .toList(),
-                      ),
-                      ListView(
-                        children: reminderProvider.reminderLists.values
-                            .map((doc) => ReminderListExpandable(
-                                  listName: doc['listName'],
-                                  dueDatetime: doc['dueDatetime'],
-                                  listItems: doc['listItems'],
-                                ))
-                            .toList(),
-                      ),
-                    ]));
-                  }),
-                  persistentFooterButtons: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
-                        color: const Color(0xDDB2F7EF),
-                        boxShadow: const [
-                          BoxShadow(color: Color(0xFF77BBB4), spreadRadius: 3),
-                        ],
-                      ),
-                      child: Consumer<TabIndexProvider>(
-                          builder: (context, tabIndexProvider, child) {
-                        return IconButton(
-                          color: const Color(0xFF77BBB4),
-                          onPressed: () {
-                            _showCreateDialog(context, tabIndexProvider.tabIndex);
+                        child: TabBar(
+                          onTap: (index) {
+                            tabIndexProvider.tabIndex = index;
                           },
-                          icon: const Icon(
-                            Icons.add,
-                            size: 30,
-                          ),
-                        );
-                      }),
+                          labelColor: const Color(0xFF77BBB4),
+                          unselectedLabelColor: Colors.white,
+                          indicatorColor: const Color(0xFF77BBB4),
+                          tabs: [
+                            Tab(
+                                icon: Icon(Icons.checklist_outlined,
+                                    color: tabIndexProvider.tabIndex == 0
+                                        ? const Color(0xFF77BBB4)
+                                        : Colors.white),
+                                text: "Tasks"),
+                            Tab(
+                                icon: Icon(Icons.published_with_changes,
+                                    color: tabIndexProvider.tabIndex == 1
+                                        ? const Color(0xFF77BBB4)
+                                        : Colors.white),
+                                text: "Routines"),
+                            Tab(
+                                icon: Icon(Icons.access_alarms_outlined,
+                                    color: tabIndexProvider.tabIndex == 2
+                                        ? const Color(0xFF77BBB4)
+                                        : Colors.white),
+                                text: "Reminders"),
+                          ],
+                        ))),
+                body: Consumer3<TodoList, Routine, ReminderList>(builder:
+                    (context, todoProvider, routineProvider, reminderProvider,
+                        child) {
+                  return (TabBarView(children: [
+                    ListView(
+                      children: todoProvider.todoLists.values
+                          .map((doc) => TodoListExpandable(
+                                listName: doc['listName'],
+                                listItems: doc['listItems'],
+                              ))
+                          .toList(),
                     ),
-                  ],
-                  persistentFooterAlignment: AlignmentDirectional.bottomCenter,
-                ))));
+                    ListView(
+                      children: routineProvider.routines.values
+                          .map((doc) => RoutineWidget(
+                                routineName: doc['routineName'],
+                                frequency: doc['frequency'],
+                                frequencyMeasure: doc['frequencyMeasure'],
+                                currentProgress: doc['currentProgress'],
+                              ))
+                          .toList(),
+                    ),
+                    ListView(
+                      children: reminderProvider.reminderLists.values
+                          .map((doc) => ReminderListExpandable(
+                                listName: doc['listName'],
+                                dueDatetime: doc['dueDatetime'],
+                                listItems: doc['listItems'],
+                              ))
+                          .toList(),
+                    ),
+                  ]));
+                }),
+                persistentFooterButtons: [
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      color: const Color(0xDDB2F7EF),
+                      boxShadow: const [
+                        BoxShadow(color: Color(0xFF77BBB4), spreadRadius: 3),
+                      ],
+                    ),
+                    child: Consumer<TabIndexProvider>(
+                        builder: (context, tabIndexProvider, child) {
+                      return IconButton(
+                        color: const Color(0xFF77BBB4),
+                        onPressed: () {
+                          showCreateDialogTodosPage(context, tabIndexProvider.tabIndex);
+                        },
+                        icon: const Icon(
+                          Icons.add,
+                          size: 30,
+                        ),
+                      );
+                    }),
+                  ),
+                ],
+                persistentFooterAlignment: AlignmentDirectional.bottomCenter,
+              ));
+        }));
   }
 
-  void _showCreateDialog(BuildContext context, int tabIndex) {
+  void showCreateDialogTodosPage(BuildContext context, int tabIndex) {
     switch (tabIndex) {
-    case 0:
-      _showCreateTodoListDialog(context);
-      break;
-    case 1: 
-      _showCreateRoutineDialog(context);
-      break;
-    case 2:
-      _showCreateReminderListDialog(context);
-      break;
-   }
+      case 0:
+        _showCreateTodoListDialog(context);
+        break;
+      case 1:
+        _showCreateRoutineDialog(context);
+        break;
+      case 2:
+        _showCreateReminderListDialog(context);
+        break;
+    }
   }
 
   void _showCreateTodoListDialog(BuildContext context) {

@@ -80,7 +80,7 @@ class RoutineWidget extends StatelessWidget {
                     title:
                         Text(routineName, style: const TextStyle(fontSize: 20)),
                     subtitle: Text(
-                      '${frequency - currentProgress} left out of $frequency time${frequency > 1 ? 's' : ''} a $frequencyMeasure',
+                      'Completed $currentProgress out of $frequency time${frequency > 1 ? 's' : ''} for the $frequencyMeasure',
                       style: const TextStyle(color: Color(0xFFF8C5D4), fontSize: 12),
                     )))));
   }

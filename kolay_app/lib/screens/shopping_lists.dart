@@ -7,10 +7,10 @@ import '../providers/shopping_list_provider.dart';
 
 class ShoppingListsPage extends StatefulWidget {
   @override
-  State<ShoppingListsPage> createState() => _ShoppingListsPageState();
+  State<ShoppingListsPage> createState() => ShoppingListsPageState();
 }
 
-class _ShoppingListsPageState extends State<ShoppingListsPage> {
+class ShoppingListsPageState extends State<ShoppingListsPage> {
   @override
   void initState() {
     super.initState();
@@ -83,7 +83,7 @@ class _ShoppingListsPageState extends State<ShoppingListsPage> {
             child: IconButton(
               color: const Color(0xFF77BBB4),
               onPressed: () {
-                _showCreateListDialog(context);
+                showCreateListDialog(context);
               },
               icon: const Icon(
                 Icons.add,
@@ -97,7 +97,7 @@ class _ShoppingListsPageState extends State<ShoppingListsPage> {
     );
   }
 
-  void _showCreateListDialog(BuildContext context) {
+  void showCreateListDialog(BuildContext context) {
     TextEditingController controller = TextEditingController();
     DateTime selectedDate = DateTime.now();
 

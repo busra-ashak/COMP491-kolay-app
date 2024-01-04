@@ -8,7 +8,7 @@ class Routine with ChangeNotifier {
 
   final FireStoreService _firestoreService = FireStoreService();
   Map<String, dynamic> routines = {};
-  List<String> routinesHome = [];
+  Map<String, dynamic> routinesHome = {};
 
 
   Future createRoutine(String routineName, String frequencyMeasure, int frequency) async {
@@ -70,7 +70,15 @@ class Routine with ChangeNotifier {
       if(frequency!=currentProgress){
         String frequencyMeasure = d.get('frequencyMeasure');
         String routineName = d.get('routineName');
-        routinesHome.add('$routineName - ${frequency-currentProgress} out of $frequency left for the $frequencyMeasure');
+        Map<String, dynamic> doc = {
+        routineName: {
+          'routineName': routineName,
+          'frequencyMeasure': frequencyMeasure,
+          'frequency': frequency,
+          'currentProgress': currentProgress
+        }
+      };
+      routinesHome.addAll(doc);
       }
     }
     notifyListeners();

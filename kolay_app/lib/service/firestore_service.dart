@@ -9,8 +9,6 @@ class FireStoreService {
   /* SHOPPING LIST */
 
   Future addItemToShoppingList(String listName, String newItem) async {
-    
-    // Get the UID of the currently authenticated user
     String? uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid != null) {
@@ -25,7 +23,6 @@ class FireStoreService {
   }
 
   Future toggleShopItemCheckbox(String listName, String itemName, bool itemTicked) async {
-    // Get the UID of the currently authenticated user
     String? uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid != null) {
@@ -41,7 +38,6 @@ class FireStoreService {
   }
 
   Future deleteItemFromShoppingList(String listName, String oldItem) async {
-    // Get the UID of the currently authenticated user
     String? uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid != null) {
@@ -56,7 +52,6 @@ class FireStoreService {
   }
 
   Future createShoppingList(String listName, DateTime datetime) async {
-    // Get the UID of the currently authenticated user
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
       await _fireStoreService.collection('USERS').doc(uid).collection('shoppingLists').doc(listName).set(
@@ -72,7 +67,6 @@ class FireStoreService {
   }
 
   Future deleteShoppingList(String listName) async {
-    // Get the UID of the currently authenticated user
     String? uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid != null) {
@@ -113,7 +107,6 @@ class FireStoreService {
   }
 
   Future completeOneRoutine(String routineName, int frequency, int currentProgress) async {
-    // Get the UID of the currently authenticated user
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     int updatedProgress = min(currentProgress+1, frequency);
 
@@ -130,7 +123,6 @@ class FireStoreService {
   }
 
   Future undoOneRoutine(String routineName, int currentProgress) async {
-    // Get the UID of the currently authenticated user
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     int updatedProgress = max(currentProgress-1, 0);
 
