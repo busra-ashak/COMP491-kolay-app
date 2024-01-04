@@ -12,9 +12,8 @@ import '../widgets/reminder_list_expandable.dart';
 import '../widgets/todo_list_expandable.dart';
 
 enum FrequencyMeasure {
-  daily('Daily'),
-  weekly('Weekly'),
-  monthly('Monthly');
+  daily('day'),
+  weekly('week');
 
   const FrequencyMeasure(this.label);
 
@@ -137,6 +136,7 @@ class _ToDosPageState extends State<ToDosPage> {
                                   routineName: doc['routineName'],
                                   frequency: doc['frequency'],
                                   frequencyMeasure: doc['frequencyMeasure'],
+                                  currentProgress: doc['currentProgress'],
                                 ))
                             .toList(),
                       ),
@@ -160,60 +160,37 @@ class _ToDosPageState extends State<ToDosPage> {
                           BoxShadow(color: Color(0xFF77BBB4), spreadRadius: 3),
                         ],
                       ),
-                      child: IconButton(
-                        color: const Color(0xFF77BBB4),
-                        onPressed: () {
-                          _showCreateDialog(context);
-                        },
-                        icon: const Icon(
-                          Icons.add,
-                          size: 30,
-                        ),
-                      ),
+                      child: Consumer<TabIndexProvider>(
+                          builder: (context, tabIndexProvider, child) {
+                        return IconButton(
+                          color: const Color(0xFF77BBB4),
+                          onPressed: () {
+                            _showCreateDialog(context, tabIndexProvider.tabIndex);
+                          },
+                          icon: const Icon(
+                            Icons.add,
+                            size: 30,
+                          ),
+                        );
+                      }),
                     ),
                   ],
                   persistentFooterAlignment: AlignmentDirectional.bottomCenter,
                 ))));
   }
 
-  void _showCreateDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Create a new to-do'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _showCreateTodoListDialog(context);
-              },
-              child: const Text('Task'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _showCreateRoutineDialog(context);
-              },
-              child: const Text('Routine'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _showCreateReminderListDialog(context);
-              },
-              child: const Text('Reminder'),
-            ),
-          ],
-        );
-      },
-    );
+  void _showCreateDialog(BuildContext context, int tabIndex) {
+    switch (tabIndex) {
+    case 0:
+      _showCreateTodoListDialog(context);
+      break;
+    case 1: 
+      _showCreateRoutineDialog(context);
+      break;
+    case 2:
+      _showCreateReminderListDialog(context);
+      break;
+   }
   }
 
   void _showCreateTodoListDialog(BuildContext context) {
@@ -268,37 +245,50 @@ class _ToDosPageState extends State<ToDosPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Create a new routine'),
-          content: Column(children: [
-            TextField(
-              controller: nameController,
-              decoration:
-                  const InputDecoration(labelText: 'The name of your routine'),
-            ),
-            Padding(
-                padding: const EdgeInsets.only(top: 40, bottom: 20),
-                child: DropdownMenu<FrequencyMeasure>(
-                  initialSelection: FrequencyMeasure.daily,
-                  controller: dropdownController,
-                  requestFocusOnTap: false,
-                  label: const Text('Frequency Measure'),
-                  dropdownMenuEntries: FrequencyMeasure.values
-                      .map<DropdownMenuEntry<FrequencyMeasure>>(
-                          (FrequencyMeasure measure) {
-                    return DropdownMenuEntry<FrequencyMeasure>(
-                      value: measure,
-                      label: measure.label,
-                    );
-                  }).toList(),
-                )),
-            TextField(
-              controller: frequencyController,
-              decoration: const InputDecoration(labelText: 'How frequent?'),
-              keyboardType: TextInputType.number,
-              inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.digitsOnly
-              ],
-            ),
-          ]),
+          content: SizedBox(
+            height: 150,
+            child: Column(children: [
+              Row(
+                children: [
+                  const Text("I will "),
+                  Expanded(
+                      child: TextField(
+                    controller: nameController,
+                    decoration: const InputDecoration(
+                        hintText: 'the name of your routine',
+                        hintStyle: TextStyle(fontSize: 12)),
+                  )),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                      child: TextField(
+                    controller: frequencyController,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                  )),
+                  const Text(" time(s) a "),
+                  DropdownMenu<FrequencyMeasure>(
+                    width: 100,
+                    initialSelection: FrequencyMeasure.daily,
+                    controller: dropdownController,
+                    requestFocusOnTap: false,
+                    dropdownMenuEntries: FrequencyMeasure.values
+                        .map<DropdownMenuEntry<FrequencyMeasure>>(
+                            (FrequencyMeasure measure) {
+                      return DropdownMenuEntry<FrequencyMeasure>(
+                        value: measure,
+                        label: measure.label,
+                      );
+                    }).toList(),
+                  ),
+                ],
+              )
+            ]),
+          ),
           actions: [
             TextButton(
               onPressed: () {

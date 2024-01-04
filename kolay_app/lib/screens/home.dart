@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kolay_app/providers/reminder_provider.dart';
+import 'package:kolay_app/providers/routine_provider.dart';
 import 'package:kolay_app/providers/shopping_list_provider.dart';
 import 'package:kolay_app/providers/meal_plan_provider.dart';
 import 'package:kolay_app/screens/profile.dart';
@@ -23,6 +24,7 @@ class _HomePageState extends State<HomePage> {
       context.read<ReminderList>().getIncompleteToDoTasksForHomeScreen();
       context.read<ShoppingList>().getShoppingListsForHomeScreen();
       context.read<MealPlan>().getMealPlansForHomeScreen();
+      context.read<Routine>().getRoutinesForHomeScreen();
     });
   }
 
@@ -57,13 +59,14 @@ class _HomePageState extends State<HomePage> {
           )
         ],
       ),
-      body: Consumer3<ReminderList, ShoppingList, MealPlan>(builder:
-          (context, reminderProvider, shoppingProvider, mealProvider, child) {
+      body: Consumer4<ReminderList, Routine, ShoppingList, MealPlan>(builder:
+          (context, reminderProvider, routineProvider, shoppingProvider, mealProvider, child) {
         return ListView(
           padding: const EdgeInsets.all(8),
           children: [
             _buildListWithTitle(
                 'Reminders', reminderProvider.reminderTasksHome),
+            _buildListWithTitle('Routines', routineProvider.routinesHome),
             _buildListWithTitle(
                 'Shopping Lists', shoppingProvider.shoppingListsHome),
             _buildListWithTitle('Meal Plans', mealProvider.mealPlansHome),
