@@ -1,7 +1,29 @@
+@JS()
+library my_flutter_code;
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../service/firestore_service.dart';
 import 'package:intl/intl.dart';
+import 'dart:js' as js;
+import 'package:js/js.dart';
+
+ReminderList reminderList = ReminderList();
+
+@JS('getIncompleteToDoTasksForHomeScreen')
+external void getIncompleteToDoTasksForHomeScreen();
+
+void main() {
+  // Call this function when your Flutter app starts
+  setupDartInterop();
+}
+
+void setupDartInterop() {
+  // Expose the Dart function to JavaScript
+  js.context['getIncompleteToDoTasksForHomeScreen'] = () {
+    reminderList.getIncompleteToDoTasksForHomeScreen();
+  };
+}
+
 class ReminderList with ChangeNotifier {
   final FireStoreService _firestoreService = FireStoreService();
   Map<String, dynamic> reminderLists = {};
