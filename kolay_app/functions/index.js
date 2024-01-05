@@ -1,6 +1,3 @@
-import 'package:kolay_app/providers/reminder_provider.dart';
-import 'package:kolay_app/providers/shopping_list_provider.dart';
-import 'package:kolay_app/providers/meal_plan_provider.dart';
 // The Cloud Functions for Firebase SDK to set up triggers and logging.
 const {onSchedule} = require("firebase-functions/v2/scheduler");
 const {getMessaging} = require("firebase-admin/messaging");
@@ -18,31 +15,14 @@ exports.scheduledFunctionCrontab = onSchedule('*/5 * * * *', async (event) => {
       // …
       'fDS20MOMR1uKuuP6tKhHKA:APA91bGLkfuR2FNlJ2jP-AEiLw7Eh2Q-ckkygi7CCDOFkB6Tnr-mvcr8bmg1go2yNOHvRqGrBu2XliLZJ1LPtBod8Rotplk0Kbp0NhhKil82lTlXWNDFLhLwXyZURmk3r2_Mb5-6J7h5',
   ];
-  
-  const _fireStoreService = FirebaseFirestore.instance;
-  
+    
   /* const message = {
       data: { title: 'Todays Plan', body: 'You have things to do today' },
       tokens: registrationTokens,
   }; */
 
-  // Call the Dart function from JavaScript and get the response
-  const response = await fetch('http://localhost:PORT', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ action: 'getIncompleteToDoTasksForHomeScreen' }),
-  });
-
-  // Get the JSON response from the Dart function
-  const results = await response.json();
-
-  // Modify the message body using the results from the Dart function
-  const messageBody = `Tasks: ${results.join(', ')}`;
-
   const message = {
-    notification: { title: 'Today\'s Plan', body: messageBody },
+    notification: { title: 'Todays Plan', body: 'You have things to do today' },
     tokens: registrationTokens,
   };
     
@@ -51,5 +31,3 @@ exports.scheduledFunctionCrontab = onSchedule('*/5 * * * *', async (event) => {
       console.log(response.successCount + ' messages were sent successfully');
     });
 });
-
-
