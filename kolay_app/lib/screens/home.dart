@@ -50,7 +50,7 @@ class _HomePageState extends State<HomePage> {
         centerTitle: true,
         title: const Text("Today's Plan",
             style: TextStyle(
-                color: Color(0xFF77BBB4),
+                color: Color(0xFF4768AD),
                 fontSize: 24,
                 fontWeight: FontWeight.bold)),
         actions: <Widget>[

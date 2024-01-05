@@ -46,7 +46,7 @@ class MealPlansPageState extends State<MealPlansPage> {
             centerTitle: true,
             title: const Text('Your Meal Plans',
                 style: TextStyle(
-                    color: Color(0xFF77BBB4),
+                    color: Color(0xFF4768AD),
                     fontSize: 24,
                     fontWeight: FontWeight.bold)),
             actions: <Widget>[

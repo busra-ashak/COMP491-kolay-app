@@ -46,7 +46,7 @@ class ShoppingListsPageState extends State<ShoppingListsPage> {
           centerTitle: true,
           title: const Text('Your Shopping Lists',
               style: TextStyle(
-                  color: Color(0xFF77BBB4),
+                  color: Color(0xFF4768AD),
                   fontSize: 24,
                   fontWeight: FontWeight.bold)),
           actions: <Widget>[

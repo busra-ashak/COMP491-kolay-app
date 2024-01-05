@@ -70,7 +70,7 @@ class ToDosPageState extends State<ToDosPage> {
                     centerTitle: true,
                     title: const Text("To-Do's",
                         style: TextStyle(
-                            color: Color(0xFF77BBB4),
+                            color: Color.fromARGB(255, 71, 104, 173),
                             fontSize: 24,
                             fontWeight: FontWeight.bold)),
                     actions: <Widget>[
@@ -91,26 +91,26 @@ class ToDosPageState extends State<ToDosPage> {
                           onTap: (index) {
                             tabIndexProvider.tabIndex = index;
                           },
-                          labelColor: const Color(0xFF77BBB4),
+                          labelColor: const Color(0xFF4768AD),
                           unselectedLabelColor: Colors.white,
-                          indicatorColor: const Color(0xFF77BBB4),
+                          indicatorColor: const Color(0xFF4768AD),
                           tabs: [
                             Tab(
                                 icon: Icon(Icons.checklist_outlined,
                                     color: tabIndexProvider.tabIndex == 0
-                                        ? const Color(0xFF77BBB4)
+                                        ? const Color(0xFF4768AD)
                                         : Colors.white),
                                 text: "Tasks"),
                             Tab(
                                 icon: Icon(Icons.published_with_changes,
                                     color: tabIndexProvider.tabIndex == 1
-                                        ? const Color(0xFF77BBB4)
+                                        ? const Color(0xFF4768AD)
                                         : Colors.white),
                                 text: "Routines"),
                             Tab(
                                 icon: Icon(Icons.access_alarms_outlined,
                                     color: tabIndexProvider.tabIndex == 2
-                                        ? const Color(0xFF77BBB4)
+                                        ? const Color(0xFF4768AD)
                                         : Colors.white),
                                 text: "Reminders"),
                           ],
