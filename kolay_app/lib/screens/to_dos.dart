@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kolay_app/screens/profile.dart';
-import 'package:kolay_app/screens/settings.dart';
 import 'package:provider/provider.dart';
 import '../providers/routine_provider.dart';
 import '../providers/reminder_provider.dart';
@@ -55,24 +54,13 @@ class ToDosPageState extends State<ToDosPage> {
               length: 3,
               child: Scaffold(
                 backgroundColor: const Color(0xFFFAF5E6),
-                appBar: AppBar(
-                    leading: IconButton(
-                      icon: const Icon(Icons.settings, color: Colors.white),
-                      iconSize: 31.0,
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SettingsPage()));
-                      },
-                    ),
-                    backgroundColor: const Color(0xFFF7B9CB),
-                    centerTitle: true,
-                    title: const Text("To-Do's",
-                        style: TextStyle(
-                            color: Color.fromARGB(255, 71, 104, 173),
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold)),
+                appBar:AppBar(
+        title: const Padding(
+            padding: EdgeInsets.only(left: 4),
+            child: Text("Your To-Do's",
+                style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold))),
                     actions: <Widget>[
                       IconButton(
                         icon: const Icon(Icons.person, color: Colors.white),

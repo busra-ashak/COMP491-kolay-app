@@ -69,7 +69,17 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-
+  fonts:
+    - family: PlaypenSans
+      fonts:
+        - asset: fonts/PlaypenSans-Bold.ttf
+        - asset: fonts/PlaypenSans-ExtraBold.ttf
+        - asset: fonts/PlaypenSans-ExtraLight.ttf
+        - asset: fonts/PlaypenSans-Light.ttf
+        - asset: fonts/PlaypenSans-Medium.ttf
+        - asset: fonts/PlaypenSans-Regular.ttf
+        - asset: fonts/PlaypenSans-SemiBold.ttf
+        - asset: fonts/PlaypenSans-Thin.ttf
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

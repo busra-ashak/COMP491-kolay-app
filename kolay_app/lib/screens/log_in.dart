@@ -6,8 +6,6 @@ import 'package:kolay_app/widgets/bottom_navigation_bar.dart';
 import 'package:kolay_app/widgets/form_container_widget.dart';
 import 'package:kolay_app/service/firebase_auth_services.dart';
 
-
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -16,16 +14,12 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   bool _isSigning = false;
-
-
 
   final FirebaseAuthService _auth = FirebaseAuthService();
 
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
-
 
   @override
   void dispose() {
@@ -33,7 +27,6 @@ class _LoginPageState extends State<LoginPage> {
     _passwordController.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -59,13 +52,17 @@ class _LoginPageState extends State<LoginPage> {
                 hintText: "Email",
                 isPasswordField: false,
               ),
-              SizedBox(height: 10,),
+              SizedBox(
+                height: 10,
+              ),
               FormContainerWidget(
                 controller: _passwordController,
                 hintText: "Password",
                 isPasswordField: true,
               ),
-              SizedBox(height: 30,),
+              SizedBox(
+                height: 30,
+              ),
               GestureDetector(
                 onTap: _signIn,
                 child: Container(
@@ -75,23 +72,39 @@ class _LoginPageState extends State<LoginPage> {
                     color: Colors.blue,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Center(child:Text("Login",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),)),
+                  child: Center(
+                      child: Text(
+                    "Login",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  )),
                 ),
               ),
-              SizedBox(height: 20,),
-              Row(mainAxisAlignment: MainAxisAlignment.center,
+              SizedBox(
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text("Don't have an account?"),
-                  SizedBox(width: 5,),
+                  SizedBox(
+                    width: 5,
+                  ),
                   GestureDetector(
-                      onTap: (){
-                        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => SignUpPage()), (route) => false);
+                      onTap: () {
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SignUpPage()),
+                            (route) => false);
                       },
-                      child: Text("Sign Up",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold),))
+                      child: Text(
+                        "Sign Up",
+                        style: TextStyle(
+                            color: Colors.blue, fontWeight: FontWeight.bold),
+                      ))
                 ],
               )
-
-
             ],
           ),
         ),
@@ -100,19 +113,20 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _signIn() async {
-
     String email = _emailController.text;
     String password = _passwordController.text;
 
     User? user = await _auth.signInWithEmailAndPassword(email, password);
 
-    if (user!= null){
+    if (user != null) {
       print("User is successfully signedIn");
-      Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => BottomNavigationBarController()));
-    } else{
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+              builder: (context) => BottomNavigationBarController()),
+          (route) => false);
+    } else {
       print("Some error happend");
     }
-
   }
 }

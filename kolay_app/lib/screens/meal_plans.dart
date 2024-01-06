@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:kolay_app/screens/profile.dart';
-import 'package:kolay_app/screens/settings.dart';
 import '../widgets/meal_plan_list.dart';
 import 'package:provider/provider.dart';
 import '../providers/meal_plan_provider.dart';
@@ -34,23 +33,15 @@ class MealPlansPageState extends State<MealPlansPage> {
         child: Scaffold(
           backgroundColor: const Color(0xFFFAF5E6),
           appBar: AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.settings, color: Colors.white),
-              iconSize: 31.0,
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => SettingsPage()));
-              },
-            ),
-            backgroundColor: const Color(0xFFF7B9CB),
-            centerTitle: true,
-            title: const Text('Your Meal Plans',
-                style: TextStyle(
-                    color: Color(0xFF4768AD),
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold)),
+            title: const Padding(
+                padding: EdgeInsets.only(left: 4),
+                child: Text("Your Meal Plans",
+                    style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold))),
             actions: <Widget>[
               IconButton(
+                padding: const EdgeInsets.only(right: 8),
                 icon: const Icon(Icons.person, color: Colors.white),
                 iconSize: 31.0,
                 onPressed: () {
