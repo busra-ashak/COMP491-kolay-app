@@ -214,13 +214,13 @@ class _HomePageState extends State<HomePage> {
         bottomNavIndex.currentIndex = 1;
         todos.showCreateDialogTodosPage(context, 2);
         break;
-      case 'Meal PLans':
-        bottomNavIndex.currentIndex = 3;
-        mealPlans.showCreateMealPlanDialog(context);
-        break;
       case 'Shopping Lists':
         bottomNavIndex.currentIndex = 2;
         shoppingLists.showCreateListDialog(context);
+        break;
+      default:
+        bottomNavIndex.currentIndex = 3;
+        mealPlans.showCreateMealPlanDialog(context);
         break;
     }
   }
