@@ -9,55 +9,113 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  final String _userEmail = FirebaseAuth.instance.currentUser!.email ?? '';
+  final String _userName = FirebaseAuth.instance.currentUser!.displayName ?? '';
+  // final String _userPhoto = FirebaseAuth.instance.currentUser!.photoURL ?? '';
+  final String _userPhone = FirebaseAuth.instance.currentUser!.phoneNumber ?? '';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFAF5E6),
       appBar: AppBar(
-        leading: BackButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: const Text('Profile',
-            style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
-      ),
-      body: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          UserAccountsDrawerHeader(
-            accountName: const Text('Jane Doe'),
-            accountEmail: const Text('example@gmail.com'),
-            currentAccountPicture: CircleAvatar(
-              child: ClipOval(
-                child: Image.network(
-                  'https://oflutter.com/wp-content/uploads/2021/02/girl-profile.png',
-                  fit: BoxFit.cover,
-                  width: 90,
-                  height: 90,
+          leading: BackButton(
+              color: Colors.white,
+              onPressed: () {
+                Navigator.pop(context);
+              }),
+          title: const Padding(
+              padding: EdgeInsets.only(left: 4),
+              child: Text("Your Profile",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold)))),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircleAvatar(
+              radius: 75,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              _userName,
+              style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF8B85C1)),
+            ),
+            const SizedBox(height: 10),
+            ProfileInfo(label: 'Email', value: _userEmail),
+            ProfileInfo(label: 'Phone', value: _userPhone),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                /* IconButton(
+                  onPressed: () {},
+                  icon: Icon(Icons.nightlight)
+                ), */
+                ElevatedButton(
+                  onPressed: () {
+                    // Add your logout logic here
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Logout'),
+                          content:
+                              const Text('Are you sure you want to log out?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                FirebaseAuth.instance.signOut();
+                                Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const LoginPage()),
+                                    (route) => false);
+                              },
+                              child: const Text('Yes'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: const Text(
+                    "Logout",
+                    style: TextStyle(color: Color(0xFF8B85C1)),
+                  ),
                 ),
-              ),
+              ],
             ),
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                  fit: BoxFit.fill,
-                  image: NetworkImage(
-                      'https://oflutter.com/wp-content/uploads/2021/02/profile-bg3.jpg')),
-            ),
-          ),
-          ListTile(
-            title: const Text('Log Out'),
-            leading: const Icon(Icons.exit_to_app),
-            onTap: (){
-              FirebaseAuth.instance.signOut();
-              Navigator.pushAndRemoveUntil(
-                            context, MaterialPageRoute(builder: (context) => LoginPage()), (route) => false);
-              },
-          ),
-        ],
+          ],
+        ),
       ),
+    );
+  }
+}
+
+class ProfileInfo extends StatelessWidget {
+  final String? label;
+  final String? value;
+
+  const ProfileInfo({super.key, required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Text('$label: ${value ?? ''}',
+          style: const TextStyle(color: Color(0xFFE76E91))),
     );
   }
 }

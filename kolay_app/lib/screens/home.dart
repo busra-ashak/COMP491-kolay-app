@@ -8,7 +8,6 @@ import 'package:kolay_app/screens/meal_plans.dart';
 import 'package:kolay_app/screens/shopping_lists.dart';
 import '../providers/bottom_navigation_provider.dart';
 import 'package:kolay_app/screens/profile.dart';
-import 'package:kolay_app/screens/settings.dart';
 import 'package:kolay_app/screens/to_dos.dart';
 import 'package:provider/provider.dart';
 
@@ -38,23 +37,15 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: const Color(0xFFFAF5E6),
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.settings, color: Colors.white),
-          iconSize: 31.0,
-          onPressed: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => SettingsPage()));
-          },
-        ),
-        backgroundColor: const Color(0xFFF7B9CB),
-        centerTitle: true,
-        title: const Text("Today's Plan",
-            style: TextStyle(
-                color: Color(0xFF4768AD),
-                fontSize: 24,
-                fontWeight: FontWeight.bold)),
+        title: const Padding(
+            padding: EdgeInsets.only(left: 4),
+            child: Text("Today's Plan",
+                style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold))),
         actions: <Widget>[
           IconButton(
+            padding: const EdgeInsets.only(right: 8),
             icon: const Icon(Icons.person, color: Colors.white),
             iconSize: 31.0,
             onPressed: () {
@@ -223,13 +214,13 @@ class _HomePageState extends State<HomePage> {
         bottomNavIndex.currentIndex = 1;
         todos.showCreateDialogTodosPage(context, 2);
         break;
-      case 'Meal PLans':
-        bottomNavIndex.currentIndex = 3;
-        mealPlans.showCreateMealPlanDialog(context);
-        break;
       case 'Shopping Lists':
         bottomNavIndex.currentIndex = 2;
         shoppingLists.showCreateListDialog(context);
+        break;
+      default:
+        bottomNavIndex.currentIndex = 3;
+        mealPlans.showCreateMealPlanDialog(context);
         break;
     }
   }

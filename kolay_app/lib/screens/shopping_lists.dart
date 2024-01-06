@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:kolay_app/screens/profile.dart';
-import 'package:kolay_app/screens/settings.dart';
 import 'package:provider/provider.dart';
 import '../widgets/shopping_list_expandable.dart';
 import '../providers/shopping_list_provider.dart';
@@ -34,23 +33,15 @@ class ShoppingListsPageState extends State<ShoppingListsPage> {
       child: Scaffold(
         backgroundColor: const Color(0xFFFAF5E6),
         appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.settings, color: Colors.white),
-            iconSize: 31.0,
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => SettingsPage()));
-            },
-          ),
-          backgroundColor: const Color(0xFFF7B9CB),
-          centerTitle: true,
-          title: const Text('Your Shopping Lists',
-              style: TextStyle(
-                  color: Color(0xFF4768AD),
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold)),
+          title: const Padding(
+              padding: EdgeInsets.only(left: 4),
+              child: Text("Your Shopping Lists",
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold))),
           actions: <Widget>[
             IconButton(
+              padding: const EdgeInsets.only(right: 8),
               icon: const Icon(Icons.person, color: Colors.white),
               iconSize: 31.0,
               onPressed: () {

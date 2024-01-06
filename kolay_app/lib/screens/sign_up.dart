@@ -121,8 +121,11 @@ controller: _passwordController,
 
     if (user!= null){
       print("User is successfully created");
-      Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => BottomNavigationBarController()));
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+              builder: (context) => BottomNavigationBarController()),
+          (route) => false);
     } else{
       print("Some error happend");
     }

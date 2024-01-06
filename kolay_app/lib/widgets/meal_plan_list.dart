@@ -146,14 +146,14 @@ class MealPlanWidget extends StatelessWidget {
               onPressed: () => _showAddItemToMealDialog(context, listName),
               child: const Text(
                 "Add ingredient",
-                style: TextStyle(color: Color(0xFF6C64B3)),
+                style: TextStyle(color: Color(0xFF6C64B3), fontSize: 12),
               ),
             ),
             ElevatedButton(
               onPressed: () => _showConfirmDialog(context, listName),
               child: const Text(
                 "Create shopping list",
-                style: TextStyle(color: Color(0xFF6C64B3)),
+                style: TextStyle(color: Color(0xFF6C64B3), fontSize: 12),
               ),
             ),
           ],
