@@ -9,7 +9,6 @@ class TodoListExpandable extends StatelessWidget {
   final String listName;
   final Map listItems;
 
-  // Constructor to accept the initial todo list name
   const TodoListExpandable(
       {Key? key, required this.listName, required this.listItems})
       : super(key: key);

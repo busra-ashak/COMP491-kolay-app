@@ -7,18 +7,14 @@ class RoutineWidget extends StatelessWidget {
   final String routineName;
   final String frequencyMeasure;
   final int frequency;
+  final int currentProgress;
 
-  final Map<String, String> _frequencyMapping = {
-    "Daily": "day",
-    "Weekly": "week",
-    "Monthly": "month",
-  };
-
-  RoutineWidget(
+  const RoutineWidget(
       {Key? key,
       required this.routineName,
       required this.frequencyMeasure,
-      required this.frequency})
+      required this.frequency,
+      required this.currentProgress})
       : super(key: key);
 
   @override
@@ -60,14 +56,33 @@ class RoutineWidget extends StatelessWidget {
                   ],
                 ),
                 child: ListTile(
+                    trailing: SizedBox(
+                        width: 96,
+                        child: Row(
+                          children: [
+                            IconButton(
+                                onPressed: () {
+                                  context.read<Routine>().undoOneRoutine(
+                                      routineName, currentProgress);
+                                },
+                                icon: const Icon(Icons.remove_circle)),
+                            IconButton(
+                                onPressed: () {
+                                  context.read<Routine>().completeOneRoutine(
+                                      routineName, frequency, currentProgress);
+                                },
+                                icon: const Icon(Icons.check_circle))
+                          ],
+                        )),
                     textColor: Colors.white,
                     iconColor: Colors.white,
                     shape: const Border(),
                     title:
                         Text(routineName, style: const TextStyle(fontSize: 20)),
                     subtitle: Text(
-                        '$frequency time(s) a ${_frequencyMapping[frequencyMeasure]}',
-                        style: const TextStyle(fontSize: 12))))));
+                      'Completed $currentProgress out of $frequency time${frequency > 1 ? 's' : ''} for the $frequencyMeasure',
+                      style: const TextStyle(color: Color(0xFFF8C5D4), fontSize: 12),
+                    )))));
   }
 
   void _showDeleteRoutineDialog(BuildContext context, String routineName) {

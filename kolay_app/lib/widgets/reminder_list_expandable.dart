@@ -11,7 +11,6 @@ class ReminderListExpandable extends StatelessWidget {
   final DateTime dueDatetime;
   final Map listItems;
 
-  // Constructor to accept the initial reminder list name
   const ReminderListExpandable(
       {Key? key,
       required this.listName,
@@ -171,9 +170,7 @@ class ReminderListExpandable extends StatelessWidget {
           title: const Text('Add a new reminder to the reminder group'),
           content: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              //position
               mainAxisSize: MainAxisSize.min,
-              // wrap content in flutter
               children: [
                 TextField(
                   controller: itemNameController,

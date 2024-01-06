@@ -7,10 +7,10 @@ import '../providers/meal_plan_provider.dart';
 
 class MealPlansPage extends StatefulWidget {
   @override
-  State<MealPlansPage> createState() => _MealPlansPageState();
+  State<MealPlansPage> createState() => MealPlansPageState();
 }
 
-class _MealPlansPageState extends State<MealPlansPage> {
+class MealPlansPageState extends State<MealPlansPage> {
   @override
   void initState() {
     super.initState();
@@ -46,7 +46,7 @@ class _MealPlansPageState extends State<MealPlansPage> {
             centerTitle: true,
             title: const Text('Your Meal Plans',
                 style: TextStyle(
-                    color: Color(0xFF77BBB4),
+                    color: Color(0xFF4768AD),
                     fontSize: 24,
                     fontWeight: FontWeight.bold)),
             actions: <Widget>[
@@ -85,7 +85,7 @@ class _MealPlansPageState extends State<MealPlansPage> {
               child: IconButton(
                 color: const Color(0xFF77BBB4),
                 onPressed: () {
-                  _showCreateMealPlanDialog(context);
+                  showCreateMealPlanDialog(context);
                 },
                 icon: const Icon(
                   Icons.add,
@@ -98,7 +98,7 @@ class _MealPlansPageState extends State<MealPlansPage> {
         ));
   }
 
-  void _showCreateMealPlanDialog(BuildContext context) {
+  void showCreateMealPlanDialog(BuildContext context) {
     TextEditingController nameController = TextEditingController();
     DateTime selectedDate = DateTime.now();
 
