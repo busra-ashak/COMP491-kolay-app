@@ -6,7 +6,7 @@ class FirebaseAuthService {
   FirebaseAuth _auth = FirebaseAuth.instance;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  late UserCredential _credential; // Private variable
+  late UserCredential _credential;
 
   Future<User?> signUpWithEmailAndPassword(String email, String password,
       String name, String phoneNumber, String photoURL) async {

@@ -7,6 +7,8 @@ import 'package:kolay_app/screens/log_in.dart';
 import 'package:kolay_app/service/firebase_auth_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:kolay_app/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -19,6 +21,7 @@ class _ProfilePageState extends State<ProfilePage> {
   late String email = '';
   late String name = '';
   late String photoURL = '';
+  late String phone = '';
   User? _user;
   @override
   void initState() {
@@ -34,13 +37,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
       if (snapshot.exists) {
         Map<String, dynamic> userData = snapshot.data()!;
-        // Now you can use userData to populate your UI
+
         setState(() {
-          // Update UI with user data
-          // e.g., assign values to variables that are bound to your UI widgets
           email = userData['email'];
           name = userData['name'];
           photoURL = userData['photoURL'];
+          phone = userData['phoneNumber'];
         });
       }
     }
@@ -48,52 +50,129 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: BackButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: const Text('Profile',
-            style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
-      ),
-      body: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          UserAccountsDrawerHeader(
-            accountName: Text(name),
-            accountEmail: Text(email),
-            currentAccountPicture: CircleAvatar(
-              child: ClipOval(
-                child: photoURL.isNotEmpty
-                    ? Image.file(File(photoURL))
-                    : Image.asset('lib/assets/default_profile_picture.jpg'),
+    return Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
+      return Scaffold(
+        backgroundColor:
+            themeBody[themeProvider.themeDataName]!['screenBackground'],
+        appBar: AppBar(
+            leading: BackButton(
+                color:
+                    themeBody[themeProvider.themeDataName]!['tabColorSelected'],
+                onPressed: () {
+                  Navigator.pop(context);
+                }),
+            title: const Padding(
+                padding: EdgeInsets.only(left: 4),
+                child: Text("Your Profile",
+                    style:
+                        TextStyle(fontSize: 24, fontWeight: FontWeight.bold)))),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 75,
+                child: ClipOval(
+                  child: photoURL.isNotEmpty
+                      ? Image.file(File(photoURL))
+                      : Image.asset('lib/assets/default_profile_picture.jpg'),
+                ),
               ),
-            ),
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                  fit: BoxFit.fill,
-                  image: NetworkImage(
-                      'https://oflutter.com/wp-content/uploads/2021/02/profile-bg3.jpg')),
-            ),
+              const SizedBox(height: 20),
+              Text(
+                name,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: themeBody[themeProvider.themeDataName]!['expandable'],
+                ),
+              ),
+              const SizedBox(height: 10),
+              ProfileInfo(label: 'Email', value: email),
+              ProfileInfo(label: 'Phone', value: phone),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  IconButton(
+                      onPressed: () {
+                        Provider.of<ThemeProvider>(context, listen: false)
+                            .toggleTheme();
+                      },
+                      icon: Icon(
+                        themeIcon[themeProvider.themeDataName],
+                        color: themeBody[themeProvider.themeDataName]![
+                            'expandable'],
+                      )),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Add your logout logic here
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Log out'),
+                            content:
+                                const Text('Are you sure you want to log out?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  FirebaseAuth.instance.signOut();
+                                  Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const LoginPage()),
+                                      (route) => false);
+                                },
+                                child: const Text('Yes'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    child: Text(
+                      "Log out",
+                      style: TextStyle(
+                        color: themeBody[themeProvider.themeDataName]![
+                            'expandableButton'],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          ListTile(
-            title: const Text('Log Out'),
-            leading: const Icon(Icons.exit_to_app),
-            onTap: () {
-              FirebaseAuth.instance.signOut();
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
-                  (route) => false);
-            },
-          ),
-        ],
-      ),
-    );
+        ),
+      );
+    });
+  }
+}
+
+class ProfileInfo extends StatelessWidget {
+  final String? label;
+  final String? value;
+
+  const ProfileInfo({super.key, required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5),
+        child: Text('$label: ${value ?? ''}',
+            style: TextStyle(
+              color:
+                  themeBody[themeProvider.themeDataName]!['tabColorSelected'],
+            )),
+      );
+    });
   }
 }

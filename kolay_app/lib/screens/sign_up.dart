@@ -227,7 +227,7 @@ class _SignUpPageState extends State<SignUpPage> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => const BottomNavigationBarController()));
+                  builder: (context) => BottomNavigationBarController()));
         } else {
           print("Some error happened");
         }

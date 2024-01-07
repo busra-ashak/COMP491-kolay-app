@@ -119,6 +119,9 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(
                     width: 5,
                   ),
+                  SizedBox(
+                    width: 5,
+                  ),
                   GestureDetector(
                       onTap: () {
                         Navigator.pushAndRemoveUntil(
@@ -150,10 +153,12 @@ class _LoginPageState extends State<LoginPage> {
 
     if (user != null) {
       print("User is successfully signed in");
-      Navigator.push(
+
+      Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
-              builder: (context) => BottomNavigationBarController()));
+              builder: (context) => BottomNavigationBarController()),
+          (route) => false);
     } else {
       _showSignInErrorMessage();
     }
