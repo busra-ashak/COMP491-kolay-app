@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:kolay_app/providers/theme_provider.dart';
 import 'package:kolay_app/screens/profile.dart';
 import 'package:provider/provider.dart';
 import '../providers/routine_provider.dart';
@@ -47,20 +48,17 @@ class ToDosPageState extends State<ToDosPage> {
             color: Colors.transparent,
           ),
         ),
-        child: Consumer<TabIndexProvider>(
-            builder: (context, tabIndexProvider, child) {
+        child: Consumer2<TabIndexProvider, ThemeProvider>(
+            builder: (context, tabIndexProvider, themeProvider, child) {
           return DefaultTabController(
               initialIndex: tabIndexProvider.tabIndex,
               length: 3,
               child: Scaffold(
-                backgroundColor: const Color(0xFFFAF5E6),
+                backgroundColor: themeBody[themeProvider.themeDataName]!['screenBackground'],
                 appBar:AppBar(
         title: const Padding(
             padding: EdgeInsets.only(left: 4),
-            child: Text("Your To-Do's",
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold))),
+            child: Text("Your To-Do's")),
                     actions: <Widget>[
                       IconButton(
                         icon: const Icon(Icons.person, color: Colors.white),
@@ -79,27 +77,27 @@ class ToDosPageState extends State<ToDosPage> {
                           onTap: (index) {
                             tabIndexProvider.tabIndex = index;
                           },
-                          labelColor: const Color(0xFF4768AD),
-                          unselectedLabelColor: Colors.white,
-                          indicatorColor: const Color(0xFF4768AD),
+                          labelColor: themeBody[themeProvider.themeDataName]!['tabColorSelected'],
+                          unselectedLabelColor: themeBody[themeProvider.themeDataName]!['tabColorUnselected'],
+                          indicatorColor: themeBody[themeProvider.themeDataName]!['tabColorSelected'],
                           tabs: [
                             Tab(
                                 icon: Icon(Icons.checklist_outlined,
                                     color: tabIndexProvider.tabIndex == 0
-                                        ? const Color(0xFF4768AD)
-                                        : Colors.white),
+                                        ? themeBody[themeProvider.themeDataName]!['tabColorSelected']
+                                        : themeBody[themeProvider.themeDataName]!['tabColorUnselected'],),
                                 text: "Tasks"),
                             Tab(
                                 icon: Icon(Icons.published_with_changes,
                                     color: tabIndexProvider.tabIndex == 1
-                                        ? const Color(0xFF4768AD)
-                                        : Colors.white),
+                                        ? themeBody[themeProvider.themeDataName]!['tabColorSelected']
+                                        : themeBody[themeProvider.themeDataName]!['tabColorUnselected'],),
                                 text: "Routines"),
                             Tab(
                                 icon: Icon(Icons.access_alarms_outlined,
                                     color: tabIndexProvider.tabIndex == 2
-                                        ? const Color(0xFF4768AD)
-                                        : Colors.white),
+                                        ? themeBody[themeProvider.themeDataName]!['tabColorSelected']
+                                        : themeBody[themeProvider.themeDataName]!['tabColorUnselected'],),
                                 text: "Reminders"),
                           ],
                         ))),
@@ -140,15 +138,15 @@ class ToDosPageState extends State<ToDosPage> {
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(50),
-                      color: const Color(0xDDB2F7EF),
-                      boxShadow: const [
-                        BoxShadow(color: Color(0xFF77BBB4), spreadRadius: 3),
+                      color: themeBody[themeProvider.themeDataName]!['floatingButton'],
+                      boxShadow: [
+                        BoxShadow(color: themeBody[themeProvider.themeDataName]!['floatingButtonOutline'] as Color, spreadRadius: 3),
                       ],
                     ),
                     child: Consumer<TabIndexProvider>(
                         builder: (context, tabIndexProvider, child) {
                       return IconButton(
-                        color: const Color(0xFF77BBB4),
+                        color: themeBody[themeProvider.themeDataName]!['floatingButtonOutline'],
                         onPressed: () {
                           showCreateDialogTodosPage(context, tabIndexProvider.tabIndex);
                         },

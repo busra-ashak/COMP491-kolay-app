@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kolay_app/providers/theme_provider.dart';
 import 'package:kolay_app/screens/profile.dart';
 import 'package:provider/provider.dart';
 import '../widgets/shopping_list_expandable.dart';
@@ -24,68 +25,72 @@ class ShoppingListsPageState extends State<ShoppingListsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: Theme.of(context).copyWith(
-        dividerTheme: const DividerThemeData(
-          color: Colors.transparent,
+    return Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
+      return Theme(
+        data: Theme.of(context).copyWith(
+          dividerTheme: const DividerThemeData(
+            color: Colors.transparent,
+          ),
         ),
-      ),
-      child: Scaffold(
-        backgroundColor: const Color(0xFFFAF5E6),
-        appBar: AppBar(
-          title: const Padding(
-              padding: EdgeInsets.only(left: 4),
-              child: Text("Your Shopping Lists",
-                  style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold))),
-          actions: <Widget>[
-            IconButton(
-              padding: const EdgeInsets.only(right: 8),
-              icon: const Icon(Icons.person, color: Colors.white),
-              iconSize: 31.0,
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => ProfilePage()));
-              },
-            )
-          ],
-        ),
-        body: Consumer<ShoppingList>(builder: (context, viewModel, child) {
-          return ListView(
-            children: viewModel.shoppingLists.values
-                .map((doc) => ShoppingListExpandable(
-                      listName: doc['listName'],
-                      datetime: doc['datetime'],
-                      listItems: doc['listItems'],
-                    ))
-                .toList(),
-          );
-        }),
-        persistentFooterButtons: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(50),
-              color: const Color(0xDDB2F7EF),
-              boxShadow: const [
-                BoxShadow(color: Color(0xFF77BBB4), spreadRadius: 3),
-              ],
-            ),
-            child: IconButton(
-              color: const Color(0xFF77BBB4),
-              onPressed: () {
-                showCreateListDialog(context);
-              },
-              icon: const Icon(
-                Icons.add,
-                size: 30,
+        child: Scaffold(
+          backgroundColor: themeBody[themeProvider.themeDataName]!['screenBackground'],
+          appBar: AppBar(
+            title: const Padding(
+                padding: EdgeInsets.only(left: 4),
+                child: Text("Your Shopping Lists")),
+            actions: <Widget>[
+              IconButton(
+                padding: const EdgeInsets.only(right: 8),
+                icon: const Icon(Icons.person, color: Colors.white),
+                iconSize: 31.0,
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => ProfilePage()));
+                },
+              )
+            ],
+          ),
+          body: Consumer<ShoppingList>(builder: (context, viewModel, child) {
+            return ListView(
+              children: viewModel.shoppingLists.values
+                  .map((doc) => ShoppingListExpandable(
+                        listName: doc['listName'],
+                        datetime: doc['datetime'],
+                        listItems: doc['listItems'],
+                      ))
+                  .toList(),
+            );
+          }),
+          persistentFooterButtons: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                color:
+                    themeBody[themeProvider.themeDataName]!['floatingButton'],
+                boxShadow: [
+                  BoxShadow(
+                      color: themeBody[themeProvider.themeDataName]![
+                          'floatingButtonOutline'] as Color,
+                      spreadRadius: 3),
+                ],
+              ),
+              child: IconButton(
+                color: themeBody[themeProvider.themeDataName]![
+                    'floatingButtonOutline'],
+                onPressed: () {
+                  showCreateListDialog(context);
+                },
+                icon: const Icon(
+                  Icons.add,
+                  size: 30,
+                ),
               ),
             ),
-          ),
-        ],
-        persistentFooterAlignment: AlignmentDirectional.bottomCenter,
-      ),
-    );
+          ],
+          persistentFooterAlignment: AlignmentDirectional.bottomCenter,
+        ),
+      );
+    });
   }
 
   void showCreateListDialog(BuildContext context) {

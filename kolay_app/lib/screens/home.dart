@@ -4,6 +4,7 @@ import 'package:kolay_app/providers/routine_provider.dart';
 import 'package:kolay_app/providers/shopping_list_provider.dart';
 import 'package:kolay_app/providers/meal_plan_provider.dart';
 import 'package:kolay_app/providers/tab_index_provider.dart';
+import 'package:kolay_app/providers/theme_provider.dart';
 import 'package:kolay_app/screens/meal_plans.dart';
 import 'package:kolay_app/screens/shopping_lists.dart';
 import '../providers/bottom_navigation_provider.dart';
@@ -34,47 +35,49 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFAF5E6),
-      appBar: AppBar(
-        title: const Padding(
-            padding: EdgeInsets.only(left: 4),
-            child: Text("Today's Plan",
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold))),
-        actions: <Widget>[
-          IconButton(
-            padding: const EdgeInsets.only(right: 8),
-            icon: const Icon(Icons.person, color: Colors.white),
-            iconSize: 31.0,
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ProfilePage()));
-            },
-          )
-        ],
-      ),
-      body: Consumer4<ReminderList, Routine, ShoppingList, MealPlan>(builder:
-          (context, reminderProvider, routineProvider, shoppingProvider,
-              mealProvider, child) {
-        return ListView(
-          padding: const EdgeInsets.all(8),
-          children: [
-            _buildListWithTitle(
-                'Reminders', reminderProvider.reminderTasksHome),
-            _buildListWithTitle(
-                'Routines', routineProvider.routinesHome.values.toList()),
-            _buildListWithTitle(
-                'Shopping Lists', shoppingProvider.shoppingListsHome),
-            _buildListWithTitle('Meal Plans', mealProvider.mealPlansHome),
+    return Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
+      return Scaffold(
+        backgroundColor: themeBody[themeProvider.themeDataName]!['screenBackground'],
+        appBar: AppBar(
+          title: const Padding(
+              padding: EdgeInsets.only(left: 4),
+              child: Text(
+                "Today's Plan",
+                style: TextStyle(fontSize: 28),
+              )),
+          actions: <Widget>[
+            IconButton(
+              padding: const EdgeInsets.only(right: 8),
+              icon: const Icon(Icons.person, color: Colors.white),
+              iconSize: 31.0,
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => ProfilePage()));
+              },
+            )
           ],
-        );
-      }),
-    );
+        ),
+        body: Consumer4<ReminderList, Routine, ShoppingList, MealPlan>(builder:
+            (context, reminderProvider, routineProvider, shoppingProvider,
+                mealProvider, child) {
+          return ListView(
+            padding: const EdgeInsets.all(8),
+            children: [
+              _buildListWithTitle(
+                  'Reminders', reminderProvider.reminderTasksHome, themeBody[themeProvider.themeDataName]),
+              _buildListWithTitle(
+                  'Routines', routineProvider.routinesHome.values.toList(), themeBody[themeProvider.themeDataName]),
+              _buildListWithTitle(
+                  'Shopping Lists', shoppingProvider.shoppingListsHome, themeBody[themeProvider.themeDataName]),
+              _buildListWithTitle('Meal Plans', mealProvider.mealPlansHome, themeBody[themeProvider.themeDataName]),
+            ],
+          );
+        }),
+      );
+    });
   }
 
-  Widget _buildListWithTitle(String title, List items) {
+  Widget _buildListWithTitle(String title, List items, var themeObject) {
     return Consumer2<BottomNavIndex, TabIndexProvider>(
         builder: (context, bottomNavIndex, tabIndexProvider, child) {
       return Column(
@@ -84,9 +87,10 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
               title,
-              style: const TextStyle(
-                color: Color(0xFF8B85C1),
+              style: TextStyle(
+                color: themeObject['homeTitles'],
                 fontSize: 20,
+                fontFamily: 'Comfortaa',
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -95,7 +99,7 @@ class _HomePageState extends State<HomePage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Card(
-                color: const Color(0xFFF7B9CB),
+                color: themeObject['homeEmptyCard'],
                 elevation: 3,
                 margin: const EdgeInsets.symmetric(vertical: 8),
                 child: ListTile(
@@ -106,7 +110,8 @@ class _HomePageState extends State<HomePage> {
                       fontSize: 20,
                     ),
                   ),
-                  onTap: () => showCreateDialog(context, title, bottomNavIndex, tabIndexProvider),
+                  onTap: () => showCreateDialog(
+                      context, title, bottomNavIndex, tabIndexProvider),
                 ),
               ),
             ),
@@ -117,7 +122,7 @@ class _HomePageState extends State<HomePage> {
               itemCount: items.length,
               itemBuilder: (BuildContext context, int index) {
                 return Card(
-                    color: Colors.teal[200],
+                    color: themeObject['homeNonEmptyCard'],
                     elevation: 3,
                     margin:
                         const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -198,11 +203,12 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void showCreateDialog(BuildContext context, String item, BottomNavIndex bottomNavIndex, TabIndexProvider tabIndexProvider) {
+  void showCreateDialog(BuildContext context, String item,
+      BottomNavIndex bottomNavIndex, TabIndexProvider tabIndexProvider) {
     ToDosPageState todos = ToDosPageState();
     MealPlansPageState mealPlans = MealPlansPageState();
     ShoppingListsPageState shoppingLists = ShoppingListsPageState();
-  
+
     switch (item) {
       case 'Routines':
         tabIndexProvider.tabIndex = 1;

@@ -25,8 +25,6 @@ class BottomNavigationBarController extends StatelessWidget {
             body: _children[bottomNavIndex.currentIndex],
             bottomNavigationBar: BottomNavigationBar(
               iconSize: 31.0,
-              selectedItemColor: const Color(0xFF77BBB4),
-              unselectedItemColor: const Color(0xFFF7B9CB),
               onTap: (index) {
                 bottomNavIndex.currentIndex = index;
               },

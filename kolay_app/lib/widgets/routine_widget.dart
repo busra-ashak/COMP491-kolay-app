@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kolay_app/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 import '../providers/routine_provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -19,70 +20,75 @@ class RoutineWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-        color: const Color(0xFF8B85C1),
-        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-        child: ClipRect(
-            child: Slidable(
-                closeOnScroll: false,
-                startActionPane: ActionPane(
-                  motion: const BehindMotion(),
-                  children: [
-                    SlidableAction(
-                      onPressed: (context) {},
-                      backgroundColor: Colors.green,
-                      borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          bottomLeft: Radius.circular(10)),
-                      icon: Icons.edit,
-                      label: 'Edit',
-                    ),
-                  ],
-                ),
-                endActionPane: ActionPane(
-                  motion: const BehindMotion(),
-                  children: [
-                    SlidableAction(
-                      onPressed: (context) {
-                        _showDeleteRoutineDialog(context, routineName);
-                      },
-                      backgroundColor: Colors.red,
-                      borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(10),
-                          bottomRight: Radius.circular(10)),
-                      icon: Icons.delete,
-                      label: 'Delete',
-                    ),
-                  ],
-                ),
-                child: ListTile(
-                    trailing: SizedBox(
-                        width: 96,
-                        child: Row(
-                          children: [
-                            IconButton(
-                                onPressed: () {
-                                  context.read<Routine>().undoOneRoutine(
-                                      routineName, currentProgress);
-                                },
-                                icon: const Icon(Icons.remove_circle)),
-                            IconButton(
-                                onPressed: () {
-                                  context.read<Routine>().completeOneRoutine(
-                                      routineName, frequency, currentProgress);
-                                },
-                                icon: const Icon(Icons.check_circle))
-                          ],
-                        )),
-                    textColor: Colors.white,
-                    iconColor: Colors.white,
-                    shape: const Border(),
-                    title:
-                        Text(routineName, style: const TextStyle(fontSize: 20)),
-                    subtitle: Text(
-                      'Completed $currentProgress out of $frequency time${frequency > 1 ? 's' : ''} for the $frequencyMeasure',
-                      style: const TextStyle(color: Color(0xFFF8C5D4), fontSize: 12),
-                    )))));
+    return Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
+      return Card(
+          color: themeBody[themeProvider.themeDataName]!['expandable'],
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+          child: ClipRect(
+              child: Slidable(
+                  closeOnScroll: false,
+                  startActionPane: ActionPane(
+                    motion: const BehindMotion(),
+                    children: [
+                      SlidableAction(
+                        onPressed: (context) {},
+                        backgroundColor: Colors.green,
+                        borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            bottomLeft: Radius.circular(10)),
+                        icon: Icons.edit,
+                        label: 'Edit',
+                      ),
+                    ],
+                  ),
+                  endActionPane: ActionPane(
+                    motion: const BehindMotion(),
+                    children: [
+                      SlidableAction(
+                        onPressed: (context) {
+                          _showDeleteRoutineDialog(context, routineName);
+                        },
+                        backgroundColor: Colors.red,
+                        borderRadius: const BorderRadius.only(
+                            topRight: Radius.circular(10),
+                            bottomRight: Radius.circular(10)),
+                        icon: Icons.delete,
+                        label: 'Delete',
+                      ),
+                    ],
+                  ),
+                  child: ListTile(
+                      trailing: SizedBox(
+                          width: 96,
+                          child: Row(
+                            children: [
+                              IconButton(
+                                  onPressed: () {
+                                    context.read<Routine>().undoOneRoutine(
+                                        routineName, currentProgress);
+                                  },
+                                  icon: const Icon(Icons.remove_circle)),
+                              IconButton(
+                                  onPressed: () {
+                                    context.read<Routine>().completeOneRoutine(
+                                        routineName,
+                                        frequency,
+                                        currentProgress);
+                                  },
+                                  icon: const Icon(Icons.check_circle))
+                            ],
+                          )),
+                      textColor: Colors.white,
+                      iconColor: Colors.white,
+                      shape: const Border(),
+                      title: Text(routineName,
+                          style: const TextStyle(fontSize: 20)),
+                      subtitle: Text(
+                        'Completed $currentProgress out of $frequency time${frequency > 1 ? 's' : ''} for the $frequencyMeasure',
+                        style: TextStyle(
+                            color: themeBody[themeProvider.themeDataName]!['routineSubtitle'], fontSize: 12),
+                      )))));
+    });
   }
 
   void _showDeleteRoutineDialog(BuildContext context, String routineName) {
