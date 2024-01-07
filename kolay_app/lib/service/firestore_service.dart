@@ -22,6 +22,7 @@ class FireStoreService {
     }
   }
 
+
   Future toggleShopItemCheckbox(String listName, String itemName, bool itemTicked) async {
     // Get the UID of the currently authenticated user
     String? uid = FirebaseAuth.instance.currentUser?.uid;
@@ -137,6 +138,19 @@ class FireStoreService {
 
       await documentReference.update({
         'listItems.$newItem': {'itemName': newItem, 'itemTicked': false}
+      });
+    }else{
+      print("User is not authenticated");
+    }
+  }
+
+  Future editItemInTodoList(String listName, String newItem, String oldItem) async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(listName);
+
+      await documentReference.update({
+        'listItems.$oldItem': {'itemName': newItem, 'itemTicked': false}
       });
     }else{
       print("User is not authenticated");
