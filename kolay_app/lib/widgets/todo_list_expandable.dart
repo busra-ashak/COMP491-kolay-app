@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kolay_app/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 import '../providers/todo_provider.dart';
 import 'package:percent_indicator/percent_indicator.dart';
@@ -9,7 +10,6 @@ class TodoListExpandable extends StatelessWidget {
   final String listName;
   final Map listItems;
 
-  // Constructor to accept the initial todo list name
   const TodoListExpandable(
       {Key? key, required this.listName, required this.listItems})
       : super(key: key);
@@ -18,86 +18,91 @@ class TodoListExpandable extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
         create: (context) => SlidableState(),
-        child: Card(
-            color: const Color(0xFF8B85C1),
-            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-            child: ClipRect(
-              child: Consumer<SlidableState>(
-                  builder: (context, slidableState, child) {
-                return Slidable(
-                  closeOnScroll: false,
-                  enabled: slidableState.isSlidableEnabled,
-                  startActionPane: ActionPane(
-                    motion: const BehindMotion(),
-                    children: [
-                      SlidableAction(
-                        onPressed: (context) {},
-                        backgroundColor: Colors.green,
-                        borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                            bottomLeft: Radius.circular(10)),
-                        icon: Icons.edit,
-                        label: 'Edit',
-                      ),
-                    ],
-                  ),
-                  endActionPane: ActionPane(
-                    motion: const BehindMotion(),
-                    children: [
-                      SlidableAction(
-                        onPressed: (context) {
-                          _showDeleteTodoListDialog(context, listName);
-                        },
-                        backgroundColor: Colors.red,
-                        borderRadius: const BorderRadius.only(
-                            topRight: Radius.circular(10),
-                            bottomRight: Radius.circular(10)),
-                        icon: Icons.delete,
-                        label: 'Delete',
-                      ),
-                    ],
-                  ),
-                  child: ExpansionTile(
-                    textColor: Colors.white,
-                    onExpansionChanged: (isExpanded) {
-                      slidableState.isSlidableEnabled = !isExpanded;
-                    },
-                    collapsedTextColor: Colors.white,
-                    iconColor: Colors.white,
-                    collapsedIconColor: Colors.white,
-                    shape: const Border(),
-                    title: Text(listName, style: const TextStyle(fontSize: 20)),
-                    subtitle: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: LinearPercentIndicator(
-                          width: 210.0,
-                          lineHeight: 14.0,
-                          percent: _getTaskProgress(listItems),
-                          center: Text(
-                            _getTaskProgress(listItems).toStringAsFixed(2),
-                            style: const TextStyle(fontSize: 12.0),
-                          ),
-                          trailing: const Icon(Icons.mood),
-                          barRadius: const Radius.circular(10),
-                          backgroundColor: Colors.grey,
-                          progressColor: const Color(0xFF77BBB4),
+        child:
+            Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
+          return Card(
+              color: themeBody[themeProvider.themeDataName]!['expandable'],
+              margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+              child: ClipRect(
+                child: Consumer<SlidableState>(
+                    builder: (context, slidableState, child) {
+                  return Slidable(
+                    closeOnScroll: false,
+                    enabled: slidableState.isSlidableEnabled,
+                    startActionPane: ActionPane(
+                      motion: const BehindMotion(),
+                      children: [
+                        SlidableAction(
+                          onPressed: (context) {},
+                          backgroundColor: Colors.green,
+                          borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(10),
+                              bottomLeft: Radius.circular(10)),
+                          icon: Icons.edit,
+                          label: 'Edit',
                         ),
-                      ),
+                      ],
                     ),
-                    children: <Widget>[
-                      Column(
-                        children: _buildExpandableContent(
-                          context,
-                          listName,
-                          listItems,
+                    endActionPane: ActionPane(
+                      motion: const BehindMotion(),
+                      children: [
+                        SlidableAction(
+                          onPressed: (context) {
+                            _showDeleteTodoListDialog(context, listName);
+                          },
+                          backgroundColor: Colors.red,
+                          borderRadius: const BorderRadius.only(
+                              topRight: Radius.circular(10),
+                              bottomRight: Radius.circular(10)),
+                          icon: Icons.delete,
+                          label: 'Delete',
+                        ),
+                      ],
+                    ),
+                    child: ExpansionTile(
+                      textColor: Colors.white,
+                      onExpansionChanged: (isExpanded) {
+                        slidableState.isSlidableEnabled = !isExpanded;
+                      },
+                      collapsedTextColor: Colors.white,
+                      iconColor: Colors.white,
+                      collapsedIconColor: Colors.white,
+                      shape: const Border(),
+                      title:
+                          Text(listName, style: const TextStyle(fontSize: 20)),
+                      subtitle: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(15.0),
+                          child: LinearPercentIndicator(
+                            width: 210.0,
+                            lineHeight: 14.0,
+                            percent: _getTaskProgress(listItems),
+                            center: Text(
+                              _getTaskProgress(listItems).toStringAsFixed(2),
+                              style: const TextStyle(fontSize: 12.0),
+                            ),
+                            trailing: const Icon(Icons.mood),
+                            barRadius: const Radius.circular(10),
+                            backgroundColor: Colors.grey,
+                            progressColor: themeBody[themeProvider.themeDataName]!['todoPercentage'],
+                          ),
                         ),
                       ),
-                    ],
-                  ),
-                );
-              }),
-            )));
+                      children: <Widget>[
+                        Column(
+                          children: _buildExpandableContent(
+                            context,
+                            listName,
+                            listItems,
+                            themeBody[themeProvider.themeDataName]
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+              ));
+        }));
   }
 
   double _getTaskProgress(Map listItems) {
@@ -113,7 +118,7 @@ class TodoListExpandable extends StatelessWidget {
   }
 
   List<Widget> _buildExpandableContent(
-      BuildContext context, String listName, Map listItems) {
+      BuildContext context, String listName, Map listItems, var themeObject) {
     List<Widget> columnContent = [];
 
     if (listItems.isNotEmpty) {
@@ -153,7 +158,7 @@ class TodoListExpandable extends StatelessWidget {
                 side: const BorderSide(color: Colors.white, width: 1.5),
                 shape: const CircleBorder(),
                 value: content['itemTicked'],
-                activeColor: const Color(0xFF77BBB4),
+                activeColor: themeObject['tick'],
                 onChanged: (bool? val) {
                   context.read<TodoList>().toggleItemCheckbox(
                       listName, content['itemName'], content['itemTicked']);
@@ -169,9 +174,9 @@ class TodoListExpandable extends StatelessWidget {
       title: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
         ElevatedButton(
           onPressed: () => _showAddTodoToListDialog(context, listName),
-          child: const Text(
+          child: Text(
             "Add item",
-            style: TextStyle(color: Color(0xFF6C64B3)),
+            style: TextStyle(color: themeObject['expandableButton']),
           ),
         ),
       ]),

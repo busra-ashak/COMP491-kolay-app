@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kolay_app/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -21,8 +22,9 @@ class ShoppingListExpandable extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
         create: (context) => SlidableState(),
-        child: Card(
-            color: const Color(0xFF8B85C1),
+        child:  Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
+          return Card(
+              color: themeBody[themeProvider.themeDataName]!['expandable'],
             margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
             child: ClipRect(child: Consumer<SlidableState>(
                 builder: (context, slidableState, child) {
@@ -77,16 +79,18 @@ class ShoppingListExpandable extends StatelessWidget {
                         context,
                         listName,
                         listItems,
+                        themeBody[themeProvider.themeDataName],
                       ),
                     ),
                   ],
                 ),
               );
-            }))));
+            })));}) 
+            );
   }
 
   List<Widget> _buildExpandableContent(
-      BuildContext context, String listName, Map listItems) {
+      BuildContext context, String listName, Map listItems, var themeObject) {
     List<Widget> columnContent = [];
 
     if (listItems.isNotEmpty) {
@@ -123,7 +127,7 @@ class ShoppingListExpandable extends StatelessWidget {
                 side: const BorderSide(color: Colors.white, width: 1.5),
                 shape: const CircleBorder(),
                 value: content['itemTicked'],
-                activeColor: const Color(0xFF77BBB4),
+                  activeColor: themeObject['tick'],
                 onChanged: (bool? val) {
                   context.read<ShoppingList>().updateToggle(
                       listName, content['itemName'], content['itemTicked']);
@@ -139,9 +143,9 @@ class ShoppingListExpandable extends StatelessWidget {
       title: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
         ElevatedButton(
           onPressed: () => _showAddItemToListDialog(context, listName),
-          child: const Text(
+          child:  Text(
             "Add item",
-            style: TextStyle(color: Color(0xFF6C64B3)),
+            style: TextStyle(color: themeObject['expandableButton']),
           ),
         ),
       ]),

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -7,8 +9,6 @@ class FireStoreService {
   /* SHOPPING LIST */
 
   Future addItemToShoppingList(String listName, String newItem) async {
-    
-    // Get the UID of the currently authenticated user
     String? uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid != null) {
@@ -24,7 +24,6 @@ class FireStoreService {
 
 
   Future toggleShopItemCheckbox(String listName, String itemName, bool itemTicked) async {
-    // Get the UID of the currently authenticated user
     String? uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid != null) {
@@ -40,7 +39,6 @@ class FireStoreService {
   }
 
   Future deleteItemFromShoppingList(String listName, String oldItem) async {
-    // Get the UID of the currently authenticated user
     String? uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid != null) {
@@ -55,7 +53,6 @@ class FireStoreService {
   }
 
   Future createShoppingList(String listName, DateTime datetime) async {
-    // Get the UID of the currently authenticated user
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
       await _fireStoreService.collection('USERS').doc(uid).collection('shoppingLists').doc(listName).set(
@@ -71,7 +68,6 @@ class FireStoreService {
   }
 
   Future deleteShoppingList(String listName) async {
-    // Get the UID of the currently authenticated user
     String? uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid != null) {
@@ -103,11 +99,44 @@ class FireStoreService {
         "routineName": routineName,
         "frequency": frequency,
         "frequencyMeasure": frequencyMeasure,
+        "currentProgress": 0,
         }
       );
     }else{
       print("User is not authenticated");
     }
+  }
+
+  Future completeOneRoutine(String routineName, int frequency, int currentProgress) async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    int updatedProgress = min(currentProgress+1, frequency);
+
+    if (uid != null) {
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('routines').doc(routineName);
+
+      await documentReference.update({
+        "currentProgress": updatedProgress
+      });
+    }else{
+      print('User is not authneticated');
+    }
+    
+  }
+
+  Future undoOneRoutine(String routineName, int currentProgress) async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    int updatedProgress = max(currentProgress-1, 0);
+
+    if (uid != null) {
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('routines').doc(routineName);
+
+      await documentReference.update({
+        "currentProgress": updatedProgress
+      });
+    }else{
+      print('User is not authneticated');
+    }
+    
   }
 
   Future deleteRoutine(String routineName) async {
