@@ -31,62 +31,94 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Login"),
-      ),
+      resizeToAvoidBottomInset: true,
+      backgroundColor: Colors.white,
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
+          padding: EdgeInsets.all(30.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Login",
-                style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(
-                height: 30,
-              ),
-              FormContainerWidget(
-                controller: _emailController,
-                hintText: "Email",
-                isPasswordField: false,
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              FormContainerWidget(
-                controller: _passwordController,
-                hintText: "Password",
-                isPasswordField: true,
-              ),
-              SizedBox(
-                height: 30,
-              ),
-              GestureDetector(
-                onTap: _signIn,
-                child: Container(
-                  width: double.infinity,
-                  height: 45,
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
+            children: <Widget>[
+              Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                      child: Text(
-                    "Login",
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                  )),
+                    border: Border.all(color: Color.fromRGBO(143, 148, 251, 1)),
+                    boxShadow: const [
+                      BoxShadow(
+                          color: Color.fromRGBO(143, 148, 251, .2),
+                          blurRadius: 20.0,
+                          offset: Offset(0, 10))
+                    ]),
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      padding: const EdgeInsets.all(8.0),
+                      decoration: const BoxDecoration(
+                          border: Border(
+                              bottom: BorderSide(
+                                  color: Color.fromRGBO(143, 148, 251, 1)))),
+                      child: TextField(
+                        controller: _emailController,
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Email",
+                            hintStyle: TextStyle(color: Colors.grey[700])),
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _passwordController,
+                              obscureText: true,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: "Password",
+                                hintStyle: TextStyle(color: Colors.grey[700]),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
                 ),
               ),
               SizedBox(
-                height: 20,
+                height: 5,
+              ),
+              GestureDetector(
+                  onTap: _signIn,
+                  child: Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        gradient: LinearGradient(colors: [
+                          Color.fromRGBO(143, 148, 251, 1),
+                          Color.fromRGBO(143, 148, 251, .6),
+                        ])),
+                    child: Center(
+                      child: Text(
+                        "Log in",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  )),
+              SizedBox(
+                height: 30,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text("Don't have an account?"),
+                  SizedBox(
+                    width: 5,
+                  ),
                   SizedBox(
                     width: 5,
                   ),
@@ -99,9 +131,10 @@ class _LoginPageState extends State<LoginPage> {
                             (route) => false);
                       },
                       child: Text(
-                        "Sign Up",
+                        "Sign up",
                         style: TextStyle(
-                            color: Colors.blue, fontWeight: FontWeight.bold),
+                            color: Color.fromRGBO(143, 148, 251, 1),
+                            fontWeight: FontWeight.bold),
                       ))
                 ],
               )
@@ -119,14 +152,68 @@ class _LoginPageState extends State<LoginPage> {
     User? user = await _auth.signInWithEmailAndPassword(email, password);
 
     if (user != null) {
-      print("User is successfully signedIn");
+      print("User is successfully signed in");
+
       Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
               builder: (context) => BottomNavigationBarController()),
           (route) => false);
     } else {
-      print("Some error happend");
+      _showSignInErrorMessage();
     }
+  }
+
+  void _showSignInErrorMessage() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          backgroundColor: Color.fromRGBO(143, 148, 251, 1),
+          contentPadding: EdgeInsets.zero,
+          content: Container(
+            constraints:
+                BoxConstraints(maxWidth: 400), // Adjust the max width as needed
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      gradient: LinearGradient(colors: [
+                        Color.fromRGBO(143, 148, 251, 1),
+                        Color.fromRGBO(143, 148, 251, .6),
+                      ])),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Invalid username or password.',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.close),
+                        color: Colors.white,
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }

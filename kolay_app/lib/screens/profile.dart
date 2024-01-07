@@ -1,7 +1,12 @@
 // DrawerPage.dart
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kolay_app/screens/log_in.dart';
+import 'package:kolay_app/service/firebase_auth_services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kolay_app/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -11,11 +16,37 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final String _userEmail = FirebaseAuth.instance.currentUser!.email ?? '';
-  final String _userName = FirebaseAuth.instance.currentUser!.displayName ?? '';
-  // final String _userPhoto = FirebaseAuth.instance.currentUser!.photoURL ?? '';
-  final String _userPhone =
-      FirebaseAuth.instance.currentUser!.phoneNumber ?? '';
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  late String email = '';
+  late String name = '';
+  late String photoURL = '';
+  late String phone = '';
+  User? _user;
+  @override
+  void initState() {
+    super.initState();
+    _user = _auth.currentUser;
+    _loadUserData();
+  }
+
+  _loadUserData() async {
+    if (_user != null) {
+      DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await _firestore.collection('USERS').doc(_user!.uid).get();
+
+      if (snapshot.exists) {
+        Map<String, dynamic> userData = snapshot.data()!;
+
+        setState(() {
+          email = userData['email'];
+          name = userData['name'];
+          photoURL = userData['photoURL'];
+          phone = userData['phoneNumber'];
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,12 +70,17 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 75,
+                child: ClipOval(
+                  child: photoURL.isNotEmpty
+                      ? Image.file(File(photoURL))
+                      : Image.asset('lib/assets/default_profile_picture.jpg'),
+                ),
               ),
               const SizedBox(height: 20),
               Text(
-                _userName,
+                name,
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -52,8 +88,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
               const SizedBox(height: 10),
-              ProfileInfo(label: 'Email', value: _userEmail),
-              ProfileInfo(label: 'Phone', value: _userPhone),
+              ProfileInfo(label: 'Email', value: email),
+              ProfileInfo(label: 'Phone', value: phone),
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -75,7 +111,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: const Text('Logout'),
+                            title: const Text('Log out'),
                             content:
                                 const Text('Are you sure you want to log out?'),
                             actions: [
@@ -103,7 +139,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       );
                     },
                     child: Text(
-                      "Logout",
+                      "Log out",
                       style: TextStyle(
                         color: themeBody[themeProvider.themeDataName]![
                             'expandableButton'],

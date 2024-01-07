@@ -37,7 +37,8 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
       return Scaffold(
-        backgroundColor: themeBody[themeProvider.themeDataName]!['screenBackground'],
+        backgroundColor:
+            themeBody[themeProvider.themeDataName]!['screenBackground'],
         appBar: AppBar(
           title: const Padding(
               padding: EdgeInsets.only(left: 4),
@@ -48,7 +49,7 @@ class _HomePageState extends State<HomePage> {
           actions: <Widget>[
             IconButton(
               padding: const EdgeInsets.only(right: 8),
-              icon: const Icon(Icons.person, color: Colors.white),
+              icon: const Icon(Icons.person),
               iconSize: 31.0,
               onPressed: () {
                 Navigator.push(context,
@@ -64,12 +65,19 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.all(8),
             children: [
               _buildListWithTitle(
-                  'Reminders', reminderProvider.reminderTasksHome, themeBody[themeProvider.themeDataName]),
+                  'Reminders',
+                  reminderProvider.reminderTasksHome,
+                  themeBody[themeProvider.themeDataName]),
               _buildListWithTitle(
-                  'Routines', routineProvider.routinesHome.values.toList(), themeBody[themeProvider.themeDataName]),
+                  'Routines',
+                  routineProvider.routinesHome.values.toList(),
+                  themeBody[themeProvider.themeDataName]),
               _buildListWithTitle(
-                  'Shopping Lists', shoppingProvider.shoppingListsHome, themeBody[themeProvider.themeDataName]),
-              _buildListWithTitle('Meal Plans', mealProvider.mealPlansHome, themeBody[themeProvider.themeDataName]),
+                  'Shopping Lists',
+                  shoppingProvider.shoppingListsHome,
+                  themeBody[themeProvider.themeDataName]),
+              _buildListWithTitle('Meal Plans', mealProvider.mealPlansHome,
+                  themeBody[themeProvider.themeDataName]),
             ],
           );
         }),

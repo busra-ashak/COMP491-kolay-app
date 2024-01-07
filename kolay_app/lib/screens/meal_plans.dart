@@ -42,7 +42,7 @@ class MealPlansPageState extends State<MealPlansPage> {
               actions: <Widget>[
                 IconButton(
                   padding: const EdgeInsets.only(right: 8),
-                  icon: const Icon(Icons.person, color: Colors.white),
+                  icon: const Icon(Icons.person),
                   iconSize: 31.0,
                   onPressed: () {
                     Navigator.push(context,

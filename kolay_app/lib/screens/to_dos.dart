@@ -54,14 +54,15 @@ class ToDosPageState extends State<ToDosPage> {
               initialIndex: tabIndexProvider.tabIndex,
               length: 3,
               child: Scaffold(
-                backgroundColor: themeBody[themeProvider.themeDataName]!['screenBackground'],
-                appBar:AppBar(
-        title: const Padding(
-            padding: EdgeInsets.only(left: 4),
-            child: Text("Your To-Do's")),
+                backgroundColor:
+                    themeBody[themeProvider.themeDataName]!['screenBackground'],
+                appBar: AppBar(
+                    title: const Padding(
+                        padding: EdgeInsets.only(left: 4),
+                        child: Text("Your To-Do's")),
                     actions: <Widget>[
                       IconButton(
-                        icon: const Icon(Icons.person, color: Colors.white),
+                        icon: const Icon(Icons.person),
                         iconSize: 31.0,
                         onPressed: () {
                           Navigator.push(
@@ -77,27 +78,42 @@ class ToDosPageState extends State<ToDosPage> {
                           onTap: (index) {
                             tabIndexProvider.tabIndex = index;
                           },
-                          labelColor: themeBody[themeProvider.themeDataName]!['tabColorSelected'],
-                          unselectedLabelColor: themeBody[themeProvider.themeDataName]!['tabColorUnselected'],
-                          indicatorColor: themeBody[themeProvider.themeDataName]!['tabColorSelected'],
+                          labelColor: themeBody[themeProvider.themeDataName]![
+                              'tabColorSelected'],
+                          unselectedLabelColor: themeBody[themeProvider
+                              .themeDataName]!['tabColorUnselected'],
+                          indicatorColor: themeBody[
+                              themeProvider.themeDataName]!['tabColorSelected'],
                           tabs: [
                             Tab(
-                                icon: Icon(Icons.checklist_outlined,
-                                    color: tabIndexProvider.tabIndex == 0
-                                        ? themeBody[themeProvider.themeDataName]!['tabColorSelected']
-                                        : themeBody[themeProvider.themeDataName]!['tabColorUnselected'],),
+                                icon: Icon(
+                                  Icons.checklist_outlined,
+                                  color: tabIndexProvider.tabIndex == 0
+                                      ? themeBody[themeProvider.themeDataName]![
+                                          'tabColorSelected']
+                                      : themeBody[themeProvider.themeDataName]![
+                                          'tabColorUnselected'],
+                                ),
                                 text: "Tasks"),
                             Tab(
-                                icon: Icon(Icons.published_with_changes,
-                                    color: tabIndexProvider.tabIndex == 1
-                                        ? themeBody[themeProvider.themeDataName]!['tabColorSelected']
-                                        : themeBody[themeProvider.themeDataName]!['tabColorUnselected'],),
+                                icon: Icon(
+                                  Icons.published_with_changes,
+                                  color: tabIndexProvider.tabIndex == 1
+                                      ? themeBody[themeProvider.themeDataName]![
+                                          'tabColorSelected']
+                                      : themeBody[themeProvider.themeDataName]![
+                                          'tabColorUnselected'],
+                                ),
                                 text: "Routines"),
                             Tab(
-                                icon: Icon(Icons.access_alarms_outlined,
-                                    color: tabIndexProvider.tabIndex == 2
-                                        ? themeBody[themeProvider.themeDataName]!['tabColorSelected']
-                                        : themeBody[themeProvider.themeDataName]!['tabColorUnselected'],),
+                                icon: Icon(
+                                  Icons.access_alarms_outlined,
+                                  color: tabIndexProvider.tabIndex == 2
+                                      ? themeBody[themeProvider.themeDataName]![
+                                          'tabColorSelected']
+                                      : themeBody[themeProvider.themeDataName]![
+                                          'tabColorUnselected'],
+                                ),
                                 text: "Reminders"),
                           ],
                         ))),
@@ -138,17 +154,23 @@ class ToDosPageState extends State<ToDosPage> {
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(50),
-                      color: themeBody[themeProvider.themeDataName]!['floatingButton'],
+                      color: themeBody[themeProvider.themeDataName]![
+                          'floatingButton'],
                       boxShadow: [
-                        BoxShadow(color: themeBody[themeProvider.themeDataName]!['floatingButtonOutline'] as Color, spreadRadius: 3),
+                        BoxShadow(
+                            color: themeBody[themeProvider.themeDataName]![
+                                'floatingButtonOutline'] as Color,
+                            spreadRadius: 3),
                       ],
                     ),
                     child: Consumer<TabIndexProvider>(
                         builder: (context, tabIndexProvider, child) {
                       return IconButton(
-                        color: themeBody[themeProvider.themeDataName]!['floatingButtonOutline'],
+                        color: themeBody[themeProvider.themeDataName]![
+                            'floatingButtonOutline'],
                         onPressed: () {
-                          showCreateDialogTodosPage(context, tabIndexProvider.tabIndex);
+                          showCreateDialogTodosPage(
+                              context, tabIndexProvider.tabIndex);
                         },
                         icon: const Icon(
                           Icons.add,

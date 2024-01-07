@@ -36,7 +36,7 @@ const themeBody = {
 
 const themeIcon = {
   'light': Icons.nightlight,
-  'dark' : Icons.sunny,
+  'dark': Icons.sunny,
 };
 
 class ThemeProvider with ChangeNotifier {
@@ -50,6 +50,7 @@ class ThemeProvider with ChangeNotifier {
       ),
       appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFFF1CFD9),
+          iconTheme: IconThemeData(color: Color(0xFF4C4385)),
           titleTextStyle: TextStyle(
               color: Color(0xFF4C4385),
               fontFamily: 'Comfortaa',
@@ -65,6 +66,7 @@ class ThemeProvider with ChangeNotifier {
         unselectedItemColor: Color(0xFFA06A3D),
       ),
       appBarTheme: const AppBarTheme(
+          iconTheme: IconThemeData(color: Color(0xFFECC35C)),
           backgroundColor: Color(0xFF14242B),
           titleTextStyle: TextStyle(
               color: Color(0xFFECC35C),
