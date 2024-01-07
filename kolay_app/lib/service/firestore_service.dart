@@ -22,6 +22,22 @@ class FireStoreService {
     }
   }
 
+  Future editItemInShoppingList(String listName, String newItem, String oldItem) async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('shoppingLists').doc(listName);
+
+      await documentReference.update({
+        'listItems.$oldItem': FieldValue.delete(),
+      });
+      await documentReference.update({
+        'listItems.$newItem': {'itemName': newItem, 'itemTicked': false}
+      });
+    }else{
+      print("User is not authenticated");
+    }
+  }
+
 
   Future toggleShopItemCheckbox(String listName, String itemName, bool itemTicked) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
@@ -107,6 +123,25 @@ class FireStoreService {
     }
   }
 
+  Future editRoutine(String routineName, String frequencyMeasure, int frequency, String oldRoutineName) async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('routines').doc(oldRoutineName);
+      await documentReference.delete();
+
+      await _fireStoreService.collection('USERS').doc(uid).collection('routines').doc(routineName).set(
+          {
+            "routineName": routineName,
+            "frequency": frequency,
+            "frequencyMeasure": frequencyMeasure,
+            "currentProgress": 0,
+          }
+      );
+    }else{
+      print("User is not authenticated");
+    }
+  }
+
   Future completeOneRoutine(String routineName, int frequency, int currentProgress) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     int updatedProgress = min(currentProgress+1, frequency);
@@ -179,7 +214,10 @@ class FireStoreService {
       final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(listName);
 
       await documentReference.update({
-        'listItems.$oldItem': {'itemName': newItem, 'itemTicked': false}
+        'listItems.$oldItem': FieldValue.delete(),
+      });
+      await documentReference.update({
+        'listItems.$newItem': {'itemName': newItem, 'itemTicked': false}
       });
     }else{
       print("User is not authenticated");
@@ -260,6 +298,23 @@ class FireStoreService {
     }
   }
 
+  Future editItemInReminderList(String listName, String newItem, DateTime itemDeadline, String oldItem) async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('reminderLists').doc(listName);
+
+      await documentReference.update({
+        'listItems.$oldItem': FieldValue.delete(),
+      });
+
+      await documentReference.update({
+        'listItems.$newItem': {'itemName': newItem, 'itemTicked': false, 'itemDeadline': itemDeadline}
+      });
+    }else{
+      print("User is not authenticated");
+    }
+  }
+
   Future toggleReminderItemCheckbox(String listName, String itemName, bool itemTicked) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
@@ -327,6 +382,23 @@ class FireStoreService {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
       final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('meals').doc(listName);
+
+      await documentReference.update({
+        'listItems.$newItem': {'itemName': newItem, 'itemTicked': false}
+      });
+    }else{
+      print("User is not authenticated");
+    }
+  }
+
+  Future editIngredientInMealPlan(String listName, String newItem, String oldItem) async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('meals').doc(listName);
+
+      await documentReference.update({
+        'listItems.$oldItem': FieldValue.delete(),
+      });
 
       await documentReference.update({
         'listItems.$newItem': {'itemName': newItem, 'itemTicked': false}

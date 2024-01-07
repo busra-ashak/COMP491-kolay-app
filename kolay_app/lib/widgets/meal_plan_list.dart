@@ -104,7 +104,8 @@ class MealPlanWidget extends StatelessWidget {
             motion: const BehindMotion(),
             children: [
               SlidableAction(
-                onPressed: (context) {},
+                onPressed: (context) {_showEditItemInMealDialog(
+                    context, listName, content['itemName']);},
                 backgroundColor: Colors.green,
                 icon: Icons.edit,
                 label: 'Edit',
@@ -206,41 +207,6 @@ class MealPlanWidget extends StatelessWidget {
     );
   }
 
-  void _showRenameDialog(BuildContext context, String listName) {
-    TextEditingController controller = TextEditingController(text: listName);
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Rename Meal Plan'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text('Enter a new name:'),
-              TextField(
-                controller: controller,
-                decoration: const InputDecoration(labelText: 'New Name'),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {},
-              child: const Text('Rename'),
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   void _showDeleteMealPlanDialog(BuildContext context, String mealplanName) {
     showDialog(
@@ -423,6 +389,42 @@ class MealPlanWidget extends StatelessWidget {
                 Navigator.of(context).pop();
               },
               child: const Text('Create'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditItemInMealDialog(BuildContext context, String listName, String oldName) {
+    TextEditingController controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit ingredient in the meal plan'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(labelText: 'Edit Item'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String newItemName = controller.text;
+                if (newItemName.isNotEmpty) {
+                  context
+                      .read<MealPlan>()
+                      .editIngredientInList(listName, newItemName, oldName);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Add'),
             ),
           ],
         );

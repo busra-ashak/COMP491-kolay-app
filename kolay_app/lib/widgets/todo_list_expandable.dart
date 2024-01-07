@@ -319,7 +319,7 @@ class TodoListExpandable extends StatelessWidget {
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Add'),
+              child: const Text('Edit'),
             ),
           ],
         );

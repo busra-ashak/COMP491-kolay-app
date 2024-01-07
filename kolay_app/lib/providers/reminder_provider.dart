@@ -58,6 +58,20 @@ class ReminderList with ChangeNotifier {
     notifyListeners();
   }
 
+  Future editReminderItemInList(String listName, String itemName, DateTime itemDeadline, String oldItem) async {
+    await _firestoreService.editItemInReminderList(listName, itemName, itemDeadline, oldItem);
+    Map<String, dynamic> doc = {
+      itemName: {
+        "itemName": itemName,
+        "itemDeadline": itemDeadline,
+        "itemTicked": false
+      }
+    };
+    reminderLists[listName]['listItems'].remove(oldItem);
+    reminderLists[listName]['listItems'].addAll(doc);
+    notifyListeners();
+  }
+
   Future deleteReminderItemFromList(String listName, String itemName) async {
     await _firestoreService.deleteItemFromReminderList(listName, itemName);
     reminderLists[listName]['listItems'].remove(itemName);

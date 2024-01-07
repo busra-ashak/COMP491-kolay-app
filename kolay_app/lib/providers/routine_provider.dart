@@ -25,6 +25,21 @@ class Routine with ChangeNotifier {
     notifyListeners();
   }
 
+  Future editRoutine(String routineName, String frequencyMeasure, int frequency, String oldRoutineName) async {
+    await _firestoreService.editRoutine(routineName, frequencyMeasure, frequency, oldRoutineName);
+    Map<String, dynamic> doc = {
+      routineName: {
+        "routineName": routineName,
+        "frequencyMeasure": frequencyMeasure,
+        "frequency": frequency,
+        "currentProgress": 0,
+      }
+    };
+    routines.remove(oldRoutineName);
+    routines.addAll(doc);
+    notifyListeners();
+  }
+
   Future completeOneRoutine(String routineName, int frequency, int currentProgress) async {
     await _firestoreService.completeOneRoutine(routineName, frequency, currentProgress);
     routines[routineName]['currentProgress']= min(currentProgress+1, frequency);
