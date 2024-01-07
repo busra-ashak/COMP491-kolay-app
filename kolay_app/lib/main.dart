@@ -4,6 +4,7 @@ import 'package:kolay_app/providers/reminder_provider.dart';
 import 'package:kolay_app/providers/shopping_list_provider.dart';
 import 'package:kolay_app/providers/routine_provider.dart';
 import 'package:kolay_app/providers/tab_index_provider.dart';
+import 'package:kolay_app/providers/theme_provider.dart';
 import 'package:kolay_app/providers/todo_provider.dart';
 import 'package:kolay_app/providers/meal_plan_provider.dart';
 import 'package:kolay_app/screens/log_in.dart';
@@ -27,7 +28,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => TodoList()),
         ChangeNotifierProvider(create: (_) => ReminderList()),
         ChangeNotifierProvider(create: (_) => MealPlan()),
-        ChangeNotifierProvider(create: (_) => TabIndexProvider())
+        ChangeNotifierProvider(create: (_) => TabIndexProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider())
       ],
       child: const MyApp(),
     ),
@@ -42,15 +44,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.red, brightness: Brightness.light),
-          useMaterial3: true,
-          fontFamily: 'PlaypenSans',
-          appBarTheme: const AppBarTheme(
-              backgroundColor: Color(0xFFF7B9CB),
-              titleTextStyle: TextStyle(
-                  color: Color(0xC14767AD), fontFamily: 'PlaypenSans'))),
+      theme: Provider.of<ThemeProvider>(context).themeData,
       home: FutureBuilder(
         future: FirebaseAuth.instance.authStateChanges().first,
         builder: (context, snapshot) {
