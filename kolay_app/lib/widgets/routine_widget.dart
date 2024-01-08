@@ -132,7 +132,7 @@ class RoutineWidget extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Create a new routine'),
+          title: const Text('Edit your routine'),
           content: SizedBox(
             height: 150,
             child: Column(children: [
