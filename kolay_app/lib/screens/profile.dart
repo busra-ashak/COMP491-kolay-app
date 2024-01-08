@@ -2,6 +2,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kolay_app/screens/log_in.dart';
+import 'package:kolay_app/service/firestore_service.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -51,6 +52,8 @@ class _ProfilePageState extends State<ProfilePage> {
             title: const Text('Log Out'),
             leading: const Icon(Icons.exit_to_app),
             onTap: (){
+              FireStoreService fireStoreService = FireStoreService();
+              fireStoreService.deleteUserToken();
               FirebaseAuth.instance.signOut();
               Navigator.pushAndRemoveUntil(
                             context, MaterialPageRoute(builder: (context) => LoginPage()), (route) => false);

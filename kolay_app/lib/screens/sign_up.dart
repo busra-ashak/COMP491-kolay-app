@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:kolay_app/screens/home.dart';
 import 'package:kolay_app/screens/log_in.dart';
+import 'package:kolay_app/service/firestore_service.dart';
 import 'package:kolay_app/widgets/bottom_navigation_bar.dart';
 import 'package:kolay_app/widgets/form_container_widget.dart';
 import 'package:kolay_app/service/firebase_auth_services.dart';
@@ -17,6 +19,8 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
 
   final FirebaseAuthService _auth = FirebaseAuthService();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  final FireStoreService _firestoreService = FireStoreService();
 
   TextEditingController _usernameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
@@ -118,6 +122,8 @@ controller: _passwordController,
     String password = _passwordController.text;
 
     User? user = await _auth.signUpWithEmailAndPassword(email, password);
+    final fCMToken = await _firebaseMessaging.getToken();
+    await _firestoreService.saveUserToken(fCMToken!);
 
     if (user!= null){
       print("User is successfully created");

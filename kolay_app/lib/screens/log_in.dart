@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:kolay_app/screens/home.dart';
 import 'package:kolay_app/screens/sign_up.dart';
+import 'package:kolay_app/service/firestore_service.dart';
 import 'package:kolay_app/widgets/bottom_navigation_bar.dart';
 import 'package:kolay_app/widgets/form_container_widget.dart';
 import 'package:kolay_app/service/firebase_auth_services.dart';
@@ -22,6 +25,8 @@ class _LoginPageState extends State<LoginPage> {
 
 
   final FirebaseAuthService _auth = FirebaseAuthService();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  final FireStoreService _firestoreService = FireStoreService();
 
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
@@ -105,6 +110,8 @@ class _LoginPageState extends State<LoginPage> {
     String password = _passwordController.text;
 
     User? user = await _auth.signInWithEmailAndPassword(email, password);
+    final fCMToken = await _firebaseMessaging.getToken();
+    await _firestoreService.saveUserToken(fCMToken!);
 
     if (user!= null){
       print("User is successfully signedIn");

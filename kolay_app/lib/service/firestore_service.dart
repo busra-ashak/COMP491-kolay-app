@@ -375,4 +375,55 @@ class FireStoreService {
       throw Exception("User is not authenticated");
     }
   }
+
+  Future saveUserToken(String token) async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      await _fireStoreService.collection('USERS').doc(uid).set(
+        {
+        "token": token,
+        }
+      );
+    }else{
+      print("User is not authenticated");
+    }
+  }
+
+  Future<String?> getUserToken() async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    
+    if (uid != null) {
+      try {
+        // Access the Firestore document for the current user
+        var userDoc = await _fireStoreService.collection('USERS').doc(uid).get();
+        // Check if the document exists
+        if (userDoc.exists) {
+          // Retrieve the 'token' field from the document
+          String token = userDoc.get('token');
+          return token;
+        } else {
+          print('User document does not exist in Firestore');
+        }
+      } catch (e) {
+        print('Error retrieving user token: $e');
+      }
+    } else {
+      print("User is not authenticated");
+    }
+    return null; // Return null if there's no authenticated user or an error occurred.
+  }
+
+  Future deleteUserToken() async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid);
+      await documentReference.update({
+        'token': FieldValue.delete(),
+      });
+    }else{
+      print("User is not authenticated");
+    }
+  }
+
+
 }

@@ -13,7 +13,7 @@ class FirebaseAuthService {
     try {
       _credential =await _auth.createUserWithEmailAndPassword(email: email, password: password);
 
-      _firestore.collection('USERS').doc(_credential.user!.uid).set({
+      await _firestore.collection('USERS').doc(_credential.user!.uid).set({
       });
       
       return _credential.user;
