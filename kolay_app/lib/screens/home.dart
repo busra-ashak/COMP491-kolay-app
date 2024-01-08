@@ -29,23 +29,26 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFAF5E6),
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.settings),
+          icon: const Icon(Icons.settings, color: Colors.white),
           iconSize: 31.0,
           onPressed: () {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => SettingsPage()));
           },
         ),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: const Text(
-          "Today's Plan",
-          style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
-        ),
+        backgroundColor: const Color(0xFFF7B9CB),
+        centerTitle: true,
+        title: const Text("Today's Plan",
+            style: TextStyle(
+                color: Color(0xFF77BBB4),
+                fontSize: 24,
+                fontWeight: FontWeight.bold)),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.person),
+            icon: const Icon(Icons.person, color: Colors.white),
             iconSize: 31.0,
             onPressed: () {
               Navigator.push(context,
@@ -79,6 +82,7 @@ class _HomePageState extends State<HomePage> {
           child: Text(
             title,
             style: const TextStyle(
+              color: Color(0xFF8B85C1),
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -86,11 +90,19 @@ class _HomePageState extends State<HomePage> {
         ),
         if (items.isEmpty)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Text(
-              "You have no $title for today :)",
-              style: const TextStyle(
-                fontSize: 16,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Card(
+              color: Colors.teal[200],
+              elevation: 3,
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              child: ListTile(
+                title: Text(
+                  "You have no ${title.toLowerCase()} planned for today :)",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                  ),
+                ),
               ),
             ),
           ),
@@ -103,11 +115,12 @@ class _HomePageState extends State<HomePage> {
               return Card(
                 color: Colors.teal[200],
                 elevation: 3,
-                margin: const EdgeInsets.symmetric(vertical: 8),
+                margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
                 child: ListTile(
                   title: Text(
                     items[index],
                     style: const TextStyle(
+                      color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
                     ),

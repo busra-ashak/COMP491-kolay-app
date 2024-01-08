@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/reminder_provider.dart';
 import 'package:intl/intl.dart';
+import 'package:kolay_app/providers/slide_expandable_provider.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class ReminderListExpandable extends StatelessWidget {
   final String listName;
   final DateTime dueDatetime;
-  final DateTime creationDatetime;
   final Map listItems;
 
   // Constructor to accept the initial reminder list name
@@ -15,37 +16,78 @@ class ReminderListExpandable extends StatelessWidget {
       {Key? key,
       required this.listName,
       required this.dueDatetime,
-      required this.creationDatetime,
       required this.listItems})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        IconButton(
-          alignment: Alignment.topLeft,
-          onPressed: () => _showDeleteListDialog(context, listName),
-          icon: const Icon(Icons.delete),
-        ),
-        Expanded(
-          child: ExpansionTile(
-            title: Text(listName), // Use the initial reminder list name here
-            subtitle:
-                Text(DateFormat('yyyy-MM-dd – kk:mm').format(creationDatetime)),
-            children: <Widget>[
-              Column(
-                children: _buildExpandableContent(
-                  context,
-                  listName,
-                  listItems,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
+    return ChangeNotifierProvider(
+        create: (context) => SlidableState(),
+        child: Card(
+            color: const Color(0xFF8B85C1),
+            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+            child: ClipRect(
+              child: Consumer<SlidableState>(
+                  builder: (context, slidableState, child) {
+                return Slidable(
+                  closeOnScroll: false,
+                  enabled: slidableState.isSlidableEnabled,
+                  startActionPane: ActionPane(
+                    motion: const BehindMotion(),
+                    children: [
+                      SlidableAction(
+                        onPressed: (context) {},
+                        backgroundColor: Colors.green,
+                        borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            bottomLeft: Radius.circular(10)),
+                        icon: Icons.edit,
+                        label: 'Edit',
+                      ),
+                    ],
+                  ),
+                  endActionPane: ActionPane(
+                    motion: const BehindMotion(),
+                    children: [
+                      SlidableAction(
+                        onPressed: (context) {
+                          _showDeleteReminderListDialog(context, listName);
+                        },
+                        backgroundColor: Colors.red,
+                        borderRadius: const BorderRadius.only(
+                            topRight: Radius.circular(10),
+                            bottomRight: Radius.circular(10)),
+                        icon: Icons.delete,
+                        label: 'Delete',
+                      ),
+                    ],
+                  ),
+                  child: ExpansionTile(
+                    textColor: Colors.white,
+                    onExpansionChanged: (isExpanded) {
+                      slidableState.isSlidableEnabled = !isExpanded;
+                    },
+                    collapsedTextColor: Colors.white,
+                    iconColor: Colors.white,
+                    collapsedIconColor: Colors.white,
+                    shape: const Border(),
+                    title: Text(listName, style: const TextStyle(fontSize: 20)),
+                    subtitle: Text(
+                        DateFormat('yyyy-MM-dd – kk:mm').format(dueDatetime),
+                        style: const TextStyle(fontSize: 12)),
+                    children: <Widget>[
+                      Column(
+                        children: _buildExpandableContent(
+                          context,
+                          listName,
+                          listItems,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            )));
   }
 
   List<Widget> _buildExpandableContent(
@@ -57,37 +99,68 @@ class ReminderListExpandable extends StatelessWidget {
         var itemDeadline = content['itemDeadline'].runtimeType == Timestamp
             ? content['itemDeadline'].toDate()
             : content['itemDeadline'];
-        columnContent.add(
-          ListTile(
-            leading: Checkbox(
-                value: content['itemTicked'],
-                onChanged: (bool? val) {
-                  context.read<ReminderList>().toggleItemCheckbox(
-                      listName, content['itemName'], content['itemTicked']);
-                }),
-            trailing: IconButton(
-                onPressed: () => _showDeleteItemFromListDialog(
-                    context, listName, content['itemName']),
-                icon: const Icon(Icons.delete)),
-            title: Text(content['itemName']),
-            subtitle: Text(DateFormat('dd/MM/yyyy HH:mm').format(itemDeadline)),
+        columnContent.add(Slidable(
+          startActionPane: ActionPane(
+            motion: const BehindMotion(),
+            children: [
+              SlidableAction(
+                onPressed: (context) {},
+                backgroundColor: Colors.green,
+                icon: Icons.edit,
+                label: 'Edit',
+              ),
+            ],
           ),
-        );
+          endActionPane: ActionPane(
+            motion: const BehindMotion(),
+            children: [
+              SlidableAction(
+                onPressed: (context) {
+                  _showDeleteReminderFromListDialog(
+                      context, listName, content['itemName']);
+                },
+                backgroundColor: Colors.red,
+                icon: Icons.delete,
+                label: 'Delete',
+              ),
+            ],
+          ),
+          child: ListTile(
+              textColor: Colors.white,
+              leading: Checkbox(
+                  side: const BorderSide(color: Colors.white, width: 1.5),
+                  shape: const CircleBorder(),
+                  value: content['itemTicked'],
+                  activeColor: const Color(0xFF77BBB4),
+                  onChanged: (bool? val) {
+                    context.read<ReminderList>().toggleItemCheckbox(
+                        listName, content['itemName'], content['itemTicked']);
+                  }),
+              title: Text(content['itemName'],
+                  style: const TextStyle(fontSize: 16)),
+              subtitle: Text(
+                  DateFormat('yyyy-MM-dd – kk:mm').format(itemDeadline),
+                  style: const TextStyle(fontSize: 12))),
+        ));
       }
     }
 
-    columnContent.add(
-      ListTile(
-        title: IconButton(
-            onPressed: () => _showAddItemToListDialog(context, listName),
-            icon: const Icon(Icons.add)),
-      ),
-    );
+    columnContent.add(ListTile(
+      title: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+        ElevatedButton(
+          onPressed: () => _showAddReminderToListDialog(context, listName),
+          child: const Text(
+            "Add reminder",
+            style: TextStyle(color: Color(0xFF6C64B3)),
+          ),
+        ),
+      ]),
+    ));
 
     return columnContent;
   }
 
-  void _showAddItemToListDialog(BuildContext context, String listName) {
+  void _showAddReminderToListDialog(BuildContext context, String listName) {
     TextEditingController itemNameController = TextEditingController();
     DateTime selectedDate = DateTime.now();
 
@@ -95,7 +168,7 @@ class ReminderListExpandable extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Add a new item to the Reminder list'),
+          title: const Text('Add a new reminder to the reminder group'),
           content: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               //position
@@ -104,7 +177,7 @@ class ReminderListExpandable extends StatelessWidget {
               children: [
                 TextField(
                   controller: itemNameController,
-                  decoration: const InputDecoration(labelText: 'New Item'),
+                  decoration: const InputDecoration(labelText: 'New reminder'),
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
@@ -184,7 +257,7 @@ class ReminderListExpandable extends StatelessWidget {
           );
   }
 
-  void _showDeleteListDialog(BuildContext context, String listName) {
+  void _showDeleteReminderListDialog(BuildContext context, String listName) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -210,7 +283,7 @@ class ReminderListExpandable extends StatelessWidget {
     );
   }
 
-  void _showDeleteItemFromListDialog(
+  void _showDeleteReminderFromListDialog(
       BuildContext context, String listName, String oldItem) {
     showDialog(
       context: context,
