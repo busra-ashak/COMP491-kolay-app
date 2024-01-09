@@ -33,7 +33,9 @@ class TodoListExpandable extends StatelessWidget {
                       motion: const BehindMotion(),
                       children: [
                         SlidableAction(
-                          onPressed: (context) {},
+                          onPressed: (context) {
+                            _showEditTodoListDialog(context, listName);
+                          },
                           backgroundColor: Colors.green,
                           borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(10),
@@ -128,7 +130,10 @@ class TodoListExpandable extends StatelessWidget {
             motion: const BehindMotion(),
             children: [
               SlidableAction(
-                onPressed: (context) {},
+                onPressed: (context) {
+                  _showEditTodoFromListDialog(
+                      context, listName, content['itemName']);
+                },
                 backgroundColor: Colors.green,
                 icon: Icons.edit,
                 label: 'Edit',
@@ -273,6 +278,92 @@ class TodoListExpandable extends StatelessWidget {
                 Navigator.of(context).pop();
               },
               child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditTodoFromListDialog(
+      BuildContext context, String listName, String oldItem) {
+
+    TextEditingController itemNameController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit your to-do item'),
+          content: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: itemNameController,
+                  decoration: InputDecoration(labelText: 'Edit Item', hintText: oldItem),
+                ),
+                const SizedBox(height: 16),
+              ]),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String newItemName = itemNameController.text;
+                if (newItemName.isNotEmpty) {
+                  context
+                      .read<TodoList>()
+                      .editTodoItemInList(listName, newItemName, oldItem);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Edit'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditTodoListDialog(BuildContext context, String oldTodoListName) {
+    TextEditingController controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit your to-do list'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                    labelText: 'The name of your to-do list'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String newListName = controller.text;
+                if (newListName.isNotEmpty) {
+                  context.read<TodoList>().editTodoList(newListName, oldTodoListName);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Edit'),
             ),
           ],
         );

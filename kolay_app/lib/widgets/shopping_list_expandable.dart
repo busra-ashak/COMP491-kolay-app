@@ -35,7 +35,9 @@ class ShoppingListExpandable extends StatelessWidget {
                   motion: const BehindMotion(),
                   children: [
                     SlidableAction(
-                      onPressed: (context) {},
+                      onPressed: (context) {
+                        _showEditShoppingListDialog(context, listName);
+                      },
                       backgroundColor: Colors.green,
                       borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(10),
@@ -100,7 +102,9 @@ class ShoppingListExpandable extends StatelessWidget {
             motion: const BehindMotion(),
             children: [
               SlidableAction(
-                onPressed: (context) {},
+                onPressed: (context) {
+                  _showEditItemFromListDialog(
+                      context, listName, content['itemName']);},
                 backgroundColor: Colors.green,
                 icon: Icons.edit,
                 label: 'Edit',
@@ -238,6 +242,111 @@ class ShoppingListExpandable extends StatelessWidget {
                 Navigator.of(context).pop();
               },
               child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditItemFromListDialog(
+      BuildContext context, String listName, String oldItem) {
+
+    TextEditingController itemNameController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit your shopping item'),
+          content: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: itemNameController,
+                  decoration: InputDecoration(labelText: 'Edit Item', hintText: oldItem),
+                ),
+                const SizedBox(height: 16),
+              ]),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String newItemName = itemNameController.text;
+                if (newItemName.isNotEmpty) {
+                  context
+                      .read<ShoppingList>()
+                      .editShoppingListItem(listName, newItemName, oldItem);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Edit'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditShoppingListDialog(BuildContext context, String oldShoppingListName) {
+    TextEditingController controller = TextEditingController();
+    DateTime selectedDate = DateTime.now();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit your shopping list'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                    labelText: 'The name of your Shopping List'),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: selectedDate,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                  );
+
+                  if (pickedDate != null && pickedDate != selectedDate) {
+                    selectedDate = pickedDate;
+                  }
+                },
+                child: const Text('Pick Date'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String newListName = controller.text;
+                if (newListName.isNotEmpty) {
+                  context
+                      .read<ShoppingList>()
+                      .editShoppingList(newListName, selectedDate, oldShoppingListName);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Edit'),
             ),
           ],
         );

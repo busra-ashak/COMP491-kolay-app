@@ -3,10 +3,8 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:kolay_app/screens/home.dart';
 import 'package:kolay_app/screens/log_in.dart';
 import 'package:kolay_app/widgets/bottom_navigation_bar.dart';
-import 'package:kolay_app/widgets/form_container_widget.dart';
 import 'package:kolay_app/service/firebase_auth_services.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -23,7 +21,6 @@ class _SignUpPageState extends State<SignUpPage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _phoneNumberController = TextEditingController();
-  TextEditingController _verificationController = TextEditingController();
   TextEditingController _photoURLController = TextEditingController();
 
   @override
@@ -220,7 +217,6 @@ class _SignUpPageState extends State<SignUpPage> {
         // Password meets the criteria
         User? user = await _auth.signUpWithEmailAndPassword(
             email, password, name, phoneNumber, photoURL);
-        String? verificationCode = await _showVerificationPanel();
 
         if (user != null) {
           print("User is successfully created");
@@ -238,107 +234,6 @@ class _SignUpPageState extends State<SignUpPage> {
     } else {
       _showInvalidEmail();
     }
-  }
-
-  Future<String?> _showVerificationPanel() async {
-    return await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
-          ),
-          backgroundColor: Color.fromRGBO(143, 148, 251, 1),
-          contentPadding: EdgeInsets.zero,
-          content: Container(
-            constraints: BoxConstraints(maxWidth: 300),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(20),
-                      bottom: Radius.circular(20),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(8.0),
-                        decoration: BoxDecoration(
-                          border: Border(
-                            bottom: BorderSide(
-                              color: Color.fromRGBO(143, 148, 251, 1),
-                            ),
-                          ),
-                        ),
-                        child: TextField(
-                          controller: _verificationController,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "Enter verification code",
-                            hintStyle: TextStyle(color: Colors.grey[700]),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context)
-                                  .pop(null); // Return null on cancel
-                            },
-                            style: ElevatedButton.styleFrom(
-                              primary: Color.fromRGBO(143, 148, 251,
-                                  1), // Change the color as needed
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                            ),
-                            child: Text(
-                              'Cancel',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              String verificationCode =
-                                  _verificationController.text;
-                              Navigator.of(context).pop(verificationCode);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              primary: Color.fromRGBO(143, 148, 251, 1),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                            ),
-                            child: Text(
-                              'Submit',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
   }
 
   Future<void> _pickProfilePicture() async {

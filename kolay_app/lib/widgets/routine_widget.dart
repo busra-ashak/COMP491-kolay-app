@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kolay_app/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 import '../providers/routine_provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+
+import '../screens/to_dos.dart';
 
 class RoutineWidget extends StatelessWidget {
   final String routineName;
@@ -31,7 +34,9 @@ class RoutineWidget extends StatelessWidget {
                     motion: const BehindMotion(),
                     children: [
                       SlidableAction(
-                        onPressed: (context) {},
+                        onPressed: (context) {
+                          _showEditRoutineDialog(context, routineName);
+                        },
                         backgroundColor: Colors.green,
                         borderRadius: const BorderRadius.only(
                             topLeft: Radius.circular(10),
@@ -110,6 +115,87 @@ class RoutineWidget extends StatelessWidget {
                 Navigator.of(context).pop();
               },
               child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditRoutineDialog(BuildContext context, String routineName) {
+
+    TextEditingController nameController = TextEditingController();
+    TextEditingController dropdownController = TextEditingController();
+    TextEditingController frequencyController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit your routine'),
+          content: SizedBox(
+            height: 150,
+            child: Column(children: [
+              Row(
+                children: [
+                  const Text("I will "),
+                  Expanded(
+                      child: TextField(
+                        controller: nameController,
+                        decoration: const InputDecoration(
+                            hintText: 'the name of your routine',
+                            hintStyle: TextStyle(fontSize: 12)),
+                      )),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                      child: TextField(
+                        controller: frequencyController,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                      )),
+                  const Text(" time(s) a "),
+                  DropdownMenu<FrequencyMeasure>(
+                    width: 100,
+                    initialSelection: FrequencyMeasure.daily,
+                    controller: dropdownController,
+                    requestFocusOnTap: false,
+                    dropdownMenuEntries: FrequencyMeasure.values
+                        .map<DropdownMenuEntry<FrequencyMeasure>>(
+                            (FrequencyMeasure measure) {
+                          return DropdownMenuEntry<FrequencyMeasure>(
+                            value: measure,
+                            label: measure.label,
+                          );
+                        }).toList(),
+                  ),
+                ],
+              )
+            ]),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String newRoutineName = nameController.text;
+                String frequencyMeasure = dropdownController.text;
+                int frequency = int.parse(frequencyController.text);
+                if (newRoutineName.isNotEmpty) {
+                  context.read<Routine>().editRoutine(
+                      newRoutineName, frequencyMeasure, frequency, routineName);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Create'),
             ),
           ],
         );

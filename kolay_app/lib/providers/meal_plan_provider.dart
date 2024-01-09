@@ -78,6 +78,19 @@ class MealPlan with ChangeNotifier {
     notifyListeners();
   }
 
+  Future editIngredientInList(String listName, String itemName, String oldItem) async {
+    await _firestoreService.editIngredientInMealPlan(listName, itemName, oldItem);
+    Map<String, dynamic> doc = {
+      itemName: {
+        "itemName": itemName,
+        "itemTicked": false
+      }
+    };
+    mealPlans[listName]['listItems'].remove(oldItem);
+    mealPlans[listName]['listItems'].addAll(doc);
+    notifyListeners();
+  }
+
   Future deleteIngredientFromList(String listName, String itemName) async {
     await _firestoreService.deleteIngreidentFromMealPlan(listName, itemName);
     mealPlans[listName]['listItems'].remove(itemName);
@@ -100,6 +113,21 @@ class MealPlan with ChangeNotifier {
         mealPlansHome.add(d.get('listName'));
       }
     }
+    notifyListeners();
+  }
+
+  Future editMealPlan(String listName, DateTime dateTime, String oldListName) async {
+    await _firestoreService.editMealPlan(listName, dateTime, oldListName);
+    Map<String, dynamic> items = mealPlans[oldListName]['listItems'];
+    Map<String, dynamic> doc = {
+      listName: {
+        "listName": listName,
+        "datetime": dateTime,
+        "listItems": items
+      }
+    };
+    mealPlans.remove(oldListName);
+    mealPlans.addAll(doc);
     notifyListeners();
   }
 }

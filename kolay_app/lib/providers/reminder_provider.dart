@@ -58,6 +58,20 @@ class ReminderList with ChangeNotifier {
     notifyListeners();
   }
 
+  Future editReminderItemInList(String listName, String itemName, DateTime itemDeadline, String oldItem) async {
+    await _firestoreService.editItemInReminderList(listName, itemName, itemDeadline, oldItem);
+    Map<String, dynamic> doc = {
+      itemName: {
+        "itemName": itemName,
+        "itemDeadline": itemDeadline,
+        "itemTicked": false
+      }
+    };
+    reminderLists[listName]['listItems'].remove(oldItem);
+    reminderLists[listName]['listItems'].addAll(doc);
+    notifyListeners();
+  }
+
   Future deleteReminderItemFromList(String listName, String itemName) async {
     await _firestoreService.deleteItemFromReminderList(listName, itemName);
     reminderLists[listName]['listItems'].remove(itemName);
@@ -99,6 +113,21 @@ class ReminderList with ChangeNotifier {
         }
       }
     }
+    notifyListeners();
+  }
+
+  Future editReminder(String listName, DateTime dateTime, String oldListName) async {
+    await _firestoreService.editReminderList(listName, dateTime, oldListName);
+    Map<String, dynamic> items = reminderLists[oldListName]['listItems'];
+    Map<String, dynamic> doc = {
+      listName: {
+        "listName": listName,
+        "dueDatetime": dateTime,
+        "listItems": items
+      }
+    };
+    reminderLists.remove(oldListName);
+    reminderLists.addAll(doc);
     notifyListeners();
   }
 
