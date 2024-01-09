@@ -37,7 +37,9 @@ class MealPlanWidget extends StatelessWidget {
                       motion: const BehindMotion(),
                       children: [
                         SlidableAction(
-                          onPressed: (context) {},
+                          onPressed: (context) {
+                            _showEditMealPlanDialog(context, listName);
+                          },
                           backgroundColor: Colors.green,
                           borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(10),
@@ -263,6 +265,67 @@ class MealPlanWidget extends StatelessWidget {
     );
   }
 
+  void _showEditMealPlanDialog(BuildContext context, String oldMealPlanName) {
+    TextEditingController nameController = TextEditingController();
+    DateTime selectedDate = DateTime.now();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit Meal Plan'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                    labelText: 'The name of your Meal Plan'),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: selectedDate,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                  );
+
+                  if (pickedDate != null && pickedDate != selectedDate) {
+                    selectedDate = pickedDate;
+                  }
+                },
+                child: const Text('Pick Date'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String newMealPlanName = nameController.text;
+                if (newMealPlanName.isNotEmpty) {
+                  context
+                      .read<MealPlan>()
+                      .editMealPlan(newMealPlanName, selectedDate, oldMealPlanName);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Edit'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _showConfirmDialog(BuildContext context, String mealPlanName) {
     showDialog(
       context: context,
@@ -424,7 +487,7 @@ class MealPlanWidget extends StatelessWidget {
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Add'),
+              child: const Text('Edit'),
             ),
           ],
         );

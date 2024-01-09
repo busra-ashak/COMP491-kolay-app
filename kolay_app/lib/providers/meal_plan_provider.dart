@@ -115,4 +115,19 @@ class MealPlan with ChangeNotifier {
     }
     notifyListeners();
   }
+
+  Future editMealPlan(String listName, DateTime dateTime, String oldListName) async {
+    await _firestoreService.editMealPlan(listName, dateTime, oldListName);
+    Map<String, dynamic> items = mealPlans[oldListName]['listItems'];
+    Map<String, dynamic> doc = {
+      listName: {
+        "listName": listName,
+        "datetime": dateTime,
+        "listItems": items
+      }
+    };
+    mealPlans.remove(oldListName);
+    mealPlans.addAll(doc);
+    notifyListeners();
+  }
 }

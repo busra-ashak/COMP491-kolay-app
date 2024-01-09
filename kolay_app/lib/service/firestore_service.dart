@@ -105,6 +105,29 @@ class FireStoreService {
     }
   }
 
+  Future editShoppingList(String listName, DateTime dateTime, String oldListName) async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('shoppingLists').doc(oldListName);
+
+      documentReference.get()
+          .then((DocumentSnapshot documentSnapshot) async {
+        Map<String, dynamic> items = documentSnapshot.get('listItems');
+        await _fireStoreService.collection('USERS').doc(uid).collection('shoppingLists').doc(oldListName).delete();
+        await _fireStoreService.collection('USERS').doc(uid).collection('shoppingLists').doc(listName).set(
+            {
+              "listName": listName,
+              "datetime": dateTime,
+              "listItems": items
+            }
+        );
+      });
+
+    }else{
+      print("User is not authenticated");
+    }
+  }
+
   /* ROUTINES */
 
   Future createRoutine(String routineName, String frequencyMeasure, int frequency) async {
@@ -283,6 +306,28 @@ class FireStoreService {
     }
   }
 
+  Future editTodoList(String listName, String oldListName) async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(oldListName);
+
+      documentReference.get()
+          .then((DocumentSnapshot documentSnapshot) async {
+        Map<String, dynamic> items = documentSnapshot.get('listItems');
+        await _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(oldListName).delete();
+        await _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(listName).set(
+            {
+              "listName": listName,
+              "listItems": items
+            }
+        );
+      });
+
+    }else{
+      print("User is not authenticated");
+    }
+  }
+
 /* REMINDER LISTS */
 
   Future addItemToReminderList(String listName, String newItem, DateTime itemDeadline) async {
@@ -372,6 +417,29 @@ class FireStoreService {
       return _ref;
     }else{
       throw Exception("User is not authenticated");
+    }
+  }
+
+  Future editReminderList(String listName, DateTime dateTime, String oldListName) async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('reminderLists').doc(oldListName);
+
+      documentReference.get()
+          .then((DocumentSnapshot documentSnapshot) async {
+        Map<String, dynamic> items = documentSnapshot.get('listItems');
+        await _fireStoreService.collection('USERS').doc(uid).collection('reminderLists').doc(oldListName).delete();
+        await _fireStoreService.collection('USERS').doc(uid).collection('reminderLists').doc(listName).set(
+            {
+              "listName": listName,
+              "dueDatetime": dateTime,
+              "listItems": items
+            }
+        );
+      });
+
+    }else{
+      print("User is not authenticated");
     }
   }
 
@@ -488,6 +556,29 @@ class FireStoreService {
       return _ref;
     }else{
       throw Exception("User is not authenticated");
+    }
+  }
+
+  Future editMealPlan(String listName, DateTime dateTime, String oldListName) async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('meals').doc(oldListName);
+
+      documentReference.get()
+          .then((DocumentSnapshot documentSnapshot) async {
+        Map<String, dynamic> items = documentSnapshot.get('listItems');
+        await _fireStoreService.collection('USERS').doc(uid).collection('meals').doc(oldListName).delete();
+        await _fireStoreService.collection('USERS').doc(uid).collection('meals').doc(listName).set(
+            {
+              "listName": listName,
+              "datetime": dateTime,
+              "listItems": items
+            }
+        );
+      });
+
+    }else{
+      print("User is not authenticated");
     }
   }
 }

@@ -38,7 +38,9 @@ class ReminderListExpandable extends StatelessWidget {
                       motion: const BehindMotion(),
                       children: [
                         SlidableAction(
-                          onPressed: (context) {},
+                          onPressed: (context) {
+                            _showEditReminderListDialog(context, listName);
+                          },
                           backgroundColor: Colors.green,
                           borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(10),
@@ -369,6 +371,67 @@ class ReminderListExpandable extends StatelessWidget {
                 }
               },
               child: const Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditReminderListDialog(BuildContext context, String oldReminderListName) {
+    TextEditingController controller = TextEditingController();
+    DateTime selectedDate = DateTime.now();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit your reminder list'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                    labelText: 'The name of your reminder list'),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () async {
+                  DateTime? pickedDate = await showDateTimePicker(
+                    context: context,
+                    initialDate: selectedDate,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                  );
+
+                  if (pickedDate != null && pickedDate != selectedDate) {
+                    selectedDate = pickedDate;
+                  }
+                },
+                child: const Text('Pick Date'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String newListName = controller.text;
+                if (newListName.isNotEmpty) {
+                  context
+                      .read<ReminderList>()
+                      .editReminder(newListName, selectedDate, oldReminderListName);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Edit'),
             ),
           ],
         );

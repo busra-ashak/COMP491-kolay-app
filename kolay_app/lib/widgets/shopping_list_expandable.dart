@@ -35,7 +35,9 @@ class ShoppingListExpandable extends StatelessWidget {
                   motion: const BehindMotion(),
                   children: [
                     SlidableAction(
-                      onPressed: (context) {},
+                      onPressed: (context) {
+                        _showEditShoppingListDialog(context, listName);
+                      },
                       backgroundColor: Colors.green,
                       borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(10),
@@ -280,6 +282,67 @@ class ShoppingListExpandable extends StatelessWidget {
                   context
                       .read<ShoppingList>()
                       .editShoppingListItem(listName, newItemName, oldItem);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Edit'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditShoppingListDialog(BuildContext context, String oldShoppingListName) {
+    TextEditingController controller = TextEditingController();
+    DateTime selectedDate = DateTime.now();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit your shopping list'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                    labelText: 'The name of your Shopping List'),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: selectedDate,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                  );
+
+                  if (pickedDate != null && pickedDate != selectedDate) {
+                    selectedDate = pickedDate;
+                  }
+                },
+                child: const Text('Pick Date'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String newListName = controller.text;
+                if (newListName.isNotEmpty) {
+                  context
+                      .read<ShoppingList>()
+                      .editShoppingList(newListName, selectedDate, oldShoppingListName);
                   Navigator.of(context).pop();
                 }
               },
