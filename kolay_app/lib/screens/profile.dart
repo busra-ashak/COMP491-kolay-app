@@ -41,8 +41,8 @@ class _ProfilePageState extends State<ProfilePage> {
         setState(() {
           email = _encryptionService.decryptText(userData['email']);
           name = _encryptionService.decryptText(userData['name']);
-          photoURL = _encryptionService.decryptText(userData['photoURL']);
-          phone = _encryptionService.decryptText(userData['phone']);
+          photoURL = userData['photoURL'];
+          phone = _encryptionService.decryptText(userData['phoneNumber']);
         });
       }
     }

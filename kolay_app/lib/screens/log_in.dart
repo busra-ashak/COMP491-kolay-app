@@ -31,20 +31,27 @@ class _LoginPageState extends State<LoginPage> {
     return Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
       return Scaffold(
         resizeToAvoidBottomInset: true,
-        backgroundColor: themeBody[themeProvider.themeDataName]!['screenBackground'],
+        backgroundColor:
+            themeBody[themeProvider.themeDataName]!['screenBackground'],
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(30.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
+                Padding(
+                    padding: const EdgeInsets.all(25),
+                    child: themeProvider.themeDataName == 'light'
+                        ? Image.asset('lib/assets/kolay-light@3x.png')
+                        : Image.asset('lib/assets/kolay-dark@3x.png')),
                 Container(
                   padding: const EdgeInsets.all(5),
                   decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                          color: themeBody[themeProvider.themeDataName]!['homeTitles'] as Color),
+                          color: themeBody[themeProvider.themeDataName]![
+                              'homeTitles'] as Color),
                       boxShadow: const [
                         BoxShadow(
                             color: Color.fromRGBO(143, 148, 251, .2),
@@ -58,9 +65,13 @@ class _LoginPageState extends State<LoginPage> {
                         decoration: BoxDecoration(
                             border: Border(
                                 bottom: BorderSide(
-                                    color: themeBody[themeProvider.themeDataName]!['homeTitles'] as Color))),
+                                    color:
+                                        themeBody[themeProvider.themeDataName]![
+                                            'homeTitles'] as Color))),
                         child: TextField(
                           controller: _emailController,
+                          cursorColor: themeBody[themeProvider.themeDataName]![
+                              'homeTitles'] as Color,
                           decoration: InputDecoration(
                               border: InputBorder.none,
                               hintText: "Email",
@@ -74,6 +85,8 @@ class _LoginPageState extends State<LoginPage> {
                             Expanded(
                               child: TextField(
                                 controller: _passwordController,
+                                cursorColor: themeBody[themeProvider
+                                    .themeDataName]!['homeTitles'] as Color,
                                 obscureText: true,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
@@ -98,8 +111,10 @@ class _LoginPageState extends State<LoginPage> {
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           gradient: LinearGradient(colors: [
-                            themeBody[themeProvider.themeDataName]!['expandableButton'] as Color,
-                            themeBody[themeProvider.themeDataName]!['homeTitles'] as Color,
+                            themeBody[themeProvider.themeDataName]![
+                                'expandableButton'] as Color,
+                            themeBody[themeProvider.themeDataName]![
+                                'homeTitles'] as Color,
                           ])),
                       child: const Center(
                         child: Text(
@@ -115,7 +130,12 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Don't have an account?", style: TextStyle(color: themeBody[themeProvider.themeDataName]!['tick'] as Color),),
+                    Text(
+                      "Don't have an account?",
+                      style: TextStyle(
+                          color: themeBody[themeProvider.themeDataName]!['tick']
+                              as Color),
+                    ),
                     const SizedBox(
                       width: 5,
                     ),
@@ -133,7 +153,8 @@ class _LoginPageState extends State<LoginPage> {
                         child: Text(
                           "Sign up",
                           style: TextStyle(
-                              color: themeBody[themeProvider.themeDataName]!['homeTitles'] as Color,
+                              color: themeBody[themeProvider.themeDataName]![
+                                  'homeTitles'] as Color,
                               fontWeight: FontWeight.bold),
                         ))
                   ],

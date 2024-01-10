@@ -14,19 +14,17 @@ class FirebaseAuthService {
     try {
       _credential = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
-      await _credential.user!.updateDisplayName(name);
-      await _credential.user!.updatePhotoURL(photoURL);
 
       _firestore.collection('USERS').doc(_credential.user!.uid).set({
         'name': _encryptionService.encryptText(name),
         'email': _encryptionService.encryptText(email),
         'phoneNumber': _encryptionService.encryptText(phoneNumber),
-        'photoURL': _encryptionService.encryptText(photoURL),
+        'photoURL': photoURL,
       });
 
       return _credential.user;
     } catch (e) {
-      print("Some error occured");
+      print("error za: $e");
     }
     return null;
   }
