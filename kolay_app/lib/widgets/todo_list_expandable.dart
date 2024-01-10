@@ -9,9 +9,13 @@ import 'package:kolay_app/providers/slide_expandable_provider.dart';
 class TodoListExpandable extends StatelessWidget {
   final String listName;
   final Map listItems;
+  final bool showProgressBar;
 
   const TodoListExpandable(
-      {Key? key, required this.listName, required this.listItems})
+      {Key? key,
+      required this.listName,
+      required this.listItems,
+      required this.showProgressBar})
       : super(key: key);
 
   @override
@@ -34,7 +38,8 @@ class TodoListExpandable extends StatelessWidget {
                       children: [
                         SlidableAction(
                           onPressed: (context) {
-                            _showEditTodoListDialog(context, listName);
+                            _showEditTodoListDialog(
+                                context, listName, showProgressBar);
                           },
                           backgroundColor: Colors.green,
                           borderRadius: const BorderRadius.only(
@@ -73,31 +78,34 @@ class TodoListExpandable extends StatelessWidget {
                       title:
                           Text(listName, style: const TextStyle(fontSize: 20)),
                       subtitle: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(15.0),
-                          child: LinearPercentIndicator(
-                            width: 210.0,
-                            lineHeight: 14.0,
-                            percent: _getTaskProgress(listItems),
-                            center: Text(
-                              _getTaskProgress(listItems).toStringAsFixed(2),
-                              style: const TextStyle(fontSize: 12.0),
+                        child: Visibility(
+                          visible: showProgressBar,
+                          child: Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: LinearPercentIndicator(
+                              width: 210.0,
+                              lineHeight: 15.0,
+                              animation: true,
+                              percent: _getTaskProgress(listItems),
+                              center: Text(
+                                _getTaskProgressString(listItems),
+                                style: const TextStyle(fontSize: 13.0, fontWeight: FontWeight.w900, color: Colors.black45),
+                              ),
+                              barRadius: const Radius.circular(10),
+                              backgroundColor: Colors.grey,
+                              progressColor: themeBody[themeProvider
+                                  .themeDataName]!['todoPercentage'],
                             ),
-                            trailing: const Icon(Icons.mood),
-                            barRadius: const Radius.circular(10),
-                            backgroundColor: Colors.grey,
-                            progressColor: themeBody[themeProvider.themeDataName]!['todoPercentage'],
                           ),
                         ),
                       ),
                       children: <Widget>[
                         Column(
                           children: _buildExpandableContent(
-                            context,
-                            listName,
-                            listItems,
-                            themeBody[themeProvider.themeDataName]
-                          ),
+                              context,
+                              listName,
+                              listItems,
+                              themeBody[themeProvider.themeDataName]),
                         ),
                       ],
                     ),
@@ -105,6 +113,18 @@ class TodoListExpandable extends StatelessWidget {
                 }),
               ));
         }));
+  }
+
+  String _getTaskProgressString(Map listItems) {
+    if (listItems.isEmpty) return '';
+    int len = listItems.values.length;
+    int ticked = 0;
+    for (Map item in listItems.values) {
+      if (item['itemTicked']) {
+        ticked++;
+      }
+    }
+    return '$ticked / $len';
   }
 
   double _getTaskProgress(Map listItems) {
@@ -116,7 +136,7 @@ class TodoListExpandable extends StatelessWidget {
         ticked++;
       }
     }
-    return ticked / len;
+    return len == 0 ? 0 : ticked / len;
   }
 
   List<Widget> _buildExpandableContent(
@@ -287,7 +307,6 @@ class TodoListExpandable extends StatelessWidget {
 
   void _showEditTodoFromListDialog(
       BuildContext context, String listName, String oldItem) {
-
     TextEditingController itemNameController = TextEditingController();
     showDialog(
       context: context,
@@ -300,7 +319,8 @@ class TodoListExpandable extends StatelessWidget {
               children: [
                 TextField(
                   controller: itemNameController,
-                  decoration: InputDecoration(labelText: 'Edit Item', hintText: oldItem),
+                  decoration: InputDecoration(
+                      labelText: 'Edit Item', hintText: oldItem),
                 ),
                 const SizedBox(height: 16),
               ]),
@@ -329,7 +349,8 @@ class TodoListExpandable extends StatelessWidget {
     );
   }
 
-  void _showEditTodoListDialog(BuildContext context, String oldTodoListName) {
+  void _showEditTodoListDialog(
+      BuildContext context, String oldTodoListName, bool showProgressBar) {
     TextEditingController controller = TextEditingController();
 
     showDialog(
@@ -337,16 +358,36 @@ class TodoListExpandable extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Edit your to-do list'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextField(
-                controller: controller,
-                decoration: const InputDecoration(
-                    labelText: 'The name of your to-do list'),
-              ),
-            ],
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    TextField(
+                      controller: controller,
+                      decoration: const InputDecoration(
+                          labelText: 'New name of your to-do list'),
+                    ),
+                    const Padding(padding: EdgeInsets.all(10.0)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Checkbox(
+                          value: showProgressBar,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              showProgressBar = !showProgressBar;
+                              context.read<TodoList>().toggleProgressionBar(
+                                  oldTodoListName, showProgressBar);
+                            });
+                          },
+                        ),
+                        const Text('Show Progress Bar')
+                      ],
+                    )
+                  ]);
+            },
           ),
           actions: [
             TextButton(
@@ -358,10 +399,13 @@ class TodoListExpandable extends StatelessWidget {
             TextButton(
               onPressed: () {
                 String newListName = controller.text;
-                if (newListName.isNotEmpty) {
-                  context.read<TodoList>().editTodoList(newListName, oldTodoListName);
-                  Navigator.of(context).pop();
+                if (newListName.isEmpty) {
+                  newListName = oldTodoListName;
                 }
+
+                context.read<TodoList>().editTodoList(
+                    newListName, oldTodoListName, showProgressBar);
+                Navigator.of(context).pop();
               },
               child: const Text('Edit'),
             ),

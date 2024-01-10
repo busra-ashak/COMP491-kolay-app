@@ -126,6 +126,7 @@ class ToDosPageState extends State<ToDosPage> {
                           .map((doc) => TodoListExpandable(
                                 listName: doc['listName'],
                                 listItems: doc['listItems'],
+                                showProgressBar: doc['showProgressBar'],
                               ))
                           .toList(),
                     ),

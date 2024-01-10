@@ -296,8 +296,9 @@ class FireStoreService {
     if (uid != null) {
       await _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(_encryptionService.encryptText(listName)).set(
         {
-        "listName": _encryptionService.encryptText(listName),
-        "listItems": {}
+        "listName": listName,
+        "listItems": {},
+        'showProgressBar': true,
         }
       );
     }else{
@@ -324,7 +325,7 @@ class FireStoreService {
     }
   }
 
-  Future editTodoList(String listName, String oldListName) async {
+  Future editTodoList(String listName, String oldListName, bool showProgressBar) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
       String encryptedListName = _encryptionService.encryptText(listName);
@@ -337,8 +338,9 @@ class FireStoreService {
         await _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(encryptedOldListName).delete();
         await _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(encryptedListName).set(
             {
-              "listName": encryptedListName,
-              "listItems": items
+              "listName": listName,
+              "listItems": items,
+              'showProgressBar': showProgressBar,
             }
         );
       });
