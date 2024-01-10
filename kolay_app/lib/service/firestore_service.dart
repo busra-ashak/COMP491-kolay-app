@@ -614,4 +614,16 @@ class FireStoreService {
       print("User is not authenticated");
     }
   }
+
+  Future deleteUserToken() async {
+    String? uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid);
+      await documentReference.update({
+        'token': '',
+      });
+    }else{
+      print("User is not authenticated");
+    }
+  }
 }

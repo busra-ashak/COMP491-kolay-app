@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kolay_app/providers/theme_provider.dart';
 import 'package:kolay_app/service/encryption_service.dart';
 import 'package:provider/provider.dart';
+import 'package:kolay_app/service/firestore_service.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -123,6 +124,9 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               TextButton(
                                 onPressed: () {
+                                  FireStoreService fireStoreService =
+                                      FireStoreService();
+                                  fireStoreService.deleteUserToken();
                                   FirebaseAuth.instance.signOut();
                                   Navigator.pushAndRemoveUntil(
                                       context,

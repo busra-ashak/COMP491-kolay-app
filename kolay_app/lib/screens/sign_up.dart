@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -242,7 +241,6 @@ class _SignUpPageState extends State<SignUpPage> {
         // Password meets the criteria
         User? user = await _auth.signUpWithEmailAndPassword(
             email, password, name, phoneNumber, photoURL);
-
         if (user != null) {
           print("User is successfully created");
           Navigator.pushAndRemoveUntil(
