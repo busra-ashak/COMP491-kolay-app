@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:kolay_app/service/encryption_service.dart';
 import '../service/firestore_service.dart';
 import 'package:intl/intl.dart';
 class ReminderList with ChangeNotifier {
   final FireStoreService _firestoreService = FireStoreService();
+  final EncryptionService _encryptionService = EncryptionService();
   Map<String, dynamic> reminderLists = {};
   List<String> reminderListsHome = [];
   List<List<String>> reminderTasksHome = [];
@@ -26,11 +28,20 @@ class ReminderList with ChangeNotifier {
     var querySnapshot = await _firestoreService.getAllReminderLists();
     reminderLists.clear();
     for (DocumentSnapshot d in querySnapshot.docs) {
+      Map<dynamic, dynamic> notDecryptedListItems = d.get('listItems') as Map<dynamic, dynamic>;
+      Map<dynamic, dynamic> decryptedListItems = {};
+
+      notDecryptedListItems.forEach((key, value) {
+         dynamic decrpytedKey = _encryptionService.decryptText(key);
+         Map<dynamic, dynamic> decryptedValue = {'itemDeadline': value['itemDeadline'],'itemName': _encryptionService.decryptText(value['itemName']),'itemTicked': value['itemTicked']} ;
+         decryptedListItems[decrpytedKey] = decryptedValue;
+      });
+
       Map<String, dynamic> doc = {
-        d.get('listName'): {
-          'listName': d.get('listName') as String,
+         _encryptionService.decryptText(d.get('listName')): {
+          'listName': _encryptionService.decryptText(d.get('listName')),
           'dueDatetime': d.get('dueDatetime').toDate() as DateTime,
-          'listItems': d.get('listItems') as Map<dynamic, dynamic>
+          'listItems': decryptedListItems
         }
       };
       reminderLists.addAll(doc);
@@ -102,13 +113,13 @@ class ReminderList with ChangeNotifier {
     var querySnapshot = await _firestoreService.getAllReminderLists();
     reminderTasksHome.clear();
     for (DocumentSnapshot d in querySnapshot.docs) {
-      String listName = d.get('listName');
+      String listName = _encryptionService.decryptText(d.get('listName'));
       var tasks = d.get('listItems');
       for(var task in tasks.values){
         String taskDueDate = DateFormat('dd/MM/yyyy').format(task['itemDeadline'].toDate() as DateTime);
         bool itemTicked = task['itemTicked'];
         if(now==taskDueDate && !itemTicked){
-          String itemName = task['itemName'];
+          String itemName = _encryptionService.decryptText(task['itemName']);
           reminderTasksHome.add([itemName,listName]);
         }
       }
@@ -118,7 +129,7 @@ class ReminderList with ChangeNotifier {
 
   Future editReminder(String listName, DateTime dateTime, String oldListName) async {
     await _firestoreService.editReminderList(listName, dateTime, oldListName);
-    Map<String, dynamic> items = reminderLists[oldListName]['listItems'];
+    Map<dynamic, dynamic> items = reminderLists[oldListName]['listItems'];
     Map<String, dynamic> doc = {
       listName: {
         "listName": listName,

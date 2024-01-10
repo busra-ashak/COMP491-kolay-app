@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:kolay_app/service/encryption_service.dart';
 import '../service/firestore_service.dart';
 class TodoList with ChangeNotifier {
   final FireStoreService _firestoreService = FireStoreService();
+  final EncryptionService _encryptionService = EncryptionService();
   Map<String, dynamic> todoLists = {};
 
 
@@ -22,10 +24,18 @@ class TodoList with ChangeNotifier {
     var querySnapshot = await _firestoreService.getAllTodoLists();
     todoLists.clear();
     for (DocumentSnapshot d in querySnapshot.docs) {
+      Map<dynamic, dynamic> notDecryptedListItems = d.get('listItems') as Map<dynamic, dynamic>;
+      Map<dynamic, dynamic> decryptedListItems = {};
+
+      notDecryptedListItems.forEach((key, value) {
+         dynamic decrpytedKey = _encryptionService.decryptText(key);
+         Map<dynamic, dynamic> decryptedValue = {'itemName': _encryptionService.decryptText(value['itemName']),'itemTicked': value['itemTicked']} ;
+         decryptedListItems[decrpytedKey] = decryptedValue;
+      });
       Map<String, dynamic> doc = {
-        d.get('listName'): {
-          'listName': d.get('listName') as String,
-          'listItems': d.get('listItems') as Map<dynamic, dynamic>
+         _encryptionService.decryptText(d.get('listName')): {
+          'listName': _encryptionService.decryptText(d.get('listName')),
+          'listItems': decryptedListItems
         }
       };
       todoLists.addAll(doc);
@@ -79,7 +89,7 @@ class TodoList with ChangeNotifier {
 
   void editTodoList(String listName, String oldListName) async {
     await _firestoreService.editTodoList(listName, oldListName);
-    Map<String, dynamic> items = todoLists[oldListName]['listItems'];
+    Map<dynamic, dynamic> items = todoLists[oldListName]['listItems'];
     Map<String, dynamic> doc = {
       listName: {
         "listName": listName,
