@@ -1,11 +1,11 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:kolay_app/screens/home.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:kolay_app/screens/log_in.dart';
 import 'package:kolay_app/widgets/bottom_navigation_bar.dart';
-import 'package:kolay_app/widgets/form_container_widget.dart';
 import 'package:kolay_app/service/firebase_auth_services.dart';
-
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -15,94 +15,185 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-
   final FirebaseAuthService _auth = FirebaseAuthService();
 
   TextEditingController _usernameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
-
+  TextEditingController _phoneNumberController = TextEditingController();
+  TextEditingController _photoURLController = TextEditingController();
 
   @override
   void dispose() {
     _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _phoneNumberController.dispose();
+    _photoURLController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("SignUp"),
-      ),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
+          padding: EdgeInsets.all(30.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                "Sign Up",
-                style: TextStyle(fontSize: 27, fontWeight: FontWeight.bold),
+              GestureDetector(
+                onTap: _pickProfilePicture,
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundColor: Color.fromRGBO(143, 148, 251, 1),
+                  backgroundImage: _photoURLController.text.isNotEmpty
+                      ? FileImage(File(_photoURLController.text))
+                      : null,
+                  child: _photoURLController.text.isEmpty
+                      ? const Icon(
+                          Icons.camera_alt,
+                          color: Colors.white,
+                          size: 42,
+                        )
+                      : null,
+                ),
               ),
-              SizedBox(
-                height: 30,
-              ),
-              FormContainerWidget(
-controller: _usernameController,
-                hintText: "Username",
-                isPasswordField: false,
-              ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
-              FormContainerWidget(
-
-controller: _emailController,
-                hintText: "Email",
-                isPasswordField: false,
+              Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Color.fromRGBO(143, 148, 251, 1)),
+                    boxShadow: const [
+                      BoxShadow(
+                          color: Color.fromRGBO(143, 148, 251, .2),
+                          blurRadius: 20.0,
+                          offset: Offset(0, 10))
+                    ]),
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      height: 60,
+                      padding: const EdgeInsets.all(8.0),
+                      decoration: const BoxDecoration(
+                          border: Border(
+                              bottom: BorderSide(
+                                  color: Color.fromRGBO(143, 148, 251, 1)))),
+                      child: TextField(
+                        controller: _usernameController,
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Name",
+                            hintStyle: TextStyle(color: Colors.grey[700])),
+                      ),
+                    ),
+                    Container(
+                      height: 60,
+                      padding: const EdgeInsets.all(8.0),
+                      decoration: const BoxDecoration(
+                          border: Border(
+                              bottom: BorderSide(
+                                  color: Color.fromRGBO(143, 148, 251, 1)))),
+                      child: TextField(
+                        controller: _emailController,
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Email",
+                            hintStyle: TextStyle(color: Colors.grey[700])),
+                      ),
+                    ),
+                    Container(
+                      height: 60,
+                      padding: const EdgeInsets.all(8.0),
+                      decoration: const BoxDecoration(
+                          border: Border(
+                              bottom: BorderSide(
+                                  color: Color.fromRGBO(143, 148, 251, 1)))),
+                      child: TextField(
+                        controller: _phoneNumberController,
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: "Phone Number",
+                            hintStyle: TextStyle(color: Colors.grey[700])),
+                      ),
+                    ),
+                    Container(
+                      height: 60,
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              obscureText: true,
+                              controller: _passwordController,
+                              decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  hintText: "Password",
+                                  hintStyle:
+                                      TextStyle(color: Colors.grey[700])),
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.info),
+                            color: Color.fromRGBO(143, 148, 251, 1),
+                            onPressed: _showPasswordRequirements,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
-              ),
-              FormContainerWidget(
-controller: _passwordController,
-
-                hintText: "Password",
-                isPasswordField: true,
-              ),
-              SizedBox(
-                height: 30,
               ),
               GestureDetector(
                 onTap: _signUp,
                 child: Container(
-                  width: double.infinity,
-                  height: 45,
+                  height: 50,
                   decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+                      borderRadius: BorderRadius.circular(10),
+                      gradient: LinearGradient(colors: [
+                        Color.fromRGBO(143, 148, 251, 1),
+                        Color.fromRGBO(143, 148, 251, .6),
+                      ])),
                   child: Center(
-                      child: Text(
-                        "Sign Up",
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                      )),
+                    child: Text(
+                      "Sign up",
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
                 ),
               ),
-              SizedBox(height: 20,),
-              Row(mainAxisAlignment: MainAxisAlignment.center,
+              const SizedBox(
+                height: 5,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Already have an account?"),
-                  SizedBox(width: 5,),
+                  const Text("Already have an account?"),
+                  const SizedBox(
+                    width: 5,
+                  ),
                   GestureDetector(
                       onTap: () {
                         Navigator.pushAndRemoveUntil(
-                            context, MaterialPageRoute(builder: (context) => LoginPage()), (route) => false);
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const LoginPage()),
+                            (route) => false);
                       },
-                      child: Text("Login", style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),))
+                      child: const Text(
+                        "Log in",
+                        style: TextStyle(
+                            color: Color.fromRGBO(143, 148, 251, 1),
+                            fontWeight: FontWeight.bold),
+                      ))
                 ],
               )
             ],
@@ -113,20 +204,201 @@ controller: _passwordController,
   }
 
   void _signUp() async {
-    String username = _usernameController.text;
+    String name = _usernameController.text;
     String email = _emailController.text;
     String password = _passwordController.text;
+    String phoneNumber = _phoneNumberController.text;
+    String photoURL = _photoURLController.text;
+    if (isEmailValid(email)) {
+      if (password.length >= 8 &&
+          password.contains(RegExp(r'[0-9]')) &&
+          password.contains(RegExp(r'[A-Z]')) &&
+          password.contains(RegExp(r'[a-z]'))) {
+        // Password meets the criteria
+        User? user = await _auth.signUpWithEmailAndPassword(
+            email, password, name, phoneNumber, photoURL);
 
-    User? user = await _auth.signUpWithEmailAndPassword(email, password);
-
-    if (user!= null){
-      print("User is successfully created");
-      Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => BottomNavigationBarController()));
-    } else{
-      print("Some error happend");
+        if (user != null) {
+          print("User is successfully created");
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => BottomNavigationBarController()));
+        } else {
+          print("Some error happened");
+        }
+      } else {
+        // Password does not meet the criteria
+        _showPasswordRequirements();
+      }
+    } else {
+      _showInvalidEmail();
     }
-
   }
 
+  Future<void> _pickProfilePicture() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _photoURLController.text = pickedFile.path;
+      });
+    }
+  }
+
+  void _showPasswordRequirements() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          backgroundColor: Color.fromRGBO(143, 148, 251, 1),
+          contentPadding: EdgeInsets.zero,
+          content: Container(
+            constraints:
+                BoxConstraints(maxWidth: 400), // Adjust the max width as needed
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(143, 148, 251, 1),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Password Requirements',
+                        style: TextStyle(color: Colors.white, fontSize: 19),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.close),
+                        color: Colors.white,
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      requirementRow(const Color.fromARGB(255, 0, 0, 0),
+                          Icons.check, 'Minimum length: 8 characters'),
+                      requirementRow(const Color.fromARGB(255, 0, 0, 0),
+                          Icons.check, 'Must contain at least one uppercase'),
+                      requirementRow(const Color.fromARGB(255, 0, 0, 0),
+                          Icons.check, 'Must contain at least one lowercase'),
+                      requirementRow(const Color.fromARGB(255, 0, 0, 0),
+                          Icons.check, 'Must contain at least one digit'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget requirementRow(Color textColor, IconData icon, String text) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        border: Border(
+            bottom: BorderSide(color: const Color.fromRGBO(143, 148, 251, 1))),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            color: textColor,
+            size: 16,
+          ),
+          SizedBox(width: 8),
+          Text(
+            text,
+            style: TextStyle(color: textColor),
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool isEmailValid(String email) {
+    final emailRegex = RegExp(r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$');
+    return emailRegex.hasMatch(email);
+  }
+
+  void _showInvalidEmail() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          backgroundColor: Color.fromRGBO(143, 148, 251, 1),
+          contentPadding: EdgeInsets.zero,
+          content: Container(
+            constraints:
+                BoxConstraints(maxWidth: 400), // Adjust the max width as needed
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      gradient: LinearGradient(colors: [
+                        Color.fromRGBO(143, 148, 251, 1),
+                        Color.fromRGBO(143, 148, 251, .6),
+                      ])),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Invalid email format.',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.close),
+                        color: Colors.white,
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 }

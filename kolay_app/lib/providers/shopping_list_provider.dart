@@ -68,6 +68,19 @@ class ShoppingList extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future editShoppingListItem(String listName, String itemName, String oldItem) async {
+    await _firestoreService.editItemInShoppingList(listName, itemName, oldItem);
+    Map<String, dynamic> doc = {
+      itemName: {
+        "itemName": itemName,
+        "itemTicked": false
+      }
+    };
+    shoppingLists[listName]['listItems'].remove(oldItem);
+    shoppingLists[listName]['listItems'].addAll(doc);
+    notifyListeners();
+  }
+
   Future removeShoppingListItem(String listName, String itemName) async {
     await _firestoreService.deleteItemFromShoppingList(listName, itemName);
     shoppingLists[listName]['listItems'].remove(itemName);
@@ -90,6 +103,21 @@ class ShoppingList extends ChangeNotifier {
         shoppingListsHome.add(_encryptionService.decryptText(d.get('listName')));
       }
     }
+    notifyListeners();
+  }
+
+  Future editShoppingList(String listName, DateTime dateTime, String oldListName) async {
+    await _firestoreService.editShoppingList(listName, dateTime, oldListName);
+    Map<String, dynamic> items = shoppingLists[oldListName]['listItems'];
+    Map<String, dynamic> doc = {
+      listName: {
+        "listName": listName,
+        "datetime": dateTime,
+        "listItems": items
+      }
+    };
+    shoppingLists.remove(oldListName);
+    shoppingLists.addAll(doc);
     notifyListeners();
   }
 }

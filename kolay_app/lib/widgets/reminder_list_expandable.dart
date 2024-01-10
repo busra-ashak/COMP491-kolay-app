@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:kolay_app/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 import '../providers/reminder_provider.dart';
 import 'package:intl/intl.dart';
@@ -11,7 +12,6 @@ class ReminderListExpandable extends StatelessWidget {
   final DateTime dueDatetime;
   final Map listItems;
 
-  // Constructor to accept the initial reminder list name
   const ReminderListExpandable(
       {Key? key,
       required this.listName,
@@ -23,75 +23,82 @@ class ReminderListExpandable extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
         create: (context) => SlidableState(),
-        child: Card(
-            color: const Color(0xFF8B85C1),
-            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-            child: ClipRect(
-              child: Consumer<SlidableState>(
-                  builder: (context, slidableState, child) {
-                return Slidable(
-                  closeOnScroll: false,
-                  enabled: slidableState.isSlidableEnabled,
-                  startActionPane: ActionPane(
-                    motion: const BehindMotion(),
-                    children: [
-                      SlidableAction(
-                        onPressed: (context) {},
-                        backgroundColor: Colors.green,
-                        borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                            bottomLeft: Radius.circular(10)),
-                        icon: Icons.edit,
-                        label: 'Edit',
-                      ),
-                    ],
-                  ),
-                  endActionPane: ActionPane(
-                    motion: const BehindMotion(),
-                    children: [
-                      SlidableAction(
-                        onPressed: (context) {
-                          _showDeleteReminderListDialog(context, listName);
-                        },
-                        backgroundColor: Colors.red,
-                        borderRadius: const BorderRadius.only(
-                            topRight: Radius.circular(10),
-                            bottomRight: Radius.circular(10)),
-                        icon: Icons.delete,
-                        label: 'Delete',
-                      ),
-                    ],
-                  ),
-                  child: ExpansionTile(
-                    textColor: Colors.white,
-                    onExpansionChanged: (isExpanded) {
-                      slidableState.isSlidableEnabled = !isExpanded;
-                    },
-                    collapsedTextColor: Colors.white,
-                    iconColor: Colors.white,
-                    collapsedIconColor: Colors.white,
-                    shape: const Border(),
-                    title: Text(listName, style: const TextStyle(fontSize: 20)),
-                    subtitle: Text(
-                        DateFormat('yyyy-MM-dd – kk:mm').format(dueDatetime),
-                        style: const TextStyle(fontSize: 12)),
-                    children: <Widget>[
-                      Column(
-                        children: _buildExpandableContent(
-                          context,
-                          listName,
-                          listItems,
+        child:
+            Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
+          return Card(
+              color: themeBody[themeProvider.themeDataName]!['expandable'],
+              margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+              child: ClipRect(
+                child: Consumer<SlidableState>(
+                    builder: (context, slidableState, child) {
+                  return Slidable(
+                    closeOnScroll: false,
+                    enabled: slidableState.isSlidableEnabled,
+                    startActionPane: ActionPane(
+                      motion: const BehindMotion(),
+                      children: [
+                        SlidableAction(
+                          onPressed: (context) {
+                            _showEditReminderListDialog(context, listName);
+                          },
+                          backgroundColor: Colors.green,
+                          borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(10),
+                              bottomLeft: Radius.circular(10)),
+                          icon: Icons.edit,
+                          label: 'Edit',
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              }),
-            )));
+                      ],
+                    ),
+                    endActionPane: ActionPane(
+                      motion: const BehindMotion(),
+                      children: [
+                        SlidableAction(
+                          onPressed: (context) {
+                            _showDeleteReminderListDialog(context, listName);
+                          },
+                          backgroundColor: Colors.red,
+                          borderRadius: const BorderRadius.only(
+                              topRight: Radius.circular(10),
+                              bottomRight: Radius.circular(10)),
+                          icon: Icons.delete,
+                          label: 'Delete',
+                        ),
+                      ],
+                    ),
+                    child: ExpansionTile(
+                      textColor: Colors.white,
+                      onExpansionChanged: (isExpanded) {
+                        slidableState.isSlidableEnabled = !isExpanded;
+                      },
+                      collapsedTextColor: Colors.white,
+                      iconColor: Colors.white,
+                      collapsedIconColor: Colors.white,
+                      shape: const Border(),
+                      title:
+                          Text(listName, style: const TextStyle(fontSize: 20)),
+                      subtitle: Text(
+                          DateFormat('yyyy-MM-dd – kk:mm').format(dueDatetime),
+                          style: const TextStyle(fontSize: 12)),
+                      children: <Widget>[
+                        Column(
+                          children: _buildExpandableContent(
+                            context,
+                            listName,
+                            listItems,
+                            themeBody[themeProvider.themeDataName]
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+              ));
+        }));
   }
 
   List<Widget> _buildExpandableContent(
-      BuildContext context, String listName, Map listItems) {
+      BuildContext context, String listName, Map listItems, var themeObject) {
     List<Widget> columnContent = [];
 
     if (listItems.isNotEmpty) {
@@ -104,7 +111,9 @@ class ReminderListExpandable extends StatelessWidget {
             motion: const BehindMotion(),
             children: [
               SlidableAction(
-                onPressed: (context) {},
+                onPressed: (context) {
+                  _showEditReminderFromListDialog(
+                      context, listName, content['itemName']);},
                 backgroundColor: Colors.green,
                 icon: Icons.edit,
                 label: 'Edit',
@@ -131,7 +140,7 @@ class ReminderListExpandable extends StatelessWidget {
                   side: const BorderSide(color: Colors.white, width: 1.5),
                   shape: const CircleBorder(),
                   value: content['itemTicked'],
-                  activeColor: const Color(0xFF77BBB4),
+                  activeColor: themeObject['tick'],
                   onChanged: (bool? val) {
                     context.read<ReminderList>().toggleItemCheckbox(
                         listName, content['itemName'], content['itemTicked']);
@@ -149,9 +158,9 @@ class ReminderListExpandable extends StatelessWidget {
       title: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
         ElevatedButton(
           onPressed: () => _showAddReminderToListDialog(context, listName),
-          child: const Text(
+          child: Text(
             "Add reminder",
-            style: TextStyle(color: Color(0xFF6C64B3)),
+            style: TextStyle(color: themeObject['expandableButton']),
           ),
         ),
       ]),
@@ -171,9 +180,7 @@ class ReminderListExpandable extends StatelessWidget {
           title: const Text('Add a new reminder to the reminder group'),
           content: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              //position
               mainAxisSize: MainAxisSize.min,
-              // wrap content in flutter
               children: [
                 TextField(
                   controller: itemNameController,
@@ -305,6 +312,126 @@ class ReminderListExpandable extends StatelessWidget {
                 Navigator.of(context).pop();
               },
               child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditReminderFromListDialog(
+      BuildContext context, String listName, String oldItem) {
+
+    DateTime selectedDate = DateTime.now();
+    TextEditingController itemNameController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit your reminder'),
+          content: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: itemNameController,
+                  decoration: const InputDecoration(labelText: 'Edit reminder'),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () async {
+                    DateTime? pickedDate = await showDateTimePicker(
+                      context: context,
+                      initialDate: selectedDate,
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2101),
+                    );
+
+                    if (pickedDate != null && pickedDate != selectedDate) {
+                      selectedDate = pickedDate;
+                    }
+                  },
+                  child: const Text('Edit Deadline'),
+                ),
+              ]),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String newItemName = itemNameController.text;
+                if (newItemName.isNotEmpty) {
+                  context.read<ReminderList>().editReminderItemInList(
+                      listName, newItemName, selectedDate, oldItem);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Add'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditReminderListDialog(BuildContext context, String oldReminderListName) {
+    TextEditingController controller = TextEditingController();
+    DateTime selectedDate = DateTime.now();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit your reminder list'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                    labelText: 'The name of your reminder list'),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () async {
+                  DateTime? pickedDate = await showDateTimePicker(
+                    context: context,
+                    initialDate: selectedDate,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                  );
+
+                  if (pickedDate != null && pickedDate != selectedDate) {
+                    selectedDate = pickedDate;
+                  }
+                },
+                child: const Text('Pick Date'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String newListName = controller.text;
+                if (newListName.isNotEmpty) {
+                  context
+                      .read<ReminderList>()
+                      .editReminder(newListName, selectedDate, oldReminderListName);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Edit'),
             ),
           ],
         );

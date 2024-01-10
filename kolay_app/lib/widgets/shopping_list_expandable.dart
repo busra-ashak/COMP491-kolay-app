@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kolay_app/providers/theme_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -21,8 +22,9 @@ class ShoppingListExpandable extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
         create: (context) => SlidableState(),
-        child: Card(
-            color: const Color(0xFF8B85C1),
+        child:  Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
+          return Card(
+              color: themeBody[themeProvider.themeDataName]!['expandable'],
             margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
             child: ClipRect(child: Consumer<SlidableState>(
                 builder: (context, slidableState, child) {
@@ -33,7 +35,9 @@ class ShoppingListExpandable extends StatelessWidget {
                   motion: const BehindMotion(),
                   children: [
                     SlidableAction(
-                      onPressed: (context) {},
+                      onPressed: (context) {
+                        _showEditShoppingListDialog(context, listName);
+                      },
                       backgroundColor: Colors.green,
                       borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(10),
@@ -77,16 +81,18 @@ class ShoppingListExpandable extends StatelessWidget {
                         context,
                         listName,
                         listItems,
+                        themeBody[themeProvider.themeDataName],
                       ),
                     ),
                   ],
                 ),
               );
-            }))));
+            })));}) 
+            );
   }
 
   List<Widget> _buildExpandableContent(
-      BuildContext context, String listName, Map listItems) {
+      BuildContext context, String listName, Map listItems, var themeObject) {
     List<Widget> columnContent = [];
 
     if (listItems.isNotEmpty) {
@@ -96,7 +102,9 @@ class ShoppingListExpandable extends StatelessWidget {
             motion: const BehindMotion(),
             children: [
               SlidableAction(
-                onPressed: (context) {},
+                onPressed: (context) {
+                  _showEditItemFromListDialog(
+                      context, listName, content['itemName']);},
                 backgroundColor: Colors.green,
                 icon: Icons.edit,
                 label: 'Edit',
@@ -123,7 +131,7 @@ class ShoppingListExpandable extends StatelessWidget {
                 side: const BorderSide(color: Colors.white, width: 1.5),
                 shape: const CircleBorder(),
                 value: content['itemTicked'],
-                activeColor: const Color(0xFF77BBB4),
+                  activeColor: themeObject['tick'],
                 onChanged: (bool? val) {
                   context.read<ShoppingList>().updateToggle(
                       listName, content['itemName'], content['itemTicked']);
@@ -139,9 +147,9 @@ class ShoppingListExpandable extends StatelessWidget {
       title: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
         ElevatedButton(
           onPressed: () => _showAddItemToListDialog(context, listName),
-          child: const Text(
+          child:  Text(
             "Add item",
-            style: TextStyle(color: Color(0xFF6C64B3)),
+            style: TextStyle(color: themeObject['expandableButton']),
           ),
         ),
       ]),
@@ -234,6 +242,111 @@ class ShoppingListExpandable extends StatelessWidget {
                 Navigator.of(context).pop();
               },
               child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditItemFromListDialog(
+      BuildContext context, String listName, String oldItem) {
+
+    TextEditingController itemNameController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit your shopping item'),
+          content: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: itemNameController,
+                  decoration: InputDecoration(labelText: 'Edit Item', hintText: oldItem),
+                ),
+                const SizedBox(height: 16),
+              ]),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String newItemName = itemNameController.text;
+                if (newItemName.isNotEmpty) {
+                  context
+                      .read<ShoppingList>()
+                      .editShoppingListItem(listName, newItemName, oldItem);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Edit'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEditShoppingListDialog(BuildContext context, String oldShoppingListName) {
+    TextEditingController controller = TextEditingController();
+    DateTime selectedDate = DateTime.now();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit your shopping list'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                    labelText: 'The name of your Shopping List'),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: selectedDate,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                  );
+
+                  if (pickedDate != null && pickedDate != selectedDate) {
+                    selectedDate = pickedDate;
+                  }
+                },
+                child: const Text('Pick Date'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                String newListName = controller.text;
+                if (newListName.isNotEmpty) {
+                  context
+                      .read<ShoppingList>()
+                      .editShoppingList(newListName, selectedDate, oldShoppingListName);
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('Edit'),
             ),
           ],
         );

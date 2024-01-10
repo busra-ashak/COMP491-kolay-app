@@ -62,6 +62,19 @@ class TodoList with ChangeNotifier {
     notifyListeners();
   }
 
+  Future editTodoItemInList(String listName, String itemName, String oldItem) async {
+    await _firestoreService.editItemInTodoList(listName, itemName, oldItem);
+    Map<String, dynamic> doc = {
+      itemName: {
+        "itemName": itemName,
+        "itemTicked": false
+      }
+    };
+    todoLists[listName]['listItems'].remove(oldItem);
+    todoLists[listName]['listItems'].addAll(doc);
+    notifyListeners();
+  }
+
   Future deleteTodoItemFromList(String listName, String itemName) async {
     await _firestoreService.deleteItemFromTodoList(listName, itemName);
     todoLists[listName]['listItems'].remove(itemName);
@@ -71,6 +84,20 @@ class TodoList with ChangeNotifier {
   Future deleteTodoList(String listName) async {
     await _firestoreService.deleteTodoList(listName);
     todoLists.remove(listName);
+    notifyListeners();
+  }
+
+  void editTodoList(String listName, String oldListName) async {
+    await _firestoreService.editTodoList(listName, oldListName);
+    Map<String, dynamic> items = todoLists[oldListName]['listItems'];
+    Map<String, dynamic> doc = {
+      listName: {
+        "listName": listName,
+        "listItems": items
+      }
+    };
+    todoLists.remove(oldListName);
+    todoLists.addAll(doc);
     notifyListeners();
   }
 
