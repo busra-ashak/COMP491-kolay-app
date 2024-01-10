@@ -1,5 +1,5 @@
 import 'package:encrypt/encrypt.dart' as encrypt;
-import 'package:encrypt/encrypt.dart';
+import 'dart:convert';
 
 class EncryptionService {
   final encrypt.Key key = encrypt.Key.fromUtf8('my 32 length key................');
@@ -19,13 +19,20 @@ class EncryptionService {
   String encryptText(String text) {
     final encrypter = encrypt.Encrypter(encrypt.AES(key));
     final encrypted = encrypter.encrypt(text, iv: iv);
-    return encrypted.base64;
+    
+    // Base64 encode and then URL encode
+    String encodedUrl = Uri.encodeComponent(base64.encode(encrypted.bytes));
+    
+    return encodedUrl;
   }
 
   String decryptText(String encryptedText) {
     try {
       final encrypter = encrypt.Encrypter(encrypt.AES(key));
-      final decrypted = encrypter.decrypt64(encryptedText, iv: iv);
+      
+      // URL decode and then Base64 decode
+      final decrypted = encrypter.decrypt64(Uri.decodeComponent(encryptedText), iv: iv);
+      
       return decrypted;
     } on Exception catch (e) {
       print('Error during decryption: $e');
