@@ -33,7 +33,7 @@ class TodoList with ChangeNotifier {
          decryptedListItems[decrpytedKey] = decryptedValue;
       });
       Map<String, dynamic> doc = {
-        d.get('listName'): {
+         _encryptionService.decryptText(d.get('listName')): {
           'listName': _encryptionService.decryptText(d.get('listName')),
           'listItems': decryptedListItems
         }

@@ -37,7 +37,7 @@ class ShoppingList extends ChangeNotifier {
          decryptedListItems[decrpytedKey] = decryptedValue;
       });
       Map<String, dynamic> doc = {
-        d.get('listName'): {
+        _encryptionService.decryptText(d.get('listName')): {
           'listName': _encryptionService.decryptText(d.get('listName')),
           'datetime': d.get('datetime').toDate() as DateTime,
           'listItems': decryptedListItems
@@ -58,12 +58,13 @@ class ShoppingList extends ChangeNotifier {
   Future addShoppingListItem(String listName, String itemName) async {
     await _firestoreService.addItemToShoppingList(listName, itemName);
     Map<String, dynamic> doc = {
-      _encryptionService.encryptText(itemName): {
-        "itemName": _encryptionService.encryptText(itemName),
+      itemName: {
+        "itemName": itemName,
         "itemTicked": false
       }
     };
     shoppingLists[listName]['listItems'].addAll(doc);
+    print(shoppingLists);
     notifyListeners();
   }
 

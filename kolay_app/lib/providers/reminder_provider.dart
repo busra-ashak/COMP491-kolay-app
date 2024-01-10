@@ -38,7 +38,7 @@ class ReminderList with ChangeNotifier {
       });
 
       Map<String, dynamic> doc = {
-        d.get('listName'): {
+         _encryptionService.decryptText(d.get('listName')): {
           'listName': _encryptionService.decryptText(d.get('listName')),
           'dueDatetime': d.get('dueDatetime').toDate() as DateTime,
           'listItems': decryptedListItems

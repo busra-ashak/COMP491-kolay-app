@@ -28,7 +28,7 @@ class Routine with ChangeNotifier {
     routines.clear();
     for (DocumentSnapshot d in querySnapshot.docs) {
       Map<String, dynamic> doc = {
-        d.get('routineName'): {
+         _encryptionService.decryptText(d.get('listName')): {
           'routineName': _encryptionService.decryptText(d.get('routineName') as String),
           'frequencyMeasure': d.get('frequencyMeasure') as String,
           'frequency': d.get('frequency') as int

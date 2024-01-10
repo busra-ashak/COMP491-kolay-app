@@ -36,7 +36,7 @@ class MealPlan with ChangeNotifier {
          decryptedListItems[decrpytedKey] = decryptedValue;
       });
       Map<String, dynamic> doc = {
-        d.get('listName'): {
+        _encryptionService.decryptText(d.get('listName')): {
           'listName': _encryptionService.decryptText(d.get('listName')),
           'datetime': d.get('datetime').toDate() as DateTime,
           'listItems': decryptedListItems
