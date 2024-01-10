@@ -11,7 +11,8 @@ class TodoList with ChangeNotifier {
     Map<String, dynamic> doc = {
       listName: {
         "listName": listName,
-        "listItems": {}
+        "listItems": {},
+        'showProgressBar': true,
       }
     };
     todoLists.addAll(doc);
@@ -25,18 +26,23 @@ class TodoList with ChangeNotifier {
       Map<String, dynamic> doc = {
         d.get('listName'): {
           'listName': d.get('listName') as String,
-          'listItems': d.get('listItems') as Map<dynamic, dynamic>
+          'listItems': d.get('listItems') as Map<dynamic, dynamic>,
+          'showProgressBar': d.get('showProgressBar') as bool
         }
       };
       todoLists.addAll(doc);
     }
-
     notifyListeners();
   }
 
   Future toggleItemCheckbox(String listName, String itemName, bool itemChecked) async {
     await _firestoreService.toggleTodoItemCheckbox(listName, itemName, itemChecked);
     todoLists[listName]['listItems'][itemName]['itemTicked'] = !itemChecked;
+    notifyListeners();
+  }
+
+  void toggleProgressionBar(String listName, bool showProgressionBar) {
+    todoLists[listName]['showProgressionBar'] = showProgressionBar;
     notifyListeners();
   }
 
@@ -77,13 +83,14 @@ class TodoList with ChangeNotifier {
     notifyListeners();
   }
 
-  void editTodoList(String listName, String oldListName) async {
-    await _firestoreService.editTodoList(listName, oldListName);
-    Map<String, dynamic> items = todoLists[oldListName]['listItems'];
+  void editTodoList(String listName, String oldListName, bool showProgressBar) async {
+    await _firestoreService.editTodoList(listName, oldListName, showProgressBar);
+    Map<dynamic, dynamic> items = todoLists[oldListName]['listItems'];
     Map<String, dynamic> doc = {
       listName: {
         "listName": listName,
-        "listItems": items
+        "listItems": items,
+        'showProgressBar': showProgressBar,
       }
     };
     todoLists.remove(oldListName);

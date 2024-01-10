@@ -118,7 +118,7 @@ class MealPlan with ChangeNotifier {
 
   Future editMealPlan(String listName, DateTime dateTime, String oldListName) async {
     await _firestoreService.editMealPlan(listName, dateTime, oldListName);
-    Map<String, dynamic> items = mealPlans[oldListName]['listItems'];
+    Map<dynamic, dynamic> items = mealPlans[oldListName]['listItems'];
     Map<String, dynamic> doc = {
       listName: {
         "listName": listName,

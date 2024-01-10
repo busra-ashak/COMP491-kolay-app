@@ -118,7 +118,7 @@ class ReminderList with ChangeNotifier {
 
   Future editReminder(String listName, DateTime dateTime, String oldListName) async {
     await _firestoreService.editReminderList(listName, dateTime, oldListName);
-    Map<String, dynamic> items = reminderLists[oldListName]['listItems'];
+    Map<dynamic, dynamic> items = reminderLists[oldListName]['listItems'];
     Map<String, dynamic> doc = {
       listName: {
         "listName": listName,

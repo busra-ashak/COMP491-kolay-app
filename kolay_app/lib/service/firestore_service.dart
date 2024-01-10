@@ -279,7 +279,8 @@ class FireStoreService {
       await _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(listName).set(
         {
         "listName": listName,
-        "listItems": {}
+        "listItems": {},
+          'showProgressBar': true,
         }
       );
     }else{
@@ -306,7 +307,7 @@ class FireStoreService {
     }
   }
 
-  Future editTodoList(String listName, String oldListName) async {
+  Future editTodoList(String listName, String oldListName, bool showProgressBar) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
       final DocumentReference documentReference = _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(oldListName);
@@ -317,8 +318,9 @@ class FireStoreService {
         await _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(oldListName).delete();
         await _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(listName).set(
             {
-              "listName": listName,
-              "listItems": items
+              'listName': listName,
+              'listItems': items,
+              'showProgressBar': showProgressBar,
             }
         );
       });
