@@ -2,11 +2,13 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:kolay_app/service/encryption_service.dart';
 import '../service/firestore_service.dart';
 
 class Routine with ChangeNotifier {
 
   final FireStoreService _firestoreService = FireStoreService();
+  final EncryptionService _encryptionService = EncryptionService();
   Map<String, dynamic> routines = {};
   Map<String, dynamic> routinesHome = {};
 
@@ -57,8 +59,8 @@ class Routine with ChangeNotifier {
     routines.clear();
     for (DocumentSnapshot d in querySnapshot.docs) {
       Map<String, dynamic> doc = {
-        d.get('routineName'): {
-          'routineName': d.get('routineName') as String,
+         _encryptionService.decryptText(d.get('routineName')): {
+          'routineName': _encryptionService.decryptText(d.get('routineName') as String),
           'frequencyMeasure': d.get('frequencyMeasure') as String,
           'frequency': d.get('frequency') as int,
           'currentProgress': d.get('currentProgress') as int
@@ -84,7 +86,7 @@ class Routine with ChangeNotifier {
       int frequency = d.get('frequency');
       if(frequency!=currentProgress){
         String frequencyMeasure = d.get('frequencyMeasure');
-        String routineName = d.get('routineName');
+        String routineName =  _encryptionService.decryptText(d.get('routineName'));
         Map<String, dynamic> doc = {
         routineName: {
           'routineName': routineName,

@@ -24,7 +24,7 @@ const themeBody = {
     'screenBackground': Color(0xFF264653),
     'tabColorSelected': Color(0xFFECC35C),
     'tabColorUnselected': Color(0xFFA06A3D),
-    'floatingButton': Color.fromARGB(255, 24, 85, 78),
+    'floatingButton': Color(0xFF2a9d8f),
     'floatingButtonOutline': Color(0xFF14242B),
     'routineSubtitle': Color.fromARGB(255, 245, 216, 141),
     'todoPercentage': Color(0xFF2a9d8f),
