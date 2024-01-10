@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kolay_app/providers/theme_provider.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import '../providers/routine_provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -62,7 +63,8 @@ class RoutineWidget extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: ListTile(
+                  child: Column(children: [
+                    ListTile(
                       trailing: SizedBox(
                           width: 96,
                           child: Row(
@@ -91,8 +93,23 @@ class RoutineWidget extends StatelessWidget {
                       subtitle: Text(
                         'Completed $currentProgress out of $frequency time${frequency > 1 ? 's' : ''} for the $frequencyMeasure',
                         style: TextStyle(
-                            color: themeBody[themeProvider.themeDataName]!['routineSubtitle'], fontSize: 12),
-                      )))));
+                            color: themeBody[themeProvider.themeDataName]![
+                                'routineSubtitle'],
+                            fontSize: 12),
+                      ),
+                    ),
+                    LinearPercentIndicator(
+                      width: 210.0,
+                      lineHeight: 10.0,
+                      animation: true,
+                      percent: frequency == 0 ? 0 : currentProgress / frequency,
+                      barRadius: const Radius.circular(10),
+                      backgroundColor: Colors.grey,
+                      progressColor: themeBody[themeProvider.themeDataName]![
+                          'todoPercentage'],
+                    ),
+                    const Padding(padding: EdgeInsets.all(10.0)),
+                  ]))));
     });
   }
 
@@ -123,7 +140,6 @@ class RoutineWidget extends StatelessWidget {
   }
 
   void _showEditRoutineDialog(BuildContext context, String routineName) {
-
     TextEditingController nameController = TextEditingController();
     TextEditingController dropdownController = TextEditingController();
     TextEditingController frequencyController = TextEditingController();
@@ -141,23 +157,23 @@ class RoutineWidget extends StatelessWidget {
                   const Text("I will "),
                   Expanded(
                       child: TextField(
-                        controller: nameController,
-                        decoration: const InputDecoration(
-                            hintText: 'the name of your routine',
-                            hintStyle: TextStyle(fontSize: 12)),
-                      )),
+                    controller: nameController,
+                    decoration: const InputDecoration(
+                        hintText: 'the name of your routine',
+                        hintStyle: TextStyle(fontSize: 12)),
+                  )),
                 ],
               ),
               Row(
                 children: [
                   Expanded(
                       child: TextField(
-                        controller: frequencyController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
-                      )),
+                    controller: frequencyController,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                  )),
                   const Text(" time(s) a "),
                   DropdownMenu<FrequencyMeasure>(
                     width: 100,
@@ -167,11 +183,11 @@ class RoutineWidget extends StatelessWidget {
                     dropdownMenuEntries: FrequencyMeasure.values
                         .map<DropdownMenuEntry<FrequencyMeasure>>(
                             (FrequencyMeasure measure) {
-                          return DropdownMenuEntry<FrequencyMeasure>(
-                            value: measure,
-                            label: measure.label,
-                          );
-                        }).toList(),
+                      return DropdownMenuEntry<FrequencyMeasure>(
+                        value: measure,
+                        label: measure.label,
+                      );
+                    }).toList(),
                   ),
                 ],
               )

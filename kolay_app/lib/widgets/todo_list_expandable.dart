@@ -84,14 +84,13 @@ class TodoListExpandable extends StatelessWidget {
                             padding: const EdgeInsets.all(15.0),
                             child: LinearPercentIndicator(
                               width: 210.0,
-                              lineHeight: 17.0,
+                              lineHeight: 15.0,
                               animation: true,
                               percent: _getTaskProgress(listItems),
                               center: Text(
                                 _getTaskProgressString(listItems),
-                                style: const TextStyle(fontSize: 13.0, fontWeight: FontWeight.w700),
+                                style: const TextStyle(fontSize: 13.0, fontWeight: FontWeight.w900, color: Colors.black45),
                               ),
-                              trailing: const Icon(Icons.mood),
                               barRadius: const Radius.circular(10),
                               backgroundColor: Colors.grey,
                               progressColor: themeBody[themeProvider
@@ -137,7 +136,7 @@ class TodoListExpandable extends StatelessWidget {
         ticked++;
       }
     }
-    return ticked / len;
+    return len == 0 ? 0 : ticked / len;
   }
 
   List<Widget> _buildExpandableContent(
