@@ -73,12 +73,10 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-    - lib/assets/background.png
     - lib/assets/log_in_background.jpg
-    - lib/assets/light-1.png
-    - lib/assets/light-2.png
-    - lib/assets/clock.png
     - lib/assets/default_profile_picture.jpg
+    - lib/assets/kolay-dark@3x.png
+    - lib/assets/kolay-light@3x.png
   fonts:
     - family: Comfortaa
       fonts:

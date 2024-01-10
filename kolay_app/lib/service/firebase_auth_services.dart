@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:kolay_app/service/encryption_service.dart';
 
 class FirebaseAuthService {
-  FirebaseAuth _auth = FirebaseAuth.instance;
-  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final EncryptionService _encryptionService = EncryptionService();
 
   late UserCredential _credential;
 
@@ -17,10 +18,10 @@ class FirebaseAuthService {
       await _credential.user!.updatePhotoURL(photoURL);
 
       _firestore.collection('USERS').doc(_credential.user!.uid).set({
-        'name': name,
-        'email': email,
-        'phoneNumber': phoneNumber,
-        'photoURL': photoURL,
+        'name': _encryptionService.encryptText(name),
+        'email': _encryptionService.encryptText(email),
+        'phoneNumber': _encryptionService.encryptText(phoneNumber),
+        'photoURL': _encryptionService.encryptText(photoURL),
       });
 
       return _credential.user;

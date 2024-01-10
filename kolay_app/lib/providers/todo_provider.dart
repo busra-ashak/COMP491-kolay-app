@@ -89,7 +89,7 @@ class TodoList with ChangeNotifier {
 
   void editTodoList(String listName, String oldListName) async {
     await _firestoreService.editTodoList(listName, oldListName);
-    Map<String, dynamic> items = todoLists[oldListName]['listItems'];
+    Map<dynamic, dynamic> items = todoLists[oldListName]['listItems'];
     Map<String, dynamic> doc = {
       listName: {
         "listName": listName,

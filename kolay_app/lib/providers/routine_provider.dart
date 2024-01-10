@@ -59,7 +59,7 @@ class Routine with ChangeNotifier {
     routines.clear();
     for (DocumentSnapshot d in querySnapshot.docs) {
       Map<String, dynamic> doc = {
-         _encryptionService.decryptText(d.get('listName')): {
+         _encryptionService.decryptText(d.get('routineName')): {
           'routineName': _encryptionService.decryptText(d.get('routineName') as String),
           'frequencyMeasure': d.get('frequencyMeasure') as String,
           'frequency': d.get('frequency') as int,
@@ -86,7 +86,7 @@ class Routine with ChangeNotifier {
       int frequency = d.get('frequency');
       if(frequency!=currentProgress){
         String frequencyMeasure = d.get('frequencyMeasure');
-        String routineName = d.get('routineName');
+        String routineName =  _encryptionService.decryptText(d.get('routineName'));
         Map<String, dynamic> doc = {
         routineName: {
           'routineName': routineName,
