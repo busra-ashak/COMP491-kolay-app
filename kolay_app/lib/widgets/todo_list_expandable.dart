@@ -84,11 +84,12 @@ class TodoListExpandable extends StatelessWidget {
                             padding: const EdgeInsets.all(15.0),
                             child: LinearPercentIndicator(
                               width: 210.0,
-                              lineHeight: 14.0,
+                              lineHeight: 17.0,
+                              animation: true,
                               percent: _getTaskProgress(listItems),
                               center: Text(
-                                _getTaskProgress(listItems).toStringAsFixed(2),
-                                style: const TextStyle(fontSize: 12.0),
+                                _getTaskProgressString(listItems),
+                                style: const TextStyle(fontSize: 13.0, fontWeight: FontWeight.w700),
                               ),
                               trailing: const Icon(Icons.mood),
                               barRadius: const Radius.circular(10),
@@ -113,6 +114,18 @@ class TodoListExpandable extends StatelessWidget {
                 }),
               ));
         }));
+  }
+
+  String _getTaskProgressString(Map listItems) {
+    if (listItems.isEmpty) return '';
+    int len = listItems.values.length;
+    int ticked = 0;
+    for (Map item in listItems.values) {
+      if (item['itemTicked']) {
+        ticked++;
+      }
+    }
+    return '$ticked / $len';
   }
 
   double _getTaskProgress(Map listItems) {
