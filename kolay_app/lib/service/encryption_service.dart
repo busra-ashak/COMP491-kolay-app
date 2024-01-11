@@ -18,6 +18,7 @@ class EncryptionService {
   // Encrypts the text
   String encryptText(String text) {
     final encrypter = encrypt.Encrypter(encrypt.AES(key));
+    print(text);
     final encrypted = encrypter.encrypt(text, iv: iv);
     
     // Base64 encode and then URL encode

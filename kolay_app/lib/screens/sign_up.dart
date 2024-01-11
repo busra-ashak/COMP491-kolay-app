@@ -48,7 +48,7 @@ class _SignUpPageState extends State<SignUpPage> {
               children: [
                 GestureDetector(
                   onTap: _pickProfilePicture,
-                  child: Padding(padding: EdgeInsets.only(bottom: 20), child: CircleAvatar(
+                  child: Padding(padding: const EdgeInsets.only(bottom: 0), child: CircleAvatar(
                     radius: 50,
                     backgroundColor:
                         themeBody[themeProvider.themeDataName]!['homeTitles']

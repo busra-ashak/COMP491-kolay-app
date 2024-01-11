@@ -509,43 +509,52 @@ class TodoListExpandable extends StatelessWidget {
             ),
           ),
           content: StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) {
-              return Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextField(
-                controller: controller,
-                style: TextStyle(
-                  color: themeBody[themeProvider.themeDataName]![
-                      'dialogOnSurface']!,
-                ),
-                decoration: InputDecoration(
-                  labelText: 'The name of your to-do list',
-                  labelStyle: TextStyle(
+              builder: (BuildContext context, StateSetter setState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextField(
+                  controller: controller,
+                  style: TextStyle(
                     color: themeBody[themeProvider.themeDataName]![
-                        'dialogPrimary']!,
+                        'dialogOnSurface']!,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: 'The name of your to-do list',
+                    labelStyle: TextStyle(
+                      color: themeBody[themeProvider.themeDataName]![
+                          'dialogPrimary']!,
+                    ),
                   ),
                 ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Checkbox(
-                    value: showProgressBar,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        showProgressBar = !showProgressBar;
-                        context.read<TodoList>().toggleProgressionBar(
-                            oldTodoListName, showProgressBar);
-                      });
-                    },
-                  ),
-                  const Text('Show Progress Bar')
-                ],
-              )
-            ],
-          );}),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Checkbox(
+                      activeColor: themeBody[themeProvider.themeDataName]![
+                      'tick']!,
+                      value: showProgressBar,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          showProgressBar = !showProgressBar;
+                          context.read<TodoList>().toggleProgressionBar(
+                              oldTodoListName, showProgressBar);
+                        });
+                      },
+                    ),
+                    Text(
+                      'Show progress bar',
+                      style: TextStyle(
+                        color: themeBody[themeProvider.themeDataName]![
+                            'routineSubtitle']!, // Change this color to your desired color
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            );
+          }),
           actions: [
             TextButton(
               onPressed: () {
@@ -562,11 +571,8 @@ class TodoListExpandable extends StatelessWidget {
             TextButton(
               onPressed: () {
                 String newListName = controller.text;
-                if (newListName.isNotEmpty) {
-                  context
-                      .read<TodoList>()
-                      .editTodoList(newListName, oldTodoListName, showProgressBar);
-                  Navigator.of(context).pop();
+                if (newListName.isEmpty) {
+                  newListName = oldTodoListName;
                 }
                 context.read<TodoList>().editTodoList(
                     newListName, oldTodoListName, showProgressBar);
