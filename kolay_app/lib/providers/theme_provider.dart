@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 const themeBody = {
   'light': {
     'expandable': Color(0xFF8B85C1),
+    'expandablePale': Color.fromARGB(114, 139, 133, 193),
     'expandableButton': Color(0xFF6C64B3),
     'tick': Color(0xFF77BBB4),
     'screenBackground': Color(0xFFFAF5E6),
@@ -12,13 +13,20 @@ const themeBody = {
     'floatingButton': Color(0xDDB2F7EF),
     'floatingButtonOutline': Color(0xFF77BBB4),
     'routineSubtitle': Color(0xFFF8C5D4),
+    'routineSubtitlePale': Color.fromARGB(187, 248, 197, 212),
     'todoPercentage': Color(0xFF77BBB4),
+    'todoPercentageDone': Color.fromARGB(104, 119, 187, 180),
     'homeTitles': Color(0xff8b85c1),
     'homeEmptyCard': Color(0xFFF7B9CB),
     'homeNonEmptyCard': Color(0xFF77BBB4),
+    'dialogSurface': Color.fromARGB(255, 255, 232, 239),
+    'dialogPrimary': Color(0xFFD1738F),
+    'dialogOnSurface': Color(0xFF4C4385),
+    'dialogOnWhiteSurface': Color(0xFF4C4385),
   },
   'dark': {
     'expandable': Color(0xFF944D3B),
+    'expandablePale': Color.fromARGB(128, 148, 77, 59),
     'expandableButton': Color(0xFF743D2F),
     'tick': Color(0xFF2a9d8f),
     'screenBackground': Color(0xFF264653),
@@ -27,10 +35,16 @@ const themeBody = {
     'floatingButton': Color.fromARGB(255, 24, 85, 78),
     'floatingButtonOutline': Color(0xFF14242B),
     'routineSubtitle': Color.fromARGB(255, 245, 216, 141),
+    'routineSubtitlePale': Color.fromARGB(135, 245, 216, 141),
     'todoPercentage': Color(0xFF2a9d8f),
+    'todoPercentageDone': Color.fromARGB(104, 119, 187, 180),
     'homeTitles': Color(0xFFE9C46A),
     'homeEmptyCard': Color(0xFFF4A261),
     'homeNonEmptyCard': Color(0xFF2A9D8F),
+    'dialogSurface': Color(0xFF14242B),
+    'dialogPrimary': Color(0xFFA06A3D),
+    'dialogOnSurface': Color(0xFFECC35C),
+    'dialogOnWhiteSurface': Color(0xFF14242B),
   }
 };
 

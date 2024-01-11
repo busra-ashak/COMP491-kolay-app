@@ -98,36 +98,76 @@ class MealPlansPageState extends State<MealPlansPage> {
   void showCreateMealPlanDialog(BuildContext context) {
     TextEditingController nameController = TextEditingController();
     DateTime selectedDate = DateTime.now();
+    final ThemeProvider themeProvider = ThemeProvider();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Create a new Meal Plan'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Create a new Meal Plan',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(
-                    labelText: 'The name of your Meal Plan'),
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!,
+                ),
+                decoration: InputDecoration(
+                  labelText: 'The name of your Meal Plan',
+                  labelStyle: TextStyle(
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogPrimary']!,
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () async {
+                  final ThemeProvider themeProvider = ThemeProvider();
                   DateTime? pickedDate = await showDatePicker(
                     context: context,
                     initialDate: selectedDate,
                     firstDate: DateTime(2000),
                     lastDate: DateTime(2101),
+                    builder: (BuildContext context, Widget? child) {
+                      return Theme(
+                          data: Theme.of(context).copyWith(
+                            colorScheme: ColorScheme.light(
+                                surface: themeBody[themeProvider
+                                    .themeDataName]!['dialogSurface']!,
+                                primary: themeBody[themeProvider
+                                    .themeDataName]!['dialogPrimary']!,
+                                onPrimary: themeBody[themeProvider
+                                    .themeDataName]!['dialogOnSurface']!,
+                                onSurface: themeBody[themeProvider
+                                    .themeDataName]!['dialogOnSurface']!),
+                          ),
+                          child: child!);
+                    },
                   );
 
                   if (pickedDate != null && pickedDate != selectedDate) {
                     selectedDate = pickedDate;
                   }
                 },
-                child: const Text('Pick Date'),
+                child: Text(
+                  'Pick Date',
+                  style: TextStyle(
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogOnWhiteSurface']!, // Change this color to your desired color
+                  ),
+                ),
               ),
             ],
           ),
@@ -136,7 +176,13 @@ class MealPlansPageState extends State<MealPlansPage> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -148,7 +194,13 @@ class MealPlansPageState extends State<MealPlansPage> {
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Create'),
+              child: Text(
+                'Create',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );

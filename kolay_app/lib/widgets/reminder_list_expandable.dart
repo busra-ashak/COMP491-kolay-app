@@ -26,7 +26,9 @@ class ReminderListExpandable extends StatelessWidget {
         child:
             Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
           return Card(
-              color: themeBody[themeProvider.themeDataName]!['expandable'],
+              color: _areAllItemsChecked(listItems)
+                  ? themeBody[themeProvider.themeDataName]!['expandablePale']
+                  : themeBody[themeProvider.themeDataName]!['expandable'],
               margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
               child: ClipRect(
                 child: Consumer<SlidableState>(
@@ -83,11 +85,10 @@ class ReminderListExpandable extends StatelessWidget {
                       children: <Widget>[
                         Column(
                           children: _buildExpandableContent(
-                            context,
-                            listName,
-                            listItems,
-                            themeBody[themeProvider.themeDataName]
-                          ),
+                              context,
+                              listName,
+                              listItems,
+                              themeBody[themeProvider.themeDataName]),
                         ),
                       ],
                     ),
@@ -113,7 +114,8 @@ class ReminderListExpandable extends StatelessWidget {
               SlidableAction(
                 onPressed: (context) {
                   _showEditReminderFromListDialog(
-                      context, listName, content['itemName']);},
+                      context, listName, content['itemName']);
+                },
                 backgroundColor: Colors.green,
                 icon: Icons.edit,
                 label: 'Edit',
@@ -172,19 +174,38 @@ class ReminderListExpandable extends StatelessWidget {
   void _showAddReminderToListDialog(BuildContext context, String listName) {
     TextEditingController itemNameController = TextEditingController();
     DateTime selectedDate = DateTime.now();
+    final ThemeProvider themeProvider = ThemeProvider();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Add a new reminder to the reminder group'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Add a new reminder to the reminder group',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           content: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: itemNameController,
-                  decoration: const InputDecoration(labelText: 'New reminder'),
+                  style: TextStyle(
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogOnSurface']!,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: 'New reminder',
+                    labelStyle: TextStyle(
+                      color: themeBody[themeProvider.themeDataName]![
+                          'dialogPrimary']!,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
@@ -200,7 +221,13 @@ class ReminderListExpandable extends StatelessWidget {
                       selectedDate = pickedDate;
                     }
                   },
-                  child: const Text('Add Deadline'),
+                  child: Text(
+                    'Add Deadline',
+                    style: TextStyle(
+                      color: themeBody[themeProvider.themeDataName]![
+                          'dialogOnWhiteSurface']!, // Change this color to your desired color
+                    ),
+                  ),
                 ),
               ]),
           actions: [
@@ -208,7 +235,13 @@ class ReminderListExpandable extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -219,12 +252,28 @@ class ReminderListExpandable extends StatelessWidget {
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Add'),
+              child: Text(
+                'Add',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
       },
     );
+  }
+
+  bool _areAllItemsChecked(Map listItems) {
+    if (listItems.isEmpty) return false;
+    for (Map item in listItems.values) {
+      if (!item['itemTicked']) {
+        return false; // At least one item is not checked
+      }
+    }
+    return true; // All items are checked
   }
 
   Future<DateTime?> showDateTimePicker({
@@ -233,6 +282,7 @@ class ReminderListExpandable extends StatelessWidget {
     DateTime? firstDate,
     DateTime? lastDate,
   }) async {
+    final ThemeProvider themeProvider = ThemeProvider();
     initialDate ??= DateTime.now();
     firstDate ??= initialDate.subtract(const Duration(days: 365 * 100));
     lastDate ??= firstDate.add(const Duration(days: 365 * 200));
@@ -242,6 +292,21 @@ class ReminderListExpandable extends StatelessWidget {
       initialDate: initialDate,
       firstDate: firstDate,
       lastDate: lastDate,
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: ColorScheme.light(
+                  surface:
+                      themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+                  primary:
+                      themeBody[themeProvider.themeDataName]!['dialogPrimary']!,
+                  onPrimary: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!,
+                  onSurface: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!),
+            ),
+            child: child!);
+      },
     );
 
     if (selectedDate == null) return null;
@@ -251,6 +316,24 @@ class ReminderListExpandable extends StatelessWidget {
     final TimeOfDay? selectedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.fromDateTime(selectedDate),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: ColorScheme.light(
+                surface:
+                    themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+                primary:
+                    themeBody[themeProvider.themeDataName]!['dialogPrimary']!,
+                onPrimary:
+                    themeBody[themeProvider.themeDataName]!['dialogOnSurface']!,
+                onSurface:
+                    themeBody[themeProvider.themeDataName]!['dialogOnSurface']!,
+                tertiaryContainer:
+                    themeBody[themeProvider.themeDataName]!['dialogPrimary']!,
+              ),
+            ),
+            child: child!);
+      },
     );
 
     return selectedTime == null
@@ -265,24 +348,46 @@ class ReminderListExpandable extends StatelessWidget {
   }
 
   void _showDeleteReminderListDialog(BuildContext context, String listName) {
+    final ThemeProvider themeProvider = ThemeProvider();
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Are you sure you want to delete $listName?'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Are you sure you want to delete $listName?',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('No'),
+              child: Text(
+                'No',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
                 context.read<ReminderList>().deleteReminderList(listName);
                 Navigator.of(context).pop();
               },
-              child: const Text('Yes'),
+              child: Text(
+                'Yes',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
@@ -292,17 +397,32 @@ class ReminderListExpandable extends StatelessWidget {
 
   void _showDeleteReminderFromListDialog(
       BuildContext context, String listName, String oldItem) {
+    final ThemeProvider themeProvider = ThemeProvider();
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Are you sure you want to delete $oldItem?'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Are you sure you want to delete $oldItem?',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('No'),
+              child: Text(
+                'No',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -311,7 +431,13 @@ class ReminderListExpandable extends StatelessWidget {
                     .deleteReminderItemFromList(listName, oldItem);
                 Navigator.of(context).pop();
               },
-              child: const Text('Yes'),
+              child: Text(
+                'Yes',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
@@ -321,21 +447,39 @@ class ReminderListExpandable extends StatelessWidget {
 
   void _showEditReminderFromListDialog(
       BuildContext context, String listName, String oldItem) {
-
     DateTime selectedDate = DateTime.now();
     TextEditingController itemNameController = TextEditingController();
+    final ThemeProvider themeProvider = ThemeProvider();
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Edit your reminder'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Edit your reminder',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           content: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: itemNameController,
-                  decoration: const InputDecoration(labelText: 'Edit reminder'),
+                  style: TextStyle(
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogOnSurface']!,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: 'Edit reminder',
+                    labelStyle: TextStyle(
+                      color: themeBody[themeProvider.themeDataName]![
+                          'dialogPrimary']!,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
@@ -351,7 +495,13 @@ class ReminderListExpandable extends StatelessWidget {
                       selectedDate = pickedDate;
                     }
                   },
-                  child: const Text('Edit Deadline'),
+                  child: Text(
+                    'Edit Deadline',
+                    style: TextStyle(
+                      color: themeBody[themeProvider.themeDataName]![
+                          'dialogOnWhiteSurface']!, // Change this color to your desired color
+                    ),
+                  ),
                 ),
               ]),
           actions: [
@@ -359,7 +509,13 @@ class ReminderListExpandable extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -370,7 +526,13 @@ class ReminderListExpandable extends StatelessWidget {
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Add'),
+              child: Text(
+                'Add',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
@@ -378,23 +540,42 @@ class ReminderListExpandable extends StatelessWidget {
     );
   }
 
-  void _showEditReminderListDialog(BuildContext context, String oldReminderListName) {
+  void _showEditReminderListDialog(
+      BuildContext context, String oldReminderListName) {
     TextEditingController controller = TextEditingController();
     DateTime selectedDate = DateTime.now();
+    final ThemeProvider themeProvider = ThemeProvider();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Edit your reminder list'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Edit your reminder list',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextField(
                 controller: controller,
-                decoration: const InputDecoration(
-                    labelText: 'The name of your reminder list'),
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!,
+                ),
+                decoration: InputDecoration(
+                  labelText: 'The name of your reminder list',
+                  labelStyle: TextStyle(
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogPrimary']!,
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
@@ -410,7 +591,13 @@ class ReminderListExpandable extends StatelessWidget {
                     selectedDate = pickedDate;
                   }
                 },
-                child: const Text('Pick Date'),
+                child: Text(
+                  'Pick Date',
+                  style: TextStyle(
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogOnWhiteSurface']!, // Change this color to your desired color
+                  ),
+                ),
               ),
             ],
           ),
@@ -419,19 +606,30 @@ class ReminderListExpandable extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
                 String newListName = controller.text;
                 if (newListName.isNotEmpty) {
-                  context
-                      .read<ReminderList>()
-                      .editReminder(newListName, selectedDate, oldReminderListName);
+                  context.read<ReminderList>().editReminder(
+                      newListName, selectedDate, oldReminderListName);
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Edit'),
+              child: Text(
+                'Edit',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );

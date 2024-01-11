@@ -220,10 +220,11 @@ class _SignUpPageState extends State<SignUpPage> {
 
         if (user != null) {
           print("User is successfully created");
-          Navigator.push(
+          Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
-                  builder: (context) => BottomNavigationBarController()));
+                  builder: (context) => BottomNavigationBarController()),
+              (route) => false);
         } else {
           print("Some error happened");
         }
@@ -265,7 +266,7 @@ class _SignUpPageState extends State<SignUpPage> {
               children: [
                 Container(
                   padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Color.fromRGBO(143, 148, 251, 1),
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(20),
@@ -275,7 +276,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      const Text(
                         'Password Requirements',
                         style: TextStyle(color: Colors.white, fontSize: 19),
                       ),
@@ -291,7 +292,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 Container(
                   padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
                       bottomLeft: Radius.circular(20),
@@ -323,9 +324,9 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget requirementRow(Color textColor, IconData icon, String text) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 8),
-      decoration: BoxDecoration(
-        border: Border(
-            bottom: BorderSide(color: const Color.fromRGBO(143, 148, 251, 1))),
+      decoration: const BoxDecoration(
+        border:
+            Border(bottom: BorderSide(color: Color.fromRGBO(143, 148, 251, 1))),
       ),
       child: Row(
         children: [
@@ -370,14 +371,14 @@ class _SignUpPageState extends State<SignUpPage> {
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
-                      gradient: LinearGradient(colors: [
+                      gradient: const LinearGradient(colors: [
                         Color.fromRGBO(143, 148, 251, 1),
                         Color.fromRGBO(143, 148, 251, .6),
                       ])),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      const Text(
                         'Invalid email format.',
                         style: TextStyle(
                             color: Colors.white,
@@ -385,7 +386,7 @@ class _SignUpPageState extends State<SignUpPage> {
                             fontWeight: FontWeight.bold),
                       ),
                       IconButton(
-                        icon: Icon(Icons.close),
+                        icon: const Icon(Icons.close),
                         color: Colors.white,
                         onPressed: () {
                           Navigator.of(context).pop();

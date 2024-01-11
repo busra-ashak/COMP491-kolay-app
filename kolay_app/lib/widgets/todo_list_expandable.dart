@@ -21,7 +21,9 @@ class TodoListExpandable extends StatelessWidget {
         child:
             Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
           return Card(
-              color: themeBody[themeProvider.themeDataName]!['expandable'],
+              color: _areAllItemsChecked(listItems)
+                  ? themeBody[themeProvider.themeDataName]!['expandablePale']
+                  : themeBody[themeProvider.themeDataName]!['expandable'],
               margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
               child: ClipRect(
                 child: Consumer<SlidableState>(
@@ -86,18 +88,21 @@ class TodoListExpandable extends StatelessWidget {
                             trailing: const Icon(Icons.mood),
                             barRadius: const Radius.circular(10),
                             backgroundColor: Colors.grey,
-                            progressColor: themeBody[themeProvider.themeDataName]!['todoPercentage'],
+                            progressColor: _areAllItemsChecked(listItems)
+                                ? themeBody[themeProvider.themeDataName]![
+                                    'todoPercentageDone']
+                                : themeBody[themeProvider.themeDataName]![
+                                    'todoPercentage'],
                           ),
                         ),
                       ),
                       children: <Widget>[
                         Column(
                           children: _buildExpandableContent(
-                            context,
-                            listName,
-                            listItems,
-                            themeBody[themeProvider.themeDataName]
-                          ),
+                              context,
+                              listName,
+                              listItems,
+                              themeBody[themeProvider.themeDataName]),
                         ),
                       ],
                     ),
@@ -117,6 +122,16 @@ class TodoListExpandable extends StatelessWidget {
       }
     }
     return ticked / len;
+  }
+
+  bool _areAllItemsChecked(Map listItems) {
+    if (listItems.isEmpty) return false;
+    for (Map item in listItems.values) {
+      if (!item['itemTicked']) {
+        return false; // At least one item is not checked
+      }
+    }
+    return true; // All items are checked
   }
 
   List<Widget> _buildExpandableContent(
@@ -181,27 +196,63 @@ class TodoListExpandable extends StatelessWidget {
             style: TextStyle(color: themeObject['expandableButton']),
           ),
         ),
+        ElevatedButton(
+          onPressed: () => _completeAllItems(context, listName, listItems),
+          child: Text(
+            "Complete",
+            style: TextStyle(color: themeObject['expandableButton']),
+          ),
+        ),
       ]),
     ));
 
     return columnContent;
   }
 
+  void _completeAllItems(BuildContext context, String listName, Map listItems) {
+    for (Map item in listItems.values) {
+      if (!item['itemTicked']) {
+        context
+            .read<TodoList>()
+            .toggleItemCheckbox(listName, item['itemName'], false);
+      }
+    }
+  }
+
   void _showAddTodoToListDialog(BuildContext context, String listName) {
     TextEditingController itemNameController = TextEditingController();
+    final ThemeProvider themeProvider = ThemeProvider();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Add a new item to the to-do list'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Add a new item to the to-do list',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           content: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: itemNameController,
-                  decoration: const InputDecoration(labelText: 'New Item'),
+                  style: TextStyle(
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogOnSurface']!,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: 'New Item',
+                    labelStyle: TextStyle(
+                      color: themeBody[themeProvider.themeDataName]![
+                          'dialogPrimary']!,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 16),
               ]),
@@ -210,7 +261,13 @@ class TodoListExpandable extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -222,7 +279,13 @@ class TodoListExpandable extends StatelessWidget {
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Add'),
+              child: Text(
+                'Add',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
@@ -231,24 +294,46 @@ class TodoListExpandable extends StatelessWidget {
   }
 
   void _showDeleteTodoListDialog(BuildContext context, String listName) {
+    final ThemeProvider themeProvider = ThemeProvider();
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Are you sure you want to delete $listName?'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Are you sure you want to delete $listName?',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('No'),
+              child: Text(
+                'No',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
                 context.read<TodoList>().deleteTodoList(listName);
                 Navigator.of(context).pop();
               },
-              child: const Text('Yes'),
+              child: Text(
+                'Yes',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
@@ -258,17 +343,33 @@ class TodoListExpandable extends StatelessWidget {
 
   void _showDeleteTodoFromListDialog(
       BuildContext context, String listName, String oldItem) {
+    final ThemeProvider themeProvider = ThemeProvider();
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Are you sure you want to delete $oldItem?'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Are you sure you want to delete $oldItem?',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('No'),
+              child: Text(
+                'No',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -277,7 +378,13 @@ class TodoListExpandable extends StatelessWidget {
                     .deleteTodoItemFromList(listName, oldItem);
                 Navigator.of(context).pop();
               },
-              child: const Text('Yes'),
+              child: Text(
+                'Yes',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
@@ -287,20 +394,39 @@ class TodoListExpandable extends StatelessWidget {
 
   void _showEditTodoFromListDialog(
       BuildContext context, String listName, String oldItem) {
+    final ThemeProvider themeProvider = ThemeProvider();
 
     TextEditingController itemNameController = TextEditingController();
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Edit your to-do item'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Edit your to-do item',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           content: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: itemNameController,
-                  decoration: InputDecoration(labelText: 'Edit Item', hintText: oldItem),
+                  style: TextStyle(
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogOnSurface']!,
+                  ),
+                  decoration: InputDecoration(
+                      labelText: 'Edit Item',
+                      labelStyle: TextStyle(
+                        color: themeBody[themeProvider.themeDataName]![
+                            'dialogPrimary']!,
+                      ),
+                      hintText: oldItem),
                 ),
                 const SizedBox(height: 16),
               ]),
@@ -309,7 +435,13 @@ class TodoListExpandable extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -321,7 +453,13 @@ class TodoListExpandable extends StatelessWidget {
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Edit'),
+              child: Text(
+                'Edit',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
@@ -331,20 +469,38 @@ class TodoListExpandable extends StatelessWidget {
 
   void _showEditTodoListDialog(BuildContext context, String oldTodoListName) {
     TextEditingController controller = TextEditingController();
+    final ThemeProvider themeProvider = ThemeProvider();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Edit your to-do list'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Edit your to-do list',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextField(
                 controller: controller,
-                decoration: const InputDecoration(
-                    labelText: 'The name of your to-do list'),
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!,
+                ),
+                decoration: InputDecoration(
+                  labelText: 'The name of your to-do list',
+                  labelStyle: TextStyle(
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogPrimary']!,
+                  ),
+                ),
               ),
             ],
           ),
@@ -353,17 +509,31 @@ class TodoListExpandable extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
                 String newListName = controller.text;
                 if (newListName.isNotEmpty) {
-                  context.read<TodoList>().editTodoList(newListName, oldTodoListName);
+                  context
+                      .read<TodoList>()
+                      .editTodoList(newListName, oldTodoListName);
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Edit'),
+              child: Text(
+                'Edit',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );

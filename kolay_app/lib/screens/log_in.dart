@@ -35,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: Colors.white,
       body: Center(
         child: Padding(
-          padding: EdgeInsets.all(30.0),
+          padding: const EdgeInsets.all(30.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -88,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 5,
               ),
               GestureDetector(
@@ -97,11 +97,11 @@ class _LoginPageState extends State<LoginPage> {
                     height: 50,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        gradient: LinearGradient(colors: [
+                        gradient: const LinearGradient(colors: [
                           Color.fromRGBO(143, 148, 251, 1),
                           Color.fromRGBO(143, 148, 251, .6),
                         ])),
-                    child: Center(
+                    child: const Center(
                       child: Text(
                         "Log in",
                         style: TextStyle(
@@ -109,17 +109,17 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   )),
-              SizedBox(
+              const SizedBox(
                 height: 30,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text("Don't have an account?"),
-                  SizedBox(
+                  const SizedBox(
                     width: 5,
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 5,
                   ),
                   GestureDetector(
@@ -130,7 +130,7 @@ class _LoginPageState extends State<LoginPage> {
                                 builder: (context) => SignUpPage()),
                             (route) => false);
                       },
-                      child: Text(
+                      child: const Text(
                         "Sign up",
                         style: TextStyle(
                             color: Color.fromRGBO(143, 148, 251, 1),

@@ -22,73 +22,76 @@ class ShoppingListExpandable extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
         create: (context) => SlidableState(),
-        child:  Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
+        child:
+            Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
           return Card(
-              color: themeBody[themeProvider.themeDataName]!['expandable'],
-            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-            child: ClipRect(child: Consumer<SlidableState>(
-                builder: (context, slidableState, child) {
-              return Slidable(
-                closeOnScroll: false,
-                enabled: slidableState.isSlidableEnabled,
-                startActionPane: ActionPane(
-                  motion: const BehindMotion(),
-                  children: [
-                    SlidableAction(
-                      onPressed: (context) {
-                        _showEditShoppingListDialog(context, listName);
-                      },
-                      backgroundColor: Colors.green,
-                      borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          bottomLeft: Radius.circular(10)),
-                      icon: Icons.edit,
-                      label: 'Edit',
-                    ),
-                  ],
-                ),
-                endActionPane: ActionPane(
-                  motion: const BehindMotion(),
-                  children: [
-                    SlidableAction(
-                      onPressed: (context) {
-                        _showDeleteListDialog(context, listName);
-                      },
-                      backgroundColor: Colors.red,
-                      borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(10),
-                          bottomRight: Radius.circular(10)),
-                      icon: Icons.delete,
-                      label: 'Delete',
-                    ),
-                  ],
-                ),
-                child: ExpansionTile(
-                  textColor: Colors.white,
-                  onExpansionChanged: (isExpanded) {
-                    slidableState.isSlidableEnabled = !isExpanded;
-                  },
-                  collapsedTextColor: Colors.white,
-                  iconColor: Colors.white,
-                  collapsedIconColor: Colors.white,
-                  shape: const Border(),
-                  title: Text(listName, style: const TextStyle(fontSize: 20)),
-                  subtitle: Text(DateFormat('dd/MM/yyyy').format(datetime),
-                      style: const TextStyle(fontSize: 12)),
-                  children: <Widget>[
-                    Column(
-                      children: _buildExpandableContent(
-                        context,
-                        listName,
-                        listItems,
-                        themeBody[themeProvider.themeDataName],
+              color: _areAllItemsChecked(listItems)
+                  ? themeBody[themeProvider.themeDataName]!['expandablePale']
+                  : themeBody[themeProvider.themeDataName]!['expandable'],
+              margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+              child: ClipRect(child: Consumer<SlidableState>(
+                  builder: (context, slidableState, child) {
+                return Slidable(
+                  closeOnScroll: false,
+                  enabled: slidableState.isSlidableEnabled,
+                  startActionPane: ActionPane(
+                    motion: const BehindMotion(),
+                    children: [
+                      SlidableAction(
+                        onPressed: (context) {
+                          _showEditShoppingListDialog(context, listName);
+                        },
+                        backgroundColor: Colors.green,
+                        borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            bottomLeft: Radius.circular(10)),
+                        icon: Icons.edit,
+                        label: 'Edit',
                       ),
-                    ),
-                  ],
-                ),
-              );
-            })));}) 
-            );
+                    ],
+                  ),
+                  endActionPane: ActionPane(
+                    motion: const BehindMotion(),
+                    children: [
+                      SlidableAction(
+                        onPressed: (context) {
+                          _showDeleteListDialog(context, listName);
+                        },
+                        backgroundColor: Colors.red,
+                        borderRadius: const BorderRadius.only(
+                            topRight: Radius.circular(10),
+                            bottomRight: Radius.circular(10)),
+                        icon: Icons.delete,
+                        label: 'Delete',
+                      ),
+                    ],
+                  ),
+                  child: ExpansionTile(
+                    textColor: Colors.white,
+                    onExpansionChanged: (isExpanded) {
+                      slidableState.isSlidableEnabled = !isExpanded;
+                    },
+                    collapsedTextColor: Colors.white,
+                    iconColor: Colors.white,
+                    collapsedIconColor: Colors.white,
+                    shape: const Border(),
+                    title: Text(listName, style: const TextStyle(fontSize: 20)),
+                    subtitle: Text(DateFormat('dd/MM/yyyy').format(datetime),
+                        style: const TextStyle(fontSize: 12)),
+                    children: <Widget>[
+                      Column(
+                        children: _buildExpandableContent(
+                          context,
+                          listName,
+                          listItems,
+                          themeBody[themeProvider.themeDataName],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              })));
+        }));
   }
 
   List<Widget> _buildExpandableContent(
@@ -104,7 +107,8 @@ class ShoppingListExpandable extends StatelessWidget {
               SlidableAction(
                 onPressed: (context) {
                   _showEditItemFromListDialog(
-                      context, listName, content['itemName']);},
+                      context, listName, content['itemName']);
+                },
                 backgroundColor: Colors.green,
                 icon: Icons.edit,
                 label: 'Edit',
@@ -131,7 +135,7 @@ class ShoppingListExpandable extends StatelessWidget {
                 side: const BorderSide(color: Colors.white, width: 1.5),
                 shape: const CircleBorder(),
                 value: content['itemTicked'],
-                  activeColor: themeObject['tick'],
+                activeColor: themeObject['tick'],
                 onChanged: (bool? val) {
                   context.read<ShoppingList>().updateToggle(
                       listName, content['itemName'], content['itemTicked']);
@@ -147,7 +151,7 @@ class ShoppingListExpandable extends StatelessWidget {
       title: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
         ElevatedButton(
           onPressed: () => _showAddItemToListDialog(context, listName),
-          child:  Text(
+          child: Text(
             "Add item",
             style: TextStyle(color: themeObject['expandableButton']),
           ),
@@ -160,21 +164,47 @@ class ShoppingListExpandable extends StatelessWidget {
 
   void _showAddItemToListDialog(BuildContext context, String listName) {
     TextEditingController controller = TextEditingController();
+    final ThemeProvider themeProvider = ThemeProvider();
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Add a new item to the shopping list'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Add a new item to the shopping list',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           content: TextField(
             controller: controller,
-            decoration: const InputDecoration(labelText: 'New Item'),
+            style: TextStyle(
+              color:
+                  themeBody[themeProvider.themeDataName]!['dialogOnSurface']!,
+            ),
+            decoration: InputDecoration(
+              labelText: 'New Item',
+              labelStyle: TextStyle(
+                color:
+                    themeBody[themeProvider.themeDataName]!['dialogPrimary']!,
+              ),
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -186,7 +216,13 @@ class ShoppingListExpandable extends StatelessWidget {
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Add'),
+              child: Text(
+                'Add',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
@@ -195,24 +231,45 @@ class ShoppingListExpandable extends StatelessWidget {
   }
 
   void _showDeleteListDialog(BuildContext context, String listName) {
+    final ThemeProvider themeProvider = ThemeProvider();
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Are you sure you want to delete $listName?'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Are you sure you want to delete $listName?',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('No'),
+              child: Text(
+                'No',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
                 context.read<ShoppingList>().removeShoppingList(listName);
                 Navigator.of(context).pop();
               },
-              child: const Text('Yes'),
+              child: Text(
+                'Yes',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
@@ -222,17 +279,32 @@ class ShoppingListExpandable extends StatelessWidget {
 
   void _showDeleteItemFromListDialog(
       BuildContext context, String listName, String oldItem) {
+    final ThemeProvider themeProvider = ThemeProvider();
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Are you sure you want to delete $oldItem?'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Are you sure you want to delete $oldItem?',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('No'),
+              child: Text(
+                'No',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -241,7 +313,13 @@ class ShoppingListExpandable extends StatelessWidget {
                     .removeShoppingListItem(listName, oldItem);
                 Navigator.of(context).pop();
               },
-              child: const Text('Yes'),
+              child: Text(
+                'Yes',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
@@ -251,20 +329,33 @@ class ShoppingListExpandable extends StatelessWidget {
 
   void _showEditItemFromListDialog(
       BuildContext context, String listName, String oldItem) {
-
     TextEditingController itemNameController = TextEditingController();
+    final ThemeProvider themeProvider = ThemeProvider();
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Edit your shopping item'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Edit your shopping item',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           content: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
                   controller: itemNameController,
-                  decoration: InputDecoration(labelText: 'Edit Item', hintText: oldItem),
+                  style: TextStyle(
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogOnSurface']!,
+                  ),
+                  decoration: InputDecoration(
+                      labelText: 'Edit Item', hintText: oldItem),
                 ),
                 const SizedBox(height: 16),
               ]),
@@ -273,7 +364,13 @@ class ShoppingListExpandable extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -285,7 +382,13 @@ class ShoppingListExpandable extends StatelessWidget {
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Edit'),
+              child: Text(
+                'Edit',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
@@ -293,23 +396,42 @@ class ShoppingListExpandable extends StatelessWidget {
     );
   }
 
-  void _showEditShoppingListDialog(BuildContext context, String oldShoppingListName) {
+  void _showEditShoppingListDialog(
+      BuildContext context, String oldShoppingListName) {
     TextEditingController controller = TextEditingController();
     DateTime selectedDate = DateTime.now();
+    final ThemeProvider themeProvider = ThemeProvider();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Edit your shopping list'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Edit your shopping list',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextField(
                 controller: controller,
-                decoration: const InputDecoration(
-                    labelText: 'The name of your Shopping List'),
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!,
+                ),
+                decoration: InputDecoration(
+                  labelText: 'The name of your Shopping List',
+                  labelStyle: TextStyle(
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogPrimary']!,
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
@@ -319,13 +441,34 @@ class ShoppingListExpandable extends StatelessWidget {
                     initialDate: selectedDate,
                     firstDate: DateTime(2000),
                     lastDate: DateTime(2101),
+                    builder: (BuildContext context, Widget? child) {
+                      return Theme(
+                          data: Theme.of(context).copyWith(
+                            colorScheme: ColorScheme.light(
+                                surface: themeBody[themeProvider
+                                    .themeDataName]!['dialogSurface']!,
+                                primary: themeBody[themeProvider
+                                    .themeDataName]!['dialogPrimary']!,
+                                onPrimary: themeBody[themeProvider
+                                    .themeDataName]!['dialogOnSurface']!,
+                                onSurface: themeBody[themeProvider
+                                    .themeDataName]!['dialogOnSurface']!),
+                          ),
+                          child: child!);
+                    },
                   );
 
                   if (pickedDate != null && pickedDate != selectedDate) {
                     selectedDate = pickedDate;
                   }
                 },
-                child: const Text('Pick Date'),
+                child: Text(
+                  'Pick Date',
+                  style: TextStyle(
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogOnWhiteSurface']!, // Change this color to your desired color
+                  ),
+                ),
               ),
             ],
           ),
@@ -334,23 +477,44 @@ class ShoppingListExpandable extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
                 String newListName = controller.text;
                 if (newListName.isNotEmpty) {
-                  context
-                      .read<ShoppingList>()
-                      .editShoppingList(newListName, selectedDate, oldShoppingListName);
+                  context.read<ShoppingList>().editShoppingList(
+                      newListName, selectedDate, oldShoppingListName);
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Edit'),
+              child: Text(
+                'Edit',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
       },
     );
+  }
+
+  bool _areAllItemsChecked(Map listItems) {
+    if (listItems.isEmpty) return false;
+    for (Map item in listItems.values) {
+      if (!item['itemTicked']) {
+        return false; // At least one item is not checked
+      }
+    }
+    return true; // All items are checked
   }
 }
