@@ -9,9 +9,13 @@ import 'package:kolay_app/providers/slide_expandable_provider.dart';
 class TodoListExpandable extends StatelessWidget {
   final String listName;
   final Map listItems;
+  final bool showProgressBar;
 
   const TodoListExpandable(
-      {Key? key, required this.listName, required this.listItems})
+      {Key? key,
+      required this.listName,
+      required this.listItems,
+      required this.showProgressBar})
       : super(key: key);
 
   @override
@@ -36,7 +40,8 @@ class TodoListExpandable extends StatelessWidget {
                       children: [
                         SlidableAction(
                           onPressed: (context) {
-                            _showEditTodoListDialog(context, listName);
+                            _showEditTodoListDialog(
+                                context, listName, showProgressBar);
                           },
                           backgroundColor: Colors.green,
                           borderRadius: const BorderRadius.only(
@@ -75,24 +80,30 @@ class TodoListExpandable extends StatelessWidget {
                       title:
                           Text(listName, style: const TextStyle(fontSize: 20)),
                       subtitle: Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(15.0),
-                          child: LinearPercentIndicator(
-                            width: 210.0,
-                            lineHeight: 14.0,
-                            percent: _getTaskProgress(listItems),
-                            center: Text(
-                              _getTaskProgress(listItems).toStringAsFixed(2),
-                              style: const TextStyle(fontSize: 12.0),
+                        child: Visibility(
+                          visible: showProgressBar,
+                          child: Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: LinearPercentIndicator(
+                              width: 210.0,
+                              lineHeight: 15.0,
+                              animation: true,
+                              percent: _getTaskProgress(listItems),
+                              center: Text(
+                                _getTaskProgressString(listItems),
+                                style: const TextStyle(
+                                    fontSize: 13.0,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.black45),
+                              ),
+                              barRadius: const Radius.circular(10),
+                              backgroundColor: Colors.grey,
+                              progressColor: _areAllItemsChecked(listItems)
+                                  ? themeBody[themeProvider.themeDataName]![
+                                      'todoPercentageDone']
+                                  : themeBody[themeProvider.themeDataName]![
+                                      'todoPercentage'],
                             ),
-                            trailing: const Icon(Icons.mood),
-                            barRadius: const Radius.circular(10),
-                            backgroundColor: Colors.grey,
-                            progressColor: _areAllItemsChecked(listItems)
-                                ? themeBody[themeProvider.themeDataName]![
-                                    'todoPercentageDone']
-                                : themeBody[themeProvider.themeDataName]![
-                                    'todoPercentage'],
                           ),
                         ),
                       ),
@@ -112,6 +123,18 @@ class TodoListExpandable extends StatelessWidget {
         }));
   }
 
+  String _getTaskProgressString(Map listItems) {
+    if (listItems.isEmpty) return '';
+    int len = listItems.values.length;
+    int ticked = 0;
+    for (Map item in listItems.values) {
+      if (item['itemTicked']) {
+        ticked++;
+      }
+    }
+    return '$ticked / $len';
+  }
+
   double _getTaskProgress(Map listItems) {
     if (listItems.isEmpty) return 0;
     int len = listItems.values.length;
@@ -121,7 +144,7 @@ class TodoListExpandable extends StatelessWidget {
         ticked++;
       }
     }
-    return ticked / len;
+    return len == 0 ? 0 : ticked / len;
   }
 
   bool _areAllItemsChecked(Map listItems) {
@@ -467,7 +490,8 @@ class TodoListExpandable extends StatelessWidget {
     );
   }
 
-  void _showEditTodoListDialog(BuildContext context, String oldTodoListName) {
+  void _showEditTodoListDialog(
+      BuildContext context, String oldTodoListName, bool showProgressBar) {
     TextEditingController controller = TextEditingController();
     final ThemeProvider themeProvider = ThemeProvider();
 
@@ -484,7 +508,9 @@ class TodoListExpandable extends StatelessWidget {
                   'dialogOnSurface']!, // Change this color to your desired color
             ),
           ),
-          content: Column(
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -502,8 +528,24 @@ class TodoListExpandable extends StatelessWidget {
                   ),
                 ),
               ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Checkbox(
+                    value: showProgressBar,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        showProgressBar = !showProgressBar;
+                        context.read<TodoList>().toggleProgressionBar(
+                            oldTodoListName, showProgressBar);
+                      });
+                    },
+                  ),
+                  const Text('Show Progress Bar')
+                ],
+              )
             ],
-          ),
+          );}),
           actions: [
             TextButton(
               onPressed: () {
@@ -523,9 +565,12 @@ class TodoListExpandable extends StatelessWidget {
                 if (newListName.isNotEmpty) {
                   context
                       .read<TodoList>()
-                      .editTodoList(newListName, oldTodoListName);
+                      .editTodoList(newListName, oldTodoListName, showProgressBar);
                   Navigator.of(context).pop();
                 }
+                context.read<TodoList>().editTodoList(
+                    newListName, oldTodoListName, showProgressBar);
+                Navigator.of(context).pop();
               },
               child: Text(
                 'Edit',

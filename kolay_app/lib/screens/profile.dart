@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:kolay_app/screens/log_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kolay_app/providers/theme_provider.dart';
+import 'package:kolay_app/service/encryption_service.dart';
 import 'package:provider/provider.dart';
+import 'package:kolay_app/service/firestore_service.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -16,6 +18,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final EncryptionService _encryptionService = EncryptionService();
   late String email = '';
   late String name = '';
   late String photoURL = '';
@@ -37,10 +40,10 @@ class _ProfilePageState extends State<ProfilePage> {
         Map<String, dynamic> userData = snapshot.data()!;
 
         setState(() {
-          email = userData['email'];
-          name = userData['name'];
+          email = _encryptionService.decryptText(userData['email']);
+          name = _encryptionService.decryptText(userData['name']);
           photoURL = userData['photoURL'];
-          phone = userData['phoneNumber'];
+          phone = _encryptionService.decryptText(userData['phoneNumber']);
         });
       }
     }
@@ -142,6 +145,9 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                               TextButton(
                                 onPressed: () {
+                                  FireStoreService fireStoreService =
+                                      FireStoreService();
+                                  fireStoreService.deleteUserToken();
                                   FirebaseAuth.instance.signOut();
                                   Navigator.pushAndRemoveUntil(
                                       context,

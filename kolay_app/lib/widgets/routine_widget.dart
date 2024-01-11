@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kolay_app/providers/theme_provider.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
 import '../providers/routine_provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -64,7 +65,8 @@ class RoutineWidget extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: ListTile(
+                  child: Column(children: [
+                    ListTile(
                       trailing: SizedBox(
                           width: 96,
                           child: Row(
@@ -99,7 +101,20 @@ class RoutineWidget extends StatelessWidget {
                                 : themeBody[themeProvider.themeDataName]![
                                     'routineSubtitle'],
                             fontSize: 12),
-                      )))));
+                      ),
+                    ),
+                    LinearPercentIndicator(
+                      width: 210.0,
+                      lineHeight: 10.0,
+                      animation: true,
+                      percent: frequency == 0 ? 0 : currentProgress / frequency,
+                      barRadius: const Radius.circular(10),
+                      backgroundColor: Colors.grey,
+                      progressColor: themeBody[themeProvider.themeDataName]![
+                          'todoPercentage'],
+                    ),
+                    const Padding(padding: EdgeInsets.all(10.0)),
+                  ]))));
     });
   }
 

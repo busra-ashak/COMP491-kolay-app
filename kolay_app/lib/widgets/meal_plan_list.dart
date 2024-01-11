@@ -486,9 +486,10 @@ class MealPlanWidget extends StatelessWidget {
               child: Text(
                 'Add to existing',
                 style: TextStyle(
-                  color: themeBody[themeProvider.themeDataName]![
-                      'dialogOnSurface']!, // Change this color to your desired color
-                ),
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogOnSurface']!,
+                    fontSize: 12 // Change this color to your desired color
+                    ),
               ),
             ),
             TextButton(
@@ -499,9 +500,10 @@ class MealPlanWidget extends StatelessWidget {
               child: Text(
                 'Create a new one',
                 style: TextStyle(
-                  color: themeBody[themeProvider.themeDataName]![
-                      'dialogOnSurface']!, // Change this color to your desired color
-                ),
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogOnSurface']!,
+                    fontSize: 12 // // Change this color to your desired color
+                    ),
               ),
             ),
           ],
