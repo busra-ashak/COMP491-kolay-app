@@ -61,7 +61,49 @@ exports.dailyNotification = onSchedule('0 9 * * *', async (event) => {
         }
       }));
 
-      message_text += `${counter} shopping lists for user ${doc.id}. `;
+      message_text += `${counter} shopping list(s),\n`;
+
+      const mealPlans = await db.collection("USERS").doc(doc.id).collection('mealPlans').get();
+      counter = 0;
+
+      await Promise.all(mealPlans.docs.map(async (mealDoc) => {
+        const timestamp = mealDoc.data().datetime;
+        const date = timestamp.toDate();
+        const mealPlanDate = date.toLocaleDateString('tr-TR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+        });
+
+        if (formattedDate.localeCompare(mealPlanDate) === 0) {
+          counter++;
+        }
+      }));
+
+      message_text += `${counter} meal plan(s),\n`;
+
+      const routines = await db.collection("USERS").doc(doc.id).collection('routines').get();
+
+      let daily_counter = 0;
+      let weekly_counter = 0;
+
+      await Promise.all(routines.docs.map(async (routine) => {
+        const progress = routine.data().currentProgress;
+        const freq = routine.data().frequency;
+        const left = freq-progress;
+        const repeat = routine.data().frequencyMeasure;
+
+        if (left !== 0 && repeat === "day") {
+          daily_counter++;
+        }
+        if (left !== 0 && repeat === "week") {
+          weekly_counter++;
+        }
+      }));
+
+      message_text += `${daily_counter} routine(s) for the day,\n`;
+      message_text += `${weekly_counter} routine(s) for the week.`;
+
 
       const message = {
         notification: { title: 'Todays Plan', body: message_text },
