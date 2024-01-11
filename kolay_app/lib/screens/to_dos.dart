@@ -202,20 +202,37 @@ class ToDosPageState extends State<ToDosPage> {
 
   void _showCreateTodoListDialog(BuildContext context) {
     TextEditingController controller = TextEditingController();
-
+    final ThemeProvider themeProvider = ThemeProvider();
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Create a new to-do list'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Create a new to-do list',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextField(
                 controller: controller,
-                decoration: const InputDecoration(
-                    labelText: 'The name of your to-do list'),
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!,
+                ),
+                decoration: InputDecoration(
+                  labelText: 'The name of your to-do list',
+                  labelStyle: TextStyle(
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogPrimary']!,
+                  ),
+                ),
               ),
             ],
           ),
@@ -224,7 +241,13 @@ class ToDosPageState extends State<ToDosPage> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -234,7 +257,13 @@ class ToDosPageState extends State<ToDosPage> {
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Create'),
+              child: Text(
+                'Create',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
@@ -246,24 +275,46 @@ class ToDosPageState extends State<ToDosPage> {
     TextEditingController nameController = TextEditingController();
     TextEditingController dropdownController = TextEditingController();
     TextEditingController frequencyController = TextEditingController();
+    final ThemeProvider themeProvider = ThemeProvider();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Create a new routine'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Create a new routine',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           content: SizedBox(
             height: 150,
             child: Column(children: [
               Row(
                 children: [
-                  const Text("I will "),
+                  Text(
+                    "I will ",
+                    style: TextStyle(
+                      color: themeBody[themeProvider.themeDataName]![
+                          'dialogPrimary']!, // Change this color to your desired color
+                    ),
+                  ),
                   Expanded(
                       child: TextField(
+                    style: TextStyle(
+                        color: themeBody[themeProvider.themeDataName]![
+                            'dialogOnSurface']!),
                     controller: nameController,
-                    decoration: const InputDecoration(
-                        hintText: 'the name of your routine',
-                        hintStyle: TextStyle(fontSize: 12)),
+                    decoration: InputDecoration(
+                      hintText: '      the name of your routine',
+                      hintStyle: TextStyle(
+                          fontSize: 12,
+                          color: themeBody[themeProvider.themeDataName]![
+                              'dialogOnSurface']!),
+                    ),
                   )),
                 ],
               ),
@@ -271,18 +322,31 @@ class ToDosPageState extends State<ToDosPage> {
                 children: [
                   Expanded(
                       child: TextField(
+                    style: TextStyle(
+                        color: themeBody[themeProvider.themeDataName]![
+                            'dialogOnSurface']!),
                     controller: frequencyController,
                     keyboardType: TextInputType.number,
                     inputFormatters: <TextInputFormatter>[
                       FilteringTextInputFormatter.digitsOnly
                     ],
                   )),
-                  const Text(" time(s) a "),
+                  Text(
+                    " time(s) a ",
+                    style: TextStyle(
+                      color: themeBody[themeProvider.themeDataName]![
+                          'dialogPrimary']!, // Change this color to your desired color
+                    ),
+                  ),
                   DropdownMenu<FrequencyMeasure>(
                     width: 100,
                     initialSelection: FrequencyMeasure.daily,
                     controller: dropdownController,
                     requestFocusOnTap: false,
+                    textStyle: TextStyle(
+                      color: themeBody[themeProvider.themeDataName]![
+                          'dialogOnSurface']!,
+                    ),
                     dropdownMenuEntries: FrequencyMeasure.values
                         .map<DropdownMenuEntry<FrequencyMeasure>>(
                             (FrequencyMeasure measure) {
@@ -301,7 +365,13 @@ class ToDosPageState extends State<ToDosPage> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -314,7 +384,13 @@ class ToDosPageState extends State<ToDosPage> {
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Create'),
+              child: Text(
+                'Create',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
@@ -325,20 +401,38 @@ class ToDosPageState extends State<ToDosPage> {
   void _showCreateReminderListDialog(BuildContext context) {
     TextEditingController controller = TextEditingController();
     DateTime selectedDate = DateTime.now();
+    final ThemeProvider themeProvider = ThemeProvider();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Create a new reminder list'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Create a new reminder list',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextField(
                 controller: controller,
-                decoration: const InputDecoration(
-                    labelText: 'The name of your reminder list'),
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!,
+                ),
+                decoration: InputDecoration(
+                  labelText: 'The name of your reminder list',
+                  labelStyle: TextStyle(
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogPrimary']!,
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
@@ -354,7 +448,13 @@ class ToDosPageState extends State<ToDosPage> {
                     selectedDate = pickedDate;
                   }
                 },
-                child: const Text('Pick Date'),
+                child: Text(
+                  'Pick Date',
+                  style: TextStyle(
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogOnWhiteSurface']!, // Change this color to your desired color
+                  ),
+                ),
               ),
             ],
           ),
@@ -363,7 +463,13 @@ class ToDosPageState extends State<ToDosPage> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -375,7 +481,13 @@ class ToDosPageState extends State<ToDosPage> {
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Create'),
+              child: Text(
+                'Create',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
@@ -389,6 +501,7 @@ class ToDosPageState extends State<ToDosPage> {
     DateTime? firstDate,
     DateTime? lastDate,
   }) async {
+    final ThemeProvider themeProvider = ThemeProvider();
     initialDate ??= DateTime.now();
     firstDate ??= initialDate.subtract(const Duration(days: 365 * 100));
     lastDate ??= firstDate.add(const Duration(days: 365 * 200));
@@ -398,6 +511,21 @@ class ToDosPageState extends State<ToDosPage> {
       initialDate: initialDate,
       firstDate: firstDate,
       lastDate: lastDate,
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: ColorScheme.light(
+                  surface:
+                      themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+                  primary:
+                      themeBody[themeProvider.themeDataName]!['dialogPrimary']!,
+                  onPrimary: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!,
+                  onSurface: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!),
+            ),
+            child: child!);
+      },
     );
 
     if (selectedDate == null) return null;
@@ -407,6 +535,24 @@ class ToDosPageState extends State<ToDosPage> {
     final TimeOfDay? selectedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.fromDateTime(selectedDate),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+            data: Theme.of(context).copyWith(
+              colorScheme: ColorScheme.light(
+                surface:
+                    themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+                primary:
+                    themeBody[themeProvider.themeDataName]!['dialogPrimary']!,
+                onPrimary:
+                    themeBody[themeProvider.themeDataName]!['dialogOnSurface']!,
+                onSurface:
+                    themeBody[themeProvider.themeDataName]!['dialogOnSurface']!,
+                tertiaryContainer:
+                    themeBody[themeProvider.themeDataName]!['dialogPrimary']!,
+              ),
+            ),
+            child: child!);
+      },
     );
 
     return selectedTime == null

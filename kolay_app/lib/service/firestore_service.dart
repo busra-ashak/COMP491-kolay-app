@@ -294,9 +294,10 @@ class FireStoreService {
   Future createTodoList(String listName) async {
     String? uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
-      await _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(_encryptionService.encryptText(listName)).set(
+      String encryptedListName = _encryptionService.encryptText(listName);
+      await _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(encryptedListName).set(
         {
-        "listName": listName,
+        "listName": encryptedListName,
         "listItems": {},
         'showProgressBar': true,
         }

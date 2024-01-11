@@ -72,7 +72,7 @@ class _ProfilePageState extends State<ProfilePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircleAvatar(
-                radius: 75,
+                radius: 60,
                 child: ClipOval(
                   child: photoURL.isNotEmpty
                       ? Image.file(File(photoURL))
@@ -107,20 +107,41 @@ class _ProfilePageState extends State<ProfilePage> {
                       )),
                   ElevatedButton(
                     onPressed: () {
-                      // Add your logout logic here
+                      final ThemeProvider themeProvider = ThemeProvider();
+
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
                           return AlertDialog(
-                            title: const Text('Log out'),
-                            content:
-                                const Text('Are you sure you want to log out?'),
+                            backgroundColor: themeBody[
+                                themeProvider.themeDataName]!['dialogSurface']!,
+                            title: Text(
+                              'Log out',
+                              style: TextStyle(
+                                color: themeBody[themeProvider.themeDataName]![
+                                    'dialogOnSurface']!, // Change this color to your desired color
+                              ),
+                            ),
+                            content: Text(
+                              'Are you sure you want to log out?',
+                              style: TextStyle(
+                                color: themeBody[themeProvider.themeDataName]![
+                                    'dialogOnSurface']!, // Change this color to your desired color
+                              ),
+                            ),
                             actions: [
                               TextButton(
                                 onPressed: () {
                                   Navigator.pop(context);
                                 },
-                                child: const Text('Cancel'),
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    color: themeBody[
+                                            themeProvider.themeDataName]![
+                                        'dialogOnSurface']!, // Change this color to your desired color
+                                  ),
+                                ),
                               ),
                               TextButton(
                                 onPressed: () {
@@ -135,7 +156,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                               const LoginPage()),
                                       (route) => false);
                                 },
-                                child: const Text('Yes'),
+                                child: Text(
+                                  'Yes',
+                                  style: TextStyle(
+                                    color: themeBody[
+                                            themeProvider.themeDataName]![
+                                        'dialogOnSurface']!, // Change this color to your desired color
+                                  ),
+                                ),
                               ),
                             ],
                           );

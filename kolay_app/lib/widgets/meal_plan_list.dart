@@ -25,7 +25,9 @@ class MealPlanWidget extends StatelessWidget {
         child:
             Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
           return Card(
-              color: themeBody[themeProvider.themeDataName]!['expandable'],
+              color: _areAllItemsChecked(listItems)
+                  ? themeBody[themeProvider.themeDataName]!['expandablePale']
+                  : themeBody[themeProvider.themeDataName]!['expandable'],
               margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
               child: ClipRect(
                 child: Consumer<SlidableState>(
@@ -81,11 +83,10 @@ class MealPlanWidget extends StatelessWidget {
                       children: <Widget>[
                         Column(
                           children: _buildExpandableContent(
-                            context,
-                            listName,
-                            listItems,
-                            themeBody[themeProvider.themeDataName]
-                          ),
+                              context,
+                              listName,
+                              listItems,
+                              themeBody[themeProvider.themeDataName]),
                         ),
                       ],
                     ),
@@ -106,8 +107,10 @@ class MealPlanWidget extends StatelessWidget {
             motion: const BehindMotion(),
             children: [
               SlidableAction(
-                onPressed: (context) {_showEditItemInMealDialog(
-                    context, listName, content['itemName']);},
+                onPressed: (context) {
+                  _showEditItemInMealDialog(
+                      context, listName, content['itemName']);
+                },
                 backgroundColor: Colors.green,
                 icon: Icons.edit,
                 label: 'Edit',
@@ -134,7 +137,7 @@ class MealPlanWidget extends StatelessWidget {
                 side: const BorderSide(color: Colors.white, width: 1.5),
                 shape: const CircleBorder(),
                 value: content['itemTicked'],
-                  activeColor: themeObject['tick'],
+                activeColor: themeObject['tick'],
                 onChanged: (bool? val) {
                   context.read<MealPlan>().toggleIngredientCheckbox(
                       listName, content['itemName'], content['itemTicked']);
@@ -155,14 +158,16 @@ class MealPlanWidget extends StatelessWidget {
               onPressed: () => _showAddItemToMealDialog(context, listName),
               child: Text(
                 "Add ingredient",
-                style: TextStyle(color: themeObject['expandableButton'], fontSize: 12),
+                style: TextStyle(
+                    color: themeObject['expandableButton'], fontSize: 12),
               ),
             ),
             ElevatedButton(
               onPressed: () => _showConfirmDialog(context, listName),
-              child:  Text(
+              child: Text(
                 "Create shopping list",
-                style: TextStyle(color: themeObject['expandableButton'], fontSize: 12),
+                style: TextStyle(
+                    color: themeObject['expandableButton'], fontSize: 12),
               ),
             ),
           ],
@@ -175,21 +180,47 @@ class MealPlanWidget extends StatelessWidget {
 
   void _showAddItemToMealDialog(BuildContext context, String listName) {
     TextEditingController controller = TextEditingController();
+    final ThemeProvider themeProvider = ThemeProvider();
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Add a new item to the meal plan'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Add a new item to the meal plan',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           content: TextField(
             controller: controller,
-            decoration: const InputDecoration(labelText: 'New Item'),
+            style: TextStyle(
+              color:
+                  themeBody[themeProvider.themeDataName]!['dialogOnSurface']!,
+            ),
+            decoration: InputDecoration(
+              labelText: 'New Item',
+              labelStyle: TextStyle(
+                color:
+                    themeBody[themeProvider.themeDataName]!['dialogPrimary']!,
+              ),
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -201,7 +232,13 @@ class MealPlanWidget extends StatelessWidget {
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Add'),
+              child: Text(
+                'Add',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
@@ -209,26 +246,46 @@ class MealPlanWidget extends StatelessWidget {
     );
   }
 
-
   void _showDeleteMealPlanDialog(BuildContext context, String mealplanName) {
+    final ThemeProvider themeProvider = ThemeProvider();
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Are you sure you want to delete $mealplanName?'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Are you sure you want to delete $mealplanName?',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('No'),
+              child: Text(
+                'No',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
                 context.read<MealPlan>().deleteMealPlan(mealplanName);
                 Navigator.of(context).pop();
               },
-              child: const Text('Yes'),
+              child: Text(
+                'Yes',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
@@ -238,17 +295,32 @@ class MealPlanWidget extends StatelessWidget {
 
   void _showDeleteItemFromMealPlanDialog(
       BuildContext context, String mealplanName, String oldItem) {
+    final ThemeProvider themeProvider = ThemeProvider();
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Are you sure you want to delete $oldItem?'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Are you sure you want to delete $oldItem?',
+            style: TextStyle(
+              color:
+                  themeBody[themeProvider.themeDataName]!['dialogOnSurface']!,
+            ),
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('No'),
+              child: Text(
+                'No',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!,
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -257,7 +329,13 @@ class MealPlanWidget extends StatelessWidget {
                     .deleteIngredientFromList(mealplanName, oldItem);
                 Navigator.of(context).pop();
               },
-              child: const Text('Yes'),
+              child: Text(
+                'Yes',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
@@ -268,20 +346,38 @@ class MealPlanWidget extends StatelessWidget {
   void _showEditMealPlanDialog(BuildContext context, String oldMealPlanName) {
     TextEditingController nameController = TextEditingController();
     DateTime selectedDate = DateTime.now();
+    final ThemeProvider themeProvider = ThemeProvider();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Edit Meal Plan'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Edit Meal Plan',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(
-                    labelText: 'The name of your Meal Plan'),
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!,
+                ),
+                decoration: InputDecoration(
+                  labelText: 'The name of your Meal Plan',
+                  labelStyle: TextStyle(
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogPrimary']!,
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
@@ -291,13 +387,34 @@ class MealPlanWidget extends StatelessWidget {
                     initialDate: selectedDate,
                     firstDate: DateTime(2000),
                     lastDate: DateTime(2101),
+                    builder: (BuildContext context, Widget? child) {
+                      return Theme(
+                          data: Theme.of(context).copyWith(
+                            colorScheme: ColorScheme.light(
+                                surface: themeBody[themeProvider
+                                    .themeDataName]!['dialogSurface']!,
+                                primary: themeBody[themeProvider
+                                    .themeDataName]!['dialogPrimary']!,
+                                onPrimary: themeBody[themeProvider
+                                    .themeDataName]!['dialogOnSurface']!,
+                                onSurface: themeBody[themeProvider
+                                    .themeDataName]!['dialogOnSurface']!),
+                          ),
+                          child: child!);
+                    },
                   );
 
                   if (pickedDate != null && pickedDate != selectedDate) {
                     selectedDate = pickedDate;
                   }
                 },
-                child: const Text('Pick Date'),
+                child: Text(
+                  'Pick Date',
+                  style: TextStyle(
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogOnWhiteSurface']!, // Change this color to your desired color
+                  ),
+                ),
               ),
             ],
           ),
@@ -306,19 +423,30 @@ class MealPlanWidget extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
                 String newMealPlanName = nameController.text;
                 if (newMealPlanName.isNotEmpty) {
-                  context
-                      .read<MealPlan>()
-                      .editMealPlan(newMealPlanName, selectedDate, oldMealPlanName);
+                  context.read<MealPlan>().editMealPlan(
+                      newMealPlanName, selectedDate, oldMealPlanName);
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Edit'),
+              child: Text(
+                'Edit',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
@@ -327,27 +455,56 @@ class MealPlanWidget extends StatelessWidget {
   }
 
   void _showConfirmDialog(BuildContext context, String mealPlanName) {
+    final ThemeProvider themeProvider = ThemeProvider();
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Add to a Shopping List'),
-          content: const Text(
-              'Do you want to add to an existing shopping list or create a new one?'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Add to a Shopping List',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
+          content: Text(
+            'Do you want to add to an existing shopping list or create a new one?',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 _showAddToListDialog(context, mealPlanName);
               },
-              child: const Text('Add to existing'),
+              child: Text(
+                'Add to existing',
+                style: TextStyle(
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogOnSurface']!,
+                    fontSize: 12 // Change this color to your desired color
+                    ),
+              ),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 _showCreateListDialog(context, mealPlanName);
               },
-              child: const Text('Create a new one'),
+              child: Text(
+                'Create a new one',
+                style: TextStyle(
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogOnSurface']!,
+                    fontSize: 12 // // Change this color to your desired color
+                    ),
+              ),
             ),
           ],
         );
@@ -357,23 +514,47 @@ class MealPlanWidget extends StatelessWidget {
 
   void _showAddToListDialog(BuildContext context, String mealPlanName) {
     TextEditingController controller = TextEditingController();
+    final ThemeProvider themeProvider = ThemeProvider();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Add to a shopping list'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Add to a shopping list',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           content: TextField(
             controller: controller,
-            decoration: const InputDecoration(
-                labelText: 'The name of your shopping list'),
+            style: TextStyle(
+              color:
+                  themeBody[themeProvider.themeDataName]!['dialogOnSurface']!,
+            ),
+            decoration: InputDecoration(
+              labelText: 'The name of your shopping list',
+              labelStyle: TextStyle(
+                color:
+                    themeBody[themeProvider.themeDataName]!['dialogPrimary']!,
+              ),
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -388,7 +569,13 @@ class MealPlanWidget extends StatelessWidget {
                 }
                 Navigator.of(context).pop();
               },
-              child: const Text('Add'),
+              child: Text(
+                'Add',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
@@ -399,20 +586,38 @@ class MealPlanWidget extends StatelessWidget {
   void _showCreateListDialog(BuildContext context, String mealPlanName) {
     TextEditingController controller = TextEditingController();
     DateTime selectedDate = DateTime.now();
+    final ThemeProvider themeProvider = ThemeProvider();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Create a shopping list'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Create a shopping list',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextField(
                 controller: controller,
-                decoration: const InputDecoration(
-                    labelText: 'The name of your Shopping List'),
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!,
+                ),
+                decoration: InputDecoration(
+                  labelText: 'The name of your Shopping List',
+                  labelStyle: TextStyle(
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogPrimary']!,
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
@@ -422,13 +627,34 @@ class MealPlanWidget extends StatelessWidget {
                     initialDate: selectedDate,
                     firstDate: DateTime(2000),
                     lastDate: DateTime(2101),
+                    builder: (BuildContext context, Widget? child) {
+                      return Theme(
+                          data: Theme.of(context).copyWith(
+                            colorScheme: ColorScheme.light(
+                                surface: themeBody[themeProvider
+                                    .themeDataName]!['dialogSurface']!,
+                                primary: themeBody[themeProvider
+                                    .themeDataName]!['dialogPrimary']!,
+                                onPrimary: themeBody[themeProvider
+                                    .themeDataName]!['dialogOnSurface']!,
+                                onSurface: themeBody[themeProvider
+                                    .themeDataName]!['dialogOnSurface']!),
+                          ),
+                          child: child!);
+                    },
                   );
 
                   if (pickedDate != null && pickedDate != selectedDate) {
                     selectedDate = pickedDate;
                   }
                 },
-                child: const Text('Pick Date'),
+                child: Text(
+                  'Pick Date',
+                  style: TextStyle(
+                    color: themeBody[themeProvider.themeDataName]![
+                        'dialogOnWhiteSurface']!, // Change this color to your desired color
+                  ),
+                ),
               ),
             ],
           ),
@@ -437,7 +663,13 @@ class MealPlanWidget extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -451,7 +683,13 @@ class MealPlanWidget extends StatelessWidget {
                 }
                 Navigator.of(context).pop();
               },
-              child: const Text('Create'),
+              child: Text(
+                'Create',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
@@ -459,15 +697,40 @@ class MealPlanWidget extends StatelessWidget {
     );
   }
 
-  void _showEditItemInMealDialog(BuildContext context, String listName, String oldName) {
+  bool _areAllItemsChecked(Map listItems) {
+    if (listItems.isEmpty) return false;
+    for (Map item in listItems.values) {
+      if (!item['itemTicked']) {
+        return false; // At least one item is not checked
+      }
+    }
+    return true; // All items are checked
+  }
+
+  void _showEditItemInMealDialog(
+      BuildContext context, String listName, String oldName) {
     TextEditingController controller = TextEditingController();
+    final ThemeProvider themeProvider = ThemeProvider();
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Edit ingredient in the meal plan'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Edit ingredient in the meal plan',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           content: TextField(
             controller: controller,
+            style: TextStyle(
+              color:
+                  themeBody[themeProvider.themeDataName]!['dialogOnSurface']!,
+            ),
             decoration: const InputDecoration(labelText: 'Edit Item'),
           ),
           actions: [
@@ -475,7 +738,13 @@ class MealPlanWidget extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -487,7 +756,13 @@ class MealPlanWidget extends StatelessWidget {
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Edit'),
+              child: Text(
+                'Edit',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );

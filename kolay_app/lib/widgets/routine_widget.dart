@@ -26,7 +26,9 @@ class RoutineWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
       return Card(
-          color: themeBody[themeProvider.themeDataName]!['expandable'],
+          color: currentProgress == frequency
+              ? themeBody[themeProvider.themeDataName]!['expandablePale']
+              : themeBody[themeProvider.themeDataName]!['expandable'],
           margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
           child: ClipRect(
               child: Slidable(
@@ -93,8 +95,11 @@ class RoutineWidget extends StatelessWidget {
                       subtitle: Text(
                         'Completed $currentProgress out of $frequency time${frequency > 1 ? 's' : ''} for the $frequencyMeasure',
                         style: TextStyle(
-                            color: themeBody[themeProvider.themeDataName]![
-                                'routineSubtitle'],
+                            color: currentProgress == frequency
+                                ? themeBody[themeProvider.themeDataName]![
+                                    'routineSubtitlePale']
+                                : themeBody[themeProvider.themeDataName]![
+                                    'routineSubtitle'],
                             fontSize: 12),
                       ),
                     ),
@@ -114,24 +119,46 @@ class RoutineWidget extends StatelessWidget {
   }
 
   void _showDeleteRoutineDialog(BuildContext context, String routineName) {
+    final ThemeProvider themeProvider = ThemeProvider();
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Are you sure you want to delete $routineName?'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Are you sure you want to delete $routineName?',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('No'),
+              child: Text(
+                'No',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
                 context.read<Routine>().deleteRoutine(routineName);
                 Navigator.of(context).pop();
               },
-              child: const Text('Yes'),
+              child: Text(
+                'Yes',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
@@ -143,24 +170,45 @@ class RoutineWidget extends StatelessWidget {
     TextEditingController nameController = TextEditingController();
     TextEditingController dropdownController = TextEditingController();
     TextEditingController frequencyController = TextEditingController();
+    final ThemeProvider themeProvider = ThemeProvider();
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Edit your routine'),
+          backgroundColor:
+              themeBody[themeProvider.themeDataName]!['dialogSurface']!,
+          title: Text(
+            'Edit your routine',
+            style: TextStyle(
+              color: themeBody[themeProvider.themeDataName]![
+                  'dialogOnSurface']!, // Change this color to your desired color
+            ),
+          ),
           content: SizedBox(
             height: 150,
             child: Column(children: [
               Row(
                 children: [
-                  const Text("I will "),
+                  Text(
+                    "I will ",
+                    style: TextStyle(
+                      color: themeBody[themeProvider.themeDataName]![
+                          'dialogPrimary']!, // Change this color to your desired color
+                    ),
+                  ),
                   Expanded(
                       child: TextField(
+                    style: TextStyle(
+                        color: themeBody[themeProvider.themeDataName]![
+                            'dialogOnSurface']!),
                     controller: nameController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                         hintText: 'the name of your routine',
-                        hintStyle: TextStyle(fontSize: 12)),
+                        hintStyle: TextStyle(
+                            fontSize: 12,
+                            color: themeBody[themeProvider.themeDataName]![
+                                'dialogOnSurface']!)),
                   )),
                 ],
               ),
@@ -174,12 +222,22 @@ class RoutineWidget extends StatelessWidget {
                       FilteringTextInputFormatter.digitsOnly
                     ],
                   )),
-                  const Text(" time(s) a "),
+                  Text(
+                    " time(s) a ",
+                    style: TextStyle(
+                      color: themeBody[themeProvider.themeDataName]![
+                          'dialogPrimary']!, // Change this color to your desired color
+                    ),
+                  ),
                   DropdownMenu<FrequencyMeasure>(
                     width: 100,
                     initialSelection: FrequencyMeasure.daily,
                     controller: dropdownController,
                     requestFocusOnTap: false,
+                    textStyle: TextStyle(
+                      color: themeBody[themeProvider.themeDataName]![
+                          'dialogOnSurface']!,
+                    ),
                     dropdownMenuEntries: FrequencyMeasure.values
                         .map<DropdownMenuEntry<FrequencyMeasure>>(
                             (FrequencyMeasure measure) {
@@ -198,7 +256,13 @@ class RoutineWidget extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -211,7 +275,13 @@ class RoutineWidget extends StatelessWidget {
                   Navigator.of(context).pop();
                 }
               },
-              child: const Text('Create'),
+              child: Text(
+                'Create',
+                style: TextStyle(
+                  color: themeBody[themeProvider.themeDataName]![
+                      'dialogOnSurface']!, // Change this color to your desired color
+                ),
+              ),
             ),
           ],
         );
