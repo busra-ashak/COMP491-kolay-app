@@ -39,6 +39,13 @@ class FirebaseAuthService {
     try {
       UserCredential credential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
+      _firebaseMessaging.getToken();
+      final fCMToken = await _firebaseMessaging.getToken();
+
+      _firestore.collection('USERS').doc(_credential.user!.uid).update({
+        'token': fCMToken,
+      });
+
       return credential.user;
     } catch (e) {
       print("Some error occured");
