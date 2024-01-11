@@ -339,7 +339,7 @@ class FireStoreService {
         await _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(encryptedOldListName).delete();
         await _fireStoreService.collection('USERS').doc(uid).collection('todoLists').doc(encryptedListName).set(
             {
-              "listName": listName,
+              "listName": encryptedListName,
               "listItems": items,
               'showProgressBar': showProgressBar,
             }
