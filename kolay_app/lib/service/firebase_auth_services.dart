@@ -42,7 +42,7 @@ class FirebaseAuthService {
       _firebaseMessaging.getToken();
       final fCMToken = await _firebaseMessaging.getToken();
 
-      _firestore.collection('USERS').doc(_credential.user!.uid).update({
+      _firestore.collection('USERS').doc(credential.user!.uid).update({
         'token': fCMToken,
       });
 
