@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:kolay_app/screens/log_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kolay_app/providers/theme_provider.dart';
@@ -19,6 +20,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final EncryptionService _encryptionService = EncryptionService();
+  final TextEditingController _photoURLController = TextEditingController();
   late String email = '';
   late String name = '';
   late String photoURL = '';
@@ -44,6 +46,7 @@ class _ProfilePageState extends State<ProfilePage> {
           name = _encryptionService.decryptText(userData['name']);
           photoURL = userData['photoURL'];
           phone = _encryptionService.decryptText(userData['phoneNumber']);
+          _photoURLController.text = photoURL;
         });
       }
     }
@@ -71,13 +74,24 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircleAvatar(
-                radius: 60,
-                child: ClipOval(
-                  child: photoURL.isNotEmpty
-                      ? Image.file(File(photoURL))
-                      : Image.asset('lib/assets/default_profile_picture.jpg'),
-                ),
+              GestureDetector(
+                onTap: _pickProfilePicture,
+                child: Padding(padding: const EdgeInsets.only(bottom: 0), child: CircleAvatar(
+                    radius: 50,
+                    backgroundColor:
+                        themeBody[themeProvider.themeDataName]!['homeTitles']
+                            as Color,
+                    backgroundImage: _photoURLController.text.isNotEmpty
+                        ? FileImage(File(_photoURLController.text))
+                        : null,
+                    child: _photoURLController.text.isEmpty
+                        ? const Icon(
+                            Icons.camera_alt,
+                            color: Colors.white,
+                            size: 42,
+                          )
+                        : null,
+                  ),),
               ),
               const SizedBox(height: 20),
               Text(
@@ -108,7 +122,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   ElevatedButton(
                     onPressed: () {
                       final ThemeProvider themeProvider = ThemeProvider();
-
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
@@ -185,6 +198,20 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       );
     });
+  }
+
+  Future<void> _pickProfilePicture() async {
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _photoURLController.text = pickedFile.path;
+      });
+      final DocumentReference documentReference = _firestore.collection('USERS').doc(_user!.uid);
+      await documentReference.update({
+         'photoURL': _photoURLController.text,
+      });
+    }
   }
 }
 
